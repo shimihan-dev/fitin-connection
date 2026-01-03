@@ -1,0 +1,163 @@
+import { motion } from 'motion/react';
+import { Dumbbell, Calendar, Heart, TrendingUp, Sparkles, Users } from 'lucide-react';
+import { ImageWithFallback } from './figma/ImageWithFallback';
+import { Card } from './ui/card';
+
+type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress';
+
+interface HomeProps {
+  onNavigate: (page: Page) => void;
+  user: { name: string; email: string } | null;
+}
+
+export function Home({ onNavigate, user }: HomeProps) {
+  const features = [
+    {
+      icon: Dumbbell,
+      title: '초보자 운동 가이드',
+      description: '진입장벽 낮은 운동부터 시작하세요',
+      page: 'workout' as Page,
+      color: 'from-blue-500 to-blue-600',
+    },
+    {
+      icon: Calendar,
+      title: '맞춤 루틴',
+      description: '나만의 운동 스케줄 만들기',
+      page: 'routine' as Page,
+      color: 'from-green-500 to-green-600',
+    },
+    {
+      icon: Heart,
+      title: '건강한 라이프스타일',
+      description: '영양, 수면, 멘탈 케어 팁',
+      page: 'lifestyle' as Page,
+      color: 'from-pink-500 to-pink-600',
+    },
+    {
+      icon: TrendingUp,
+      title: '진척도 추적',
+      description: '내 성장을 한눈에 확인하기',
+      page: 'progress' as Page,
+      color: 'from-purple-500 to-purple-600',
+    },
+  ];
+
+  return (
+    <div className="p-6 space-y-8">
+      {/* Welcome Message for Logged In Users */}
+      {user && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-gradient-to-r from-blue-500 to-green-500 rounded-2xl p-6 text-white shadow-lg"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+              <span className="text-2xl">👋</span>
+            </div>
+            <div>
+              <h2 className="text-xl">환영합니다, {user.name}님!</h2>
+              <p className="text-sm text-white/90">오늘도 건강한 하루를 만들어가세요 💪</p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Hero Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-center space-y-4 py-8"
+      >
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <Sparkles className="w-8 h-8 text-yellow-500" />
+          <h1 className="text-3xl md:text-4xl bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+            IGC 피트니스 가이드
+          </h1>
+          <Sparkles className="w-8 h-8 text-yellow-500" />
+        </div>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          건강한 대학생활을 위한 모든 것<br />
+          운동 초보자도 쉽게 시작할 수 있는 맞춤형 가이드
+        </p>
+        
+        <div className="flex items-center justify-center gap-2 pt-2">
+          <Users className="w-5 h-5 text-blue-600" />
+          <span className="text-sm text-gray-600">IGC 글로벌캠퍼스 5개 대학 전용</span>
+        </div>
+      </motion.div>
+
+      {/* Hero Image */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="relative rounded-2xl overflow-hidden shadow-xl"
+      >
+        <ImageWithFallback
+          src="https://images.unsplash.com/photo-1612073584622-335da5fadd8a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2xsZWdlJTIwc3R1ZGVudCUyMHdvcmtvdXQlMjBneW18ZW58MXx8fHwxNzY2NTU3OTAxfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+          alt="College students working out"
+          className="w-full h-64 md:h-96 object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end">
+          <div className="p-6 text-white">
+            <h2 className="text-2xl mb-2">당신의 건강한 변화, 지금 시작하세요</h2>
+            <p className="text-sm text-gray-200">2030세대를 위한 피트니스 라이프스타일 플랫폼</p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Feature Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {features.map((feature, index) => {
+          const Icon = feature.icon;
+          return (
+            <motion.div
+              key={feature.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+            >
+              <Card
+                className="p-6 cursor-pointer hover:shadow-lg transition-all border-2 hover:border-blue-300 group"
+                onClick={() => onNavigate(feature.page)}
+              >
+                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <Icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="mb-2">{feature.title}</h3>
+                <p className="text-sm text-gray-600">{feature.description}</p>
+              </Card>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Quick Stats */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.7 }}
+        className="bg-gradient-to-r from-blue-600 to-green-600 rounded-2xl p-6 text-white"
+      >
+        <h3 className="text-center mb-6">시작하기 전에 알아두세요</h3>
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <p className="text-3xl mb-1">20분</p>
+            <p className="text-sm text-blue-100">하루 최소 운동</p>
+          </div>
+          <div>
+            <p className="text-3xl mb-1">3회</p>
+            <p className="text-sm text-blue-100">주당 권장 횟수</p>
+          </div>
+          <div>
+            <p className="text-3xl mb-1">100%</p>
+            <p className="text-sm text-blue-100">초보자 친화적</p>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
