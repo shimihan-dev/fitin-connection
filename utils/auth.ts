@@ -199,12 +199,33 @@ export async function requestPasswordReset(email: string): Promise<{ success: bo
             return { success: false, error: '인증 코드 발송에 실패했습니다.' };
         }
 
-        // TODO: 실제 이메일 발송 구현
-        // 현재는 콘솔에 출력 (테스트용)
-        console.log('=================================');
-        console.log(`비밀번호 재설정 인증 코드: ${code}`);
-        console.log(`이메일: ${email}`);
-        console.log('=================================');
+        // Vercel API Route를 통해 이메일 발송
+        try {
+            const response = await fetch('/api/send-reset-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email.toLowerCase(), code }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('이메일 발송 에러:', errorData);
+                // 이메일 발송 실패해도 코드는 저장되었으므로 콘솔에 출력 (개발용)
+                console.log('=================================');
+                console.log(`비밀번호 재설정 인증 코드: ${code}`);
+                console.log(`이메일: ${email}`);
+                console.log('=================================');
+            }
+        } catch (emailError) {
+            // 이메일 발송 실패해도 코드는 저장되었으므로 콘솔에 출력 (개발용)
+            console.error('이메일 API 호출 에러:', emailError);
+            console.log('=================================');
+            console.log(`비밀번호 재설정 인증 코드: ${code}`);
+            console.log(`이메일: ${email}`);
+            console.log('=================================');
+        }
 
         return { success: true, error: null };
     } catch (err) {
