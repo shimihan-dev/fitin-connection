@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { supabase } from '../../../utils/supabase/client';
+import { signIn, signUp, isValidEmail } from '../../../utils/auth';
 
 interface HeaderProps {
   user: { name: string; email: string } | null;
@@ -37,19 +37,17 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: loginData.email,
-        password: loginData.password,
-      });
+      const { user: loggedInUser, error } = await signIn(loginData.email, loginData.password);
 
       if (error) {
-        console.error('로그인 에러:', error);
-        alert(`로그인 실패: ${error.message}`);
+        alert(error);
       } else {
         setShowLoginDialog(false);
         setLoginData({ email: '', password: '' });
         // 로그인 성공 시 콜백 호출 (슬라이드 표시)
         onLoginSuccess?.();
+        // 페이지 새로고침으로 상태 반영
+        window.location.reload();
       }
     } catch (error) {
       console.error('로그인 에러:', error);
@@ -72,24 +70,24 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
       return;
     }
 
+    if (!isValidEmail(signupData.email)) {
+      alert('올바른 이메일 형식이 아닙니다.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { user: newUser, error } = await signUp({
         email: signupData.email,
         password: signupData.password,
-        options: {
-          data: {
-            name: signupData.name,
-            university: signupData.university,
-            gender: signupData.gender,
-          },
-        },
+        name: signupData.name,
+        university: signupData.university,
+        gender: signupData.gender,
       });
 
       if (error) {
-        console.error('회원가입 에러:', error);
-        alert(`회원가입 실패: ${error.message}`);
+        alert(error);
       } else {
         alert('회원가입 성공! 이제 로그인해주세요.');
         setShowSignupDialog(false);

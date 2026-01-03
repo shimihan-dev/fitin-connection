@@ -8,7 +8,7 @@ import { Navigation } from './components/Navigation';
 import { Header } from './components/Header';
 import { SignupPage } from './components/SignupPage';
 import { WelcomeSlides } from './components/WelcomeSlides';
-import { supabase } from '../../utils/supabase/client';
+import { getCurrentUser, signOut } from '../../utils/auth';
 
 type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress';
 
@@ -36,33 +36,17 @@ export default function App() {
       setIsSignupPage(true);
     }
 
-    // 현재 로그인된 사용자 확인
+    // 현재 로그인된 사용자 확인 (localStorage에서)
     checkUser();
-
-    // 인증 상태 변경 리스너
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setUser({
-          name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || '사용자',
-          email: session.user.email || '',
-        });
-      } else {
-        setUser(null);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
   }, []);
 
-  const checkUser = async () => {
+  const checkUser = () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
+      const currentUser = getCurrentUser();
+      if (currentUser) {
         setUser({
-          name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || '사용자',
-          email: session.user.email || '',
+          name: currentUser.name || currentUser.email.split('@')[0] || '사용자',
+          email: currentUser.email,
         });
       }
     } catch (error) {
@@ -72,15 +56,10 @@ export default function App() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      setUser(null);
-      alert('로그아웃되었습니다.');
-    } catch (error) {
-      console.error('로그아웃 에러:', error);
-      alert('로그아웃 중 오류가 발생했습니다.');
-    }
+  const handleLogout = () => {
+    signOut();
+    setUser(null);
+    alert('로그아웃되었습니다.');
   };
 
   // 회원가입 페이지인 경우
