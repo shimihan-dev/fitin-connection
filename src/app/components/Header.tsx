@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { signIn, signUp, isValidEmail, User as AuthUser } from '../../../utils/auth';
+import { signIn, signUp, isValidEmail, User as AuthUser, requestPasswordReset, verifyResetCode, resetPassword } from '../../../utils/auth';
 
 interface HeaderProps {
   user: { name: string; email: string } | null;
@@ -17,6 +17,15 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
   const [showSignupDialog, setShowSignupDialog] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // 비밀번호 찾기 관련 상태
+  const [showForgotPasswordDialog, setShowForgotPasswordDialog] = useState(false);
+  const [showVerifyCodeDialog, setShowVerifyCodeDialog] = useState(false);
+  const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetCode, setResetCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
 
   const [loginData, setLoginData] = useState({
     email: '',
@@ -125,6 +134,91 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
 
   const handleAppDownload = () => {
     alert('앱 다운로드 기능은 준비 중입니다!\niOS와 Android 버전이 곧 출시됩니다.');
+  };
+
+  // 비밀번호 찾기 - 1단계: 이메일로 인증 코드 요청
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { success, error } = await requestPasswordReset(resetEmail);
+
+      if (error) {
+        alert(error);
+      } else if (success) {
+        alert('인증 코드가 발송되었습니다.\n이메일을 확인해주세요.\n\n(테스트: 브라우저 콘솔에서 코드를 확인할 수 있습니다)');
+        setShowForgotPasswordDialog(false);
+        setShowVerifyCodeDialog(true);
+      }
+    } catch (error) {
+      console.error('비밀번호 찾기 에러:', error);
+      alert('인증 코드 발송 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 비밀번호 찾기 - 2단계: 인증 코드 확인
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { valid, error } = await verifyResetCode(resetEmail, resetCode);
+
+      if (error) {
+        alert(error);
+      } else if (valid) {
+        setShowVerifyCodeDialog(false);
+        setShowResetPasswordDialog(true);
+      }
+    } catch (error) {
+      console.error('인증 코드 확인 에러:', error);
+      alert('인증 코드 확인 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 비밀번호 찾기 - 3단계: 새 비밀번호 설정
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (newPassword !== newPasswordConfirm) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      alert('비밀번호는 최소 8자 이상이어야 합니다.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { success, error } = await resetPassword(resetEmail, resetCode, newPassword);
+
+      if (error) {
+        alert(error);
+      } else if (success) {
+        alert('비밀번호가 성공적으로 변경되었습니다.\n새 비밀번호로 로그인해주세요.');
+
+        // 상태 초기화
+        setShowResetPasswordDialog(false);
+        setShowLoginDialog(true);
+        setResetEmail('');
+        setResetCode('');
+        setNewPassword('');
+        setNewPasswordConfirm('');
+      }
+    } catch (error) {
+      console.error('비밀번호 재설정 에러:', error);
+      alert('비밀번호 변경 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -307,6 +401,18 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
                 disabled={loading}
               >
                 계정이 없으신가요? 회원가입
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLoginDialog(false);
+                  setShowForgotPasswordDialog(true);
+                  setResetEmail(loginData.email); // 이미 입력한 이메일 전달
+                }}
+                className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
+                disabled={loading}
+              >
+                비밀번호를 잊으셨나요?
               </button>
             </div>
           </form>
@@ -504,6 +610,152 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
                 이미 계정이 있으신가요? 로그인
               </button>
             </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Forgot Password Dialog - Step 1: Email Input */}
+      <Dialog open={showForgotPasswordDialog} onOpenChange={setShowForgotPasswordDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>비밀번호 찾기</DialogTitle>
+            <DialogDescription>
+              가입하신 이메일 주소를 입력해주세요.
+              인증 코드를 발송해드립니다.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="reset-email">이메일</Label>
+              <Input
+                id="reset-email"
+                type="email"
+                placeholder="your@email.com"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700"
+                disabled={loading}
+              >
+                {loading ? '발송 중...' : '인증 코드 발송'}
+              </Button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowForgotPasswordDialog(false);
+                  setShowLoginDialog(true);
+                }}
+                className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                disabled={loading}
+              >
+                로그인으로 돌아가기
+              </button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Verify Code Dialog - Step 2: Code Input */}
+      <Dialog open={showVerifyCodeDialog} onOpenChange={setShowVerifyCodeDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>인증 코드 확인</DialogTitle>
+            <DialogDescription>
+              {resetEmail}로 발송된 6자리 인증 코드를 입력해주세요.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleVerifyCode} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="reset-code">인증 코드</Label>
+              <Input
+                id="reset-code"
+                type="text"
+                placeholder="123456"
+                value={resetCode}
+                onChange={(e) => setResetCode(e.target.value)}
+                required
+                disabled={loading}
+                maxLength={6}
+                className="text-center text-2xl tracking-widest"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700"
+                disabled={loading || resetCode.length !== 6}
+              >
+                {loading ? '확인 중...' : '확인'}
+              </Button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowVerifyCodeDialog(false);
+                  setShowForgotPasswordDialog(true);
+                }}
+                className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                disabled={loading}
+              >
+                인증 코드 다시 받기
+              </button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset Password Dialog - Step 3: New Password */}
+      <Dialog open={showResetPasswordDialog} onOpenChange={setShowResetPasswordDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>새 비밀번호 설정</DialogTitle>
+            <DialogDescription>
+              사용하실 새 비밀번호를 입력해주세요.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleResetPassword} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="new-password">새 비밀번호</Label>
+              <Input
+                id="new-password"
+                type="password"
+                placeholder="••••••••"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                disabled={loading}
+                minLength={8}
+              />
+              <p className="text-xs text-gray-500">최소 8자 이상</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="new-password-confirm">비밀번호 확인</Label>
+              <Input
+                id="new-password-confirm"
+                type="password"
+                placeholder="••••••••"
+                value={newPasswordConfirm}
+                onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                required
+                disabled={loading}
+                minLength={8}
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full bg-green-600 hover:bg-green-700"
+              disabled={loading || newPassword.length < 8}
+            >
+              {loading ? '변경 중...' : '비밀번호 변경'}
+            </Button>
           </form>
         </DialogContent>
       </Dialog>

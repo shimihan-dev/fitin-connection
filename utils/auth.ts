@@ -145,3 +145,146 @@ export function getCurrentUser(): User | null {
 export function isLoggedIn(): boolean {
     return getCurrentUser() !== null;
 }
+
+// ============================================
+// 비밀번호 재설정 관련 함수
+// ============================================
+
+// 6자리 인증 코드 생성
+function generateResetCode(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// 비밀번호 재설정 요청 (인증 코드 발송)
+export async function requestPasswordReset(email: string): Promise<{ success: boolean; error: string | null }> {
+    try {
+        // 이메일 형식 검증
+        if (!isValidEmail(email)) {
+            return { success: false, error: '올바른 이메일 형식이 아닙니다.' };
+        }
+
+        // 사용자 존재 여부 확인
+        const { data: user } = await supabase
+            .from('users')
+            .select('id')
+            .eq('email', email.toLowerCase())
+            .single();
+
+        if (!user) {
+            return { success: false, error: '등록되지 않은 이메일입니다.' };
+        }
+
+        // 기존 미사용 코드 삭제
+        await supabase
+            .from('password_reset_codes')
+            .delete()
+            .eq('email', email.toLowerCase())
+            .eq('used', false);
+
+        // 새 인증 코드 생성
+        const code = generateResetCode();
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10분 후 만료
+
+        // 인증 코드 저장
+        const { error } = await supabase
+            .from('password_reset_codes')
+            .insert({
+                email: email.toLowerCase(),
+                code,
+                expires_at: expiresAt.toISOString(),
+            });
+
+        if (error) {
+            console.error('인증 코드 저장 에러:', error);
+            return { success: false, error: '인증 코드 발송에 실패했습니다.' };
+        }
+
+        // TODO: 실제 이메일 발송 구현
+        // 현재는 콘솔에 출력 (테스트용)
+        console.log('=================================');
+        console.log(`비밀번호 재설정 인증 코드: ${code}`);
+        console.log(`이메일: ${email}`);
+        console.log('=================================');
+
+        return { success: true, error: null };
+    } catch (err) {
+        console.error('비밀번호 재설정 요청 에러:', err);
+        return { success: false, error: '인증 코드 발송 중 오류가 발생했습니다.' };
+    }
+}
+
+// 인증 코드 확인
+export async function verifyResetCode(email: string, code: string): Promise<{ valid: boolean; error: string | null }> {
+    try {
+        const { data: resetCode, error } = await supabase
+            .from('password_reset_codes')
+            .select('*')
+            .eq('email', email.toLowerCase())
+            .eq('code', code)
+            .eq('used', false)
+            .single();
+
+        if (error || !resetCode) {
+            return { valid: false, error: '인증 코드가 올바르지 않습니다.' };
+        }
+
+        // 만료 확인
+        if (new Date(resetCode.expires_at) < new Date()) {
+            return { valid: false, error: '인증 코드가 만료되었습니다. 다시 요청해주세요.' };
+        }
+
+        return { valid: true, error: null };
+    } catch (err) {
+        console.error('인증 코드 확인 에러:', err);
+        return { valid: false, error: '인증 코드 확인 중 오류가 발생했습니다.' };
+    }
+}
+
+// 비밀번호 재설정
+export async function resetPassword(
+    email: string,
+    code: string,
+    newPassword: string
+): Promise<{ success: boolean; error: string | null }> {
+    try {
+        // 비밀번호 길이 검증
+        if (newPassword.length < 8) {
+            return { success: false, error: '비밀번호는 최소 8자 이상이어야 합니다.' };
+        }
+
+        // 인증 코드 다시 확인
+        const { valid, error: verifyError } = await verifyResetCode(email, code);
+        if (!valid) {
+            return { success: false, error: verifyError };
+        }
+
+        // 새 비밀번호 해싱
+        const passwordHash = await hashPassword(newPassword);
+
+        // 비밀번호 업데이트
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({
+                password_hash: passwordHash,
+                updated_at: new Date().toISOString()
+            })
+            .eq('email', email.toLowerCase());
+
+        if (updateError) {
+            console.error('비밀번호 업데이트 에러:', updateError);
+            return { success: false, error: '비밀번호 변경에 실패했습니다.' };
+        }
+
+        // 인증 코드 사용 처리
+        await supabase
+            .from('password_reset_codes')
+            .update({ used: true })
+            .eq('email', email.toLowerCase())
+            .eq('code', code);
+
+        return { success: true, error: null };
+    } catch (err) {
+        console.error('비밀번호 재설정 에러:', err);
+        return { success: false, error: '비밀번호 변경 중 오류가 발생했습니다.' };
+    }
+}
