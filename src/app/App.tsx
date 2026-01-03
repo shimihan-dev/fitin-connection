@@ -7,6 +7,7 @@ import { Progress } from './components/Progress';
 import { Navigation } from './components/Navigation';
 import { Header } from './components/Header';
 import { SignupPage } from './components/SignupPage';
+import { WelcomeSlides } from './components/WelcomeSlides';
 import { supabase } from '../../utils/supabase/client';
 
 type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress';
@@ -16,6 +17,17 @@ export default function App() {
   const [isSignupPage, setIsSignupPage] = useState(false);
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showWelcomeSlides, setShowWelcomeSlides] = useState(false);
+
+  // 로그인 성공 시 슬라이드 표시
+  const handleLoginSuccess = () => {
+    setShowWelcomeSlides(true);
+  };
+
+  // 슬라이드 완료 시 닫기
+  const handleWelcomeSlidesComplete = () => {
+    setShowWelcomeSlides(false);
+  };
 
   useEffect(() => {
     // URL 파라미터 체크해서 회원가입 페이지인지 확인
@@ -95,7 +107,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-      <Header user={user} onLogout={handleLogout} />
+      {/* Welcome Slides - 로그인 성공 시 표시 */}
+      {showWelcomeSlides && (
+        <WelcomeSlides onComplete={handleWelcomeSlidesComplete} />
+      )}
+
+      <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} />
       <div className="max-w-7xl mx-auto pt-16 pb-20">
         {renderPage()}
       </div>

@@ -9,9 +9,10 @@ import { supabase } from '../../../utils/supabase/client';
 interface HeaderProps {
   user: { name: string; email: string } | null;
   onLogout: () => void;
+  onLoginSuccess?: () => void;
 }
 
-export function Header({ user, onLogout }: HeaderProps) {
+export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [showSignupDialog, setShowSignupDialog] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -45,9 +46,10 @@ export function Header({ user, onLogout }: HeaderProps) {
         console.error('로그인 에러:', error);
         alert(`로그인 실패: ${error.message}`);
       } else {
-        alert('로그인 성공!');
         setShowLoginDialog(false);
         setLoginData({ email: '', password: '' });
+        // 로그인 성공 시 콜백 호출 (슬라이드 표시)
+        onLoginSuccess?.();
       }
     } catch (error) {
       console.error('로그인 에러:', error);
@@ -59,7 +61,7 @@ export function Header({ user, onLogout }: HeaderProps) {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (signupData.password !== signupData.passwordConfirm) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
@@ -92,7 +94,7 @@ export function Header({ user, onLogout }: HeaderProps) {
         alert('회원가입 성공! 이제 로그인해주세요.');
         setShowSignupDialog(false);
         setShowLoginDialog(true);
-        
+
         // 폼 초기화
         setSignupData({
           name: '',
@@ -163,13 +165,6 @@ export function Header({ user, onLogout }: HeaderProps) {
                     <LogOut className="w-4 h-4" />
                     로그아웃
                   </Button>
-                  <Button
-                    onClick={handleAppDownload}
-                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
-                  >
-                    <Download className="w-4 h-4" />
-                    앱 다운로드
-                  </Button>
                 </>
               ) : (
                 <>
@@ -188,13 +183,6 @@ export function Header({ user, onLogout }: HeaderProps) {
                   >
                     <UserPlus className="w-4 h-4" />
                     회원가입
-                  </Button>
-                  <Button
-                    onClick={handleAppDownload}
-                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
-                  >
-                    <Download className="w-4 h-4" />
-                    앱 다운로드
                   </Button>
                 </>
               )}
@@ -235,16 +223,6 @@ export function Header({ user, onLogout }: HeaderProps) {
                     <LogOut className="w-4 h-4" />
                     로그아웃
                   </Button>
-                  <Button
-                    onClick={() => {
-                      handleAppDownload();
-                      setShowMobileMenu(false);
-                    }}
-                    className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 flex items-center gap-2"
-                  >
-                    <Download className="w-4 h-4" />
-                    앱 다운로드
-                  </Button>
                 </>
               ) : (
                 <>
@@ -269,16 +247,6 @@ export function Header({ user, onLogout }: HeaderProps) {
                   >
                     <UserPlus className="w-4 h-4" />
                     회원가입
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      handleAppDownload();
-                      setShowMobileMenu(false);
-                    }}
-                    className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 flex items-center gap-2"
-                  >
-                    <Download className="w-4 h-4" />
-                    앱 다운로드
                   </Button>
                 </>
               )}
@@ -326,8 +294,8 @@ export function Header({ user, onLogout }: HeaderProps) {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full bg-blue-600 hover:bg-blue-700"
                 disabled={loading}
               >
