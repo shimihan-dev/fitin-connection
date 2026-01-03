@@ -4,12 +4,12 @@ import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { signIn, signUp, isValidEmail } from '../../../utils/auth';
+import { signIn, signUp, isValidEmail, User as AuthUser } from '../../../utils/auth';
 
 interface HeaderProps {
   user: { name: string; email: string } | null;
   onLogout: () => void;
-  onLoginSuccess?: () => void;
+  onLoginSuccess?: (user: AuthUser) => void;
 }
 
 export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
@@ -41,13 +41,11 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
 
       if (error) {
         alert(error);
-      } else {
+      } else if (loggedInUser) {
         setShowLoginDialog(false);
         setLoginData({ email: '', password: '' });
-        // 로그인 성공 시 콜백 호출 (슬라이드 표시)
-        onLoginSuccess?.();
-        // 페이지 새로고침으로 상태 반영
-        window.location.reload();
+        // 로그인 성공 시 콜백 호출 (사용자 정보 전달)
+        onLoginSuccess?.(loggedInUser);
       }
     } catch (error) {
       console.error('로그인 에러:', error);

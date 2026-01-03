@@ -8,7 +8,7 @@ import { Navigation } from './components/Navigation';
 import { Header } from './components/Header';
 import { SignupPage } from './components/SignupPage';
 import { WelcomeSlides } from './components/WelcomeSlides';
-import { getCurrentUser, signOut } from '../../utils/auth';
+import { getCurrentUser, signOut, User } from '../../utils/auth';
 
 type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress';
 
@@ -19,8 +19,12 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [showWelcomeSlides, setShowWelcomeSlides] = useState(false);
 
-  // 로그인 성공 시 슬라이드 표시
-  const handleLoginSuccess = () => {
+  // 로그인 성공 시 사용자 상태 업데이트 및 슬라이드 표시
+  const handleLoginSuccess = (loggedInUser: User) => {
+    setUser({
+      name: loggedInUser.name || loggedInUser.email.split('@')[0] || '사용자',
+      email: loggedInUser.email,
+    });
     setShowWelcomeSlides(true);
   };
 
