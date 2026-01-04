@@ -100,12 +100,17 @@ export async function signIn(email: string, password: string): Promise<{ user: U
         // 이메일로 사용자 조회
         const { data: user, error } = await supabase
             .from('users')
-            .select('id, email, name, university, gender, created_at, password_hash')
+            .select('id, email, name, university, gender, created_at, password_hash, is_deleted')
             .eq('email', email.toLowerCase())
             .single();
 
         if (error || !user) {
             return { user: null, error: '등록되지 않은 이메일입니다.' };
+        }
+
+        // 삭제된 계정 체크
+        if (user.is_deleted) {
+            return { user: null, error: '탈퇴한 계정입니다.' };
         }
 
         // 비밀번호 검증
@@ -130,6 +135,50 @@ export async function signIn(email: string, password: string): Promise<{ user: U
 // 로그아웃
 export function signOut(): void {
     localStorage.removeItem(USER_STORAGE_KEY);
+}
+
+// 회원 탈퇴 (Soft Delete)
+export async function deleteAccount(email: string, password: string): Promise<{ success: boolean; error: string | null }> {
+    try {
+        // 비밀번호 확인을 위해 사용자 조회
+        const { data: user, error } = await supabase
+            .from('users')
+            .select('id, password_hash')
+            .eq('email', email.toLowerCase())
+            .single();
+
+        if (error || !user) {
+            return { success: false, error: '사용자를 찾을 수 없습니다.' };
+        }
+
+        // 비밀번호 검증
+        const isValid = await verifyPassword(password, user.password_hash);
+        if (!isValid) {
+            return { success: false, error: '비밀번호가 올바르지 않습니다.' };
+        }
+
+        // 소프트 삭제 처리
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({
+                is_deleted: true,
+                deleted_at: new Date().toISOString()
+            })
+            .eq('id', user.id);
+
+        if (updateError) {
+            console.error('회원 탈퇴 에러:', updateError);
+            return { success: false, error: '회원 탈퇴 중 오류가 발생했습니다.' };
+        }
+
+        // 로컬 스토리지에서 세션 삭제
+        signOut();
+
+        return { success: true, error: null };
+    } catch (err) {
+        console.error('회원 탈퇴 에러:', err);
+        return { success: false, error: '회원 탈퇴 중 오류가 발생했습니다.' };
+    }
 }
 
 // 현재 로그인된 사용자 가져오기
