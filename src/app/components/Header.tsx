@@ -47,7 +47,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick }: Header
     gender: '',
     password: '',
     passwordConfirm: '',
-    referralId: '',
+    referrer: '',
   });
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -100,7 +100,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick }: Header
         name: signupData.name,
         university: signupData.university,
         gender: signupData.gender,
-        referralId: signupData.referralId,
+        referrer: signupData.referrer,
       });
 
       if (error) {
@@ -118,7 +118,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick }: Header
           gender: '',
           password: '',
           passwordConfirm: '',
-          referralId: '',
+          referrer: '',
         });
       }
     } catch (error) {
@@ -533,10 +533,10 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick }: Header
               </Label>
               <Input
                 id="signup-referral"
-                name="referralId"
+                name="referrer"
                 type="text"
                 placeholder="추천인의 이메일 또는 ID"
-                value={signupData.referralId}
+                value={signupData.referrer}
                 onChange={handleSignupChange}
                 disabled={loading}
               />
