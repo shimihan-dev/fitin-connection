@@ -18,11 +18,7 @@ export interface SignUpData {
     name: string;
     university?: string;
     gender?: string;
-<<<<<<< HEAD
     referrer?: string;
-=======
-    referralId?: string;
->>>>>>> 4d68bfcdedbe1ceb03d0e4d44a44dd240645fcd6
 }
 
 // 로컬 스토리지 키
@@ -81,11 +77,7 @@ export async function signUp(data: SignUpData): Promise<{ user: User | null; err
                 name: data.name,
                 university: data.university || null,
                 gender: data.gender || null,
-<<<<<<< HEAD
                 referrer: data.referrer || null,
-=======
-                referral_id: data.referralId || null,
->>>>>>> 4d68bfcdedbe1ceb03d0e4d44a44dd240645fcd6
             })
             .select('id, email, name, university, gender, created_at')
             .single();
