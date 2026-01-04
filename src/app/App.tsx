@@ -85,7 +85,7 @@ export default function App() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-        <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} />
+        <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} onSignupClick={() => setIsSignupPage(true)} />
         <div className="max-w-7xl mx-auto pt-16 pb-20">
           <LandingPage onStart={() => setIsSignupPage(true)} />
         </div>

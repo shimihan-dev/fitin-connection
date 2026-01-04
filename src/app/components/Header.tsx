@@ -10,9 +10,10 @@ interface HeaderProps {
   user: { name: string; email: string } | null;
   onLogout: () => void;
   onLoginSuccess?: (user: AuthUser) => void;
+  onSignupClick?: () => void;
 }
 
-export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
+export function Header({ user, onLogout, onLoginSuccess, onSignupClick }: HeaderProps) {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [showSignupDialog, setShowSignupDialog] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -278,7 +279,7 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => setShowSignupDialog(true)}
+                    onClick={() => onSignupClick ? onSignupClick() : setShowSignupDialog(true)}
                     className="flex items-center gap-2"
                   >
                     <UserPlus className="w-4 h-4" />
@@ -340,7 +341,11 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
                   <Button
                     variant="ghost"
                     onClick={() => {
-                      setShowSignupDialog(true);
+                      if (onSignupClick) {
+                        onSignupClick();
+                      } else {
+                        setShowSignupDialog(true);
+                      }
                       setShowMobileMenu(false);
                     }}
                     className="w-full justify-start flex items-center gap-2"
