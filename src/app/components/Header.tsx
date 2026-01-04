@@ -39,6 +39,7 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
     gender: '',
     password: '',
     passwordConfirm: '',
+    referralId: '',
   });
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -91,6 +92,7 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
         name: signupData.name,
         university: signupData.university,
         gender: signupData.gender,
+        referralId: signupData.referralId,
       });
 
       if (error) {
@@ -108,6 +110,7 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
           gender: '',
           password: '',
           passwordConfirm: '',
+          referralId: '',
         });
       }
     } catch (error) {
@@ -509,6 +512,23 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
                 <option value="ghent">Ghent University (겐트대학교)</option>
                 <option value="gmu">George Mason University (조지메이슨)</option>
               </select>
+            </div>
+
+            {/* 추천인 ID */}
+            <div className="space-y-2">
+              <Label htmlFor="signup-referral">
+                추천인 ID <span className="text-gray-400">(선택)</span>
+              </Label>
+              <Input
+                id="signup-referral"
+                name="referralId"
+                type="text"
+                placeholder="추천인의 이메일 또는 ID"
+                value={signupData.referralId}
+                onChange={handleSignupChange}
+                disabled={loading}
+              />
+              <p className="text-xs text-gray-500">추천인이 있다면 입력해주세요</p>
             </div>
 
             {/* 비밀번호 */}
