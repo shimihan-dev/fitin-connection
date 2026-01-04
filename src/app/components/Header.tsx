@@ -31,6 +31,9 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
   const [showDeleteAccountDialog, setShowDeleteAccountDialog] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
 
+  // 계정 메뉴 다이얼로그
+  const [showAccountMenuDialog, setShowAccountMenuDialog] = useState(false);
+
   const [loginData, setLoginData] = useState({
     email: '',
     password: '',
@@ -256,19 +259,11 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
                   </div>
                   <Button
                     variant="outline"
-                    onClick={onLogout}
+                    onClick={() => setShowAccountMenuDialog(true)}
                     className="flex items-center gap-2"
                   >
                     <LogOut className="w-4 h-4" />
                     로그아웃
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => setShowDeleteAccountDialog(true)}
-                    className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <UserMinus className="w-4 h-4" />
-                    회원탈퇴
                   </Button>
                 </>
               ) : (
@@ -320,24 +315,13 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
                   <Button
                     variant="ghost"
                     onClick={() => {
-                      onLogout();
+                      setShowAccountMenuDialog(true);
                       setShowMobileMenu(false);
                     }}
                     className="w-full justify-start flex items-center gap-2"
                   >
                     <LogOut className="w-4 h-4" />
                     로그아웃
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setShowDeleteAccountDialog(true);
-                      setShowMobileMenu(false);
-                    }}
-                    className="w-full justify-start flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <UserMinus className="w-4 h-4" />
-                    회원탈퇴
                   </Button>
                 </>
               ) : (
@@ -871,6 +855,43 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Account Menu Dialog */}
+      <Dialog open={showAccountMenuDialog} onOpenChange={setShowAccountMenuDialog}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>계정 관리</DialogTitle>
+            <DialogDescription>
+              원하시는 작업을 선택해주세요.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-3 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowAccountMenuDialog(false);
+                onLogout();
+              }}
+              className="w-full justify-center flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              로그아웃
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setShowAccountMenuDialog(false);
+                setShowDeleteAccountDialog(true);
+              }}
+              className="w-full justify-center flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              <UserMinus className="w-4 h-4" />
+              회원탈퇴
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </>
