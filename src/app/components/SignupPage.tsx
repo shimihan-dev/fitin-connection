@@ -4,8 +4,15 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card } from './ui/card';
+import { signUp, isValidEmail } from '../../utils/auth';
 
-export function SignupPage() {
+interface SignupPageProps {
+  onClose: () => void;
+  onLoginClick?: () => void;
+}
+
+export function SignupPage({ onClose, onLoginClick }: SignupPageProps) {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -13,19 +20,51 @@ export function SignupPage() {
     gender: '',
     password: '',
     passwordConfirm: '',
+    referrer: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.passwordConfirm) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
     }
-    
-    // 회원가입 로직 (현재는 UI만)
-    alert(`회원가입이 완료되었습니다!\n이름: ${formData.name}\n이메일: ${formData.email}`);
-    window.close();
+
+    if (formData.password.length < 8) {
+      alert('비밀번호는 최소 8자 이상이어야 합니다.');
+      return;
+    }
+
+    if (!isValidEmail(formData.email)) {
+      alert('올바른 이메일 형식이 아닙니다.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { error } = await signUp({
+        email: formData.email,
+        password: formData.password,
+        name: formData.name,
+        university: formData.university,
+        gender: formData.gender,
+        referrer: formData.referrer,
+      });
+
+      if (error) {
+        alert(error);
+      } else {
+        alert('회원가입이 완료되었습니다!\n로그인해주세요.');
+        onClose();
+      }
+    } catch (err) {
+      console.error('Signup Error:', err);
+      alert('회원가입 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -66,6 +105,7 @@ export function SignupPage() {
                   value={formData.name}
                   onChange={handleChange}
                   required
+                  disabled={loading}
                 />
               </div>
 
@@ -81,6 +121,7 @@ export function SignupPage() {
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
+                  disabled={loading}
                 >
                   <option value="">선택하세요</option>
                   <option value="male">남성</option>
@@ -103,6 +144,7 @@ export function SignupPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                disabled={loading}
               />
             </div>
 
@@ -118,6 +160,7 @@ export function SignupPage() {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
+                disabled={loading}
               >
                 <option value="">선택하세요</option>
                 <option value="utah">University of Utah (유타대학교)</option>
@@ -142,6 +185,7 @@ export function SignupPage() {
                 onChange={handleChange}
                 minLength={8}
                 required
+                disabled={loading}
               />
               <p className="text-xs text-gray-500">최소 8자 이상</p>
             </div>
@@ -160,7 +204,27 @@ export function SignupPage() {
                 onChange={handleChange}
                 minLength={8}
                 required
+                disabled={loading}
               />
+            </div>
+
+            {/* 추천인 */}
+            <div className="space-y-2">
+              <Label htmlFor="referrer">
+                추천인 (선택)
+              </Label>
+              <Input
+                id="referrer"
+                name="referrer"
+                type="text"
+                placeholder="추천인의 이름을 입력하세요"
+                value={formData.referrer}
+                onChange={handleChange}
+                disabled={loading}
+              />
+              <p className="text-xs text-gray-500">
+                친구의 소개로 오셨나요? 추천인을 입력해주세요.
+              </p>
             </div>
 
             {/* 약관 동의 */}
@@ -171,6 +235,7 @@ export function SignupPage() {
                   id="terms"
                   required
                   className="mt-1"
+                  disabled={loading}
                 />
                 <label htmlFor="terms" className="text-sm text-gray-700">
                   <span className="text-red-500">*</span> 이용약관 및 개인정보처리방침에 동의합니다.
@@ -181,6 +246,7 @@ export function SignupPage() {
                   type="checkbox"
                   id="marketing"
                   className="mt-1"
+                  disabled={loading}
                 />
                 <label htmlFor="marketing" className="text-sm text-gray-700">
                   (선택) 마케팅 정보 수신에 동의합니다.
@@ -193,8 +259,9 @@ export function SignupPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => window.close()}
+                onClick={onClose}
                 className="flex-1"
+                disabled={loading}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 취소
@@ -202,9 +269,10 @@ export function SignupPage() {
               <Button
                 type="submit"
                 className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
+                disabled={loading}
               >
                 <UserPlus className="w-4 h-4 mr-2" />
-                가입하기
+                {loading ? '가입 중...' : '가입하기'}
               </Button>
             </div>
           </form>
@@ -214,8 +282,10 @@ export function SignupPage() {
             <p className="text-sm text-gray-600">
               이미 계정이 있으신가요?{' '}
               <button
-                onClick={() => window.close()}
+                onClick={onLoginClick}
                 className="text-blue-600 hover:text-blue-700 hover:underline"
+                type="button"
+                disabled={loading}
               >
                 로그인하기
               </button>

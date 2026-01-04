@@ -8,6 +8,7 @@ import { Navigation } from './components/Navigation';
 import { Header } from './components/Header';
 import { SignupPage } from './components/SignupPage';
 import { WelcomeSlides } from './components/WelcomeSlides';
+import { LandingPage } from './components/LandingPage';
 import { getCurrentUser, signOut, User } from '../../utils/auth';
 
 type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress';
@@ -68,7 +69,28 @@ export default function App() {
 
   // 회원가입 페이지인 경우
   if (isSignupPage) {
-    return <SignupPage />;
+    return <SignupPage onClose={() => setIsSignupPage(false)} onLoginClick={() => setIsSignupPage(false)} />;
+  }
+
+  // 로딩 중 표시
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // 로그인하지 않은 경우 랜딩 페이지 표시
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+        <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} />
+        <div className="max-w-7xl mx-auto pt-16 pb-20">
+          <LandingPage onStart={() => setIsSignupPage(true)} />
+        </div>
+      </div>
+    );
   }
 
   const renderPage = () => {
