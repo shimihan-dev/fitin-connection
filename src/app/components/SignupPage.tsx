@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card } from './ui/card';
-import { signUp, isValidEmail } from '../../utils/auth';
+import { signUp, isValidEmail } from '../../../utils/auth';
 
 interface SignupPageProps {
   onClose: () => void;
