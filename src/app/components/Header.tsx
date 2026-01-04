@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Dumbbell, LogIn, UserPlus, Download, Menu, X, User, LogOut } from 'lucide-react';
+import { Dumbbell, LogIn, UserPlus, Download, Menu, X, User, LogOut, UserMinus } from 'lucide-react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { signIn, signUp, isValidEmail, User as AuthUser, requestPasswordReset, verifyResetCode, resetPassword } from '../../../utils/auth';
+import { signIn, signUp, isValidEmail, User as AuthUser, requestPasswordReset, verifyResetCode, resetPassword, deleteAccount } from '../../../utils/auth';
 
 interface HeaderProps {
   user: { name: string; email: string } | null;
@@ -27,6 +27,13 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
   const [newPassword, setNewPassword] = useState('');
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
 
+  // 회원 탈퇴 관련 상태
+  const [showDeleteAccountDialog, setShowDeleteAccountDialog] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+
+  // 계정 메뉴 다이얼로그
+  const [showAccountMenuDialog, setShowAccountMenuDialog] = useState(false);
+
   const [loginData, setLoginData] = useState({
     email: '',
     password: '',
@@ -39,6 +46,7 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
     gender: '',
     password: '',
     passwordConfirm: '',
+    referralId: '',
   });
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -91,6 +99,7 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
         name: signupData.name,
         university: signupData.university,
         gender: signupData.gender,
+        referralId: signupData.referralId,
       });
 
       if (error) {
@@ -108,6 +117,7 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
           gender: '',
           password: '',
           passwordConfirm: '',
+          referralId: '',
         });
       }
     } catch (error) {
@@ -249,7 +259,7 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
                   </div>
                   <Button
                     variant="outline"
-                    onClick={onLogout}
+                    onClick={() => setShowAccountMenuDialog(true)}
                     className="flex items-center gap-2"
                   >
                     <LogOut className="w-4 h-4" />
@@ -305,7 +315,7 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
                   <Button
                     variant="ghost"
                     onClick={() => {
-                      onLogout();
+                      setShowAccountMenuDialog(true);
                       setShowMobileMenu(false);
                     }}
                     className="w-full justify-start flex items-center gap-2"
@@ -509,6 +519,23 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
                 <option value="ghent">Ghent University (겐트대학교)</option>
                 <option value="gmu">George Mason University (조지메이슨)</option>
               </select>
+            </div>
+
+            {/* 추천인 ID */}
+            <div className="space-y-2">
+              <Label htmlFor="signup-referral">
+                추천인 ID <span className="text-gray-400">(선택)</span>
+              </Label>
+              <Input
+                id="signup-referral"
+                name="referralId"
+                type="text"
+                placeholder="추천인의 이메일 또는 ID"
+                value={signupData.referralId}
+                onChange={handleSignupChange}
+                disabled={loading}
+              />
+              <p className="text-xs text-gray-500">추천인이 있다면 입력해주세요</p>
             </div>
 
             {/* 비밀번호 */}
@@ -757,6 +784,114 @@ export function Header({ user, onLogout, onLoginSuccess }: HeaderProps) {
               {loading ? '변경 중...' : '비밀번호 변경'}
             </Button>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Account Dialog */}
+      <Dialog open={showDeleteAccountDialog} onOpenChange={setShowDeleteAccountDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-red-600">회원 탈퇴</DialogTitle>
+            <DialogDescription>
+              정말 탈퇴하시겠습니까? 탈퇴 후에는 로그인이 불가능합니다.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={async (e) => {
+            e.preventDefault();
+            if (!user) return;
+
+            setLoading(true);
+            try {
+              const { success, error } = await deleteAccount(user.email, deletePassword);
+
+              if (error) {
+                alert(error);
+              } else if (success) {
+                alert('회원 탈퇴가 완료되었습니다.\n이용해 주셔서 감사합니다.');
+                setShowDeleteAccountDialog(false);
+                setDeletePassword('');
+                onLogout();
+              }
+            } catch (err) {
+              console.error('회원 탈퇴 에러:', err);
+              alert('회원 탈퇴 중 오류가 발생했습니다.');
+            } finally {
+              setLoading(false);
+            }
+          }} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="delete-password">비밀번호 확인</Label>
+              <Input
+                id="delete-password"
+                type="password"
+                placeholder="현재 비밀번호를 입력하세요"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setShowDeleteAccountDialog(false);
+                  setDeletePassword('');
+                }}
+                className="flex-1"
+                disabled={loading}
+              >
+                취소
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1 bg-red-600 hover:bg-red-700"
+                disabled={loading || !deletePassword}
+              >
+                <UserMinus className="w-4 h-4 mr-2" />
+                {loading ? '탈퇴 중...' : '탈퇴하기'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Account Menu Dialog */}
+      <Dialog open={showAccountMenuDialog} onOpenChange={setShowAccountMenuDialog}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>계정 관리</DialogTitle>
+            <DialogDescription>
+              원하시는 작업을 선택해주세요.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-3 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowAccountMenuDialog(false);
+                onLogout();
+              }}
+              className="w-full justify-center flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              로그아웃
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setShowAccountMenuDialog(false);
+                setShowDeleteAccountDialog(true);
+              }}
+              className="w-full justify-center flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              <UserMinus className="w-4 h-4" />
+              회원탈퇴
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </>
