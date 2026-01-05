@@ -1,4 +1,4 @@
-import { ArrowRight, Dumbbell, Calendar, Heart, TrendingUp, Users } from 'lucide-react';
+import { ArrowRight, Dumbbell, Calendar, Heart, TrendingUp, Users, Utensils } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface LandingPageProps {
@@ -16,20 +16,20 @@ export function LandingPage({ onStart }: LandingPageProps) {
               IGC 학생들을 위한 특별한 혜택
             </span>
           </div>
-          
+
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900">
             건강한 대학생활의<br />
             <span className="text-blue-600">새로운 시작</span>
           </h1>
-          
+
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Fitin Connection과 함께 체계적인 운동, 건강한 식단, 
+            Fitin Connection과 함께 체계적인 운동, 건강한 식단,
             그리고 함께 성장하는 커뮤니티를 경험해보세요.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               onClick={onStart}
               className="text-lg px-8 py-6 rounded-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
             >
@@ -46,36 +46,41 @@ export function LandingPage({ onStart }: LandingPageProps) {
           <h2 className="text-3xl font-bold text-center mb-16">
             모든 서비스가 <span className="text-green-600">준비되어 있습니다</span>
           </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {[
               {
-                icon: <Dumbbell className="w-8 h-8 text-blue-500" />,
+                icon: <Dumbbell className="w-6 h-6 text-blue-500" />,
                 title: "맞춤형 루틴",
                 desc: "나의 목표와 체력에 딱 맞는 운동 계획을 제공합니다."
               },
               {
-                icon: <Calendar className="w-8 h-8 text-green-500" />,
+                icon: <Calendar className="w-6 h-6 text-green-500" />,
                 title: "스마트 플래너",
                 desc: "운동 일정과 컨디션을 체계적으로 관리하세요."
               },
               {
-                icon: <Heart className="w-8 h-8 text-red-500" />,
+                icon: <Heart className="w-6 h-6 text-red-500" />,
                 title: "라이프스타일",
                 desc: "건강한 식단부터 수면 관리까지 케어해드립니다."
               },
               {
-                icon: <TrendingUp className="w-8 h-8 text-purple-500" />,
+                icon: <TrendingUp className="w-6 h-6 text-purple-500" />,
                 title: "성장 기록",
-                desc: "눈뒈 보이는 변화를 그래프로 확인해보세요."
+                desc: "눈에 보이는 변화를 그래프로 확인해보세요."
+              },
+              {
+                icon: <Utensils className="w-6 h-6 text-orange-500" />,
+                title: "식단 관리",
+                desc: "자신만의 식단을 추가하고 관리해보세요."
               }
             ].map((feature, idx) => (
-              <div key={idx} className="group p-8 rounded-2xl bg-gray-50 hover:bg-white border border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-xl transition-all duration-300">
-                <div className="mb-4 p-3 bg-white rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-300 w-fit">
+              <div key={idx} className="group p-6 rounded-2xl bg-gray-50 hover:bg-white border border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-xl transition-all duration-300">
+                <div className="mb-3 p-2 bg-white rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-300 w-fit">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-bold mb-2 text-gray-900">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{feature.desc}</p>
+                <h3 className="text-lg font-bold mb-1 text-gray-900">{feature.title}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{feature.desc}</p>
               </div>
             ))}
           </div>
