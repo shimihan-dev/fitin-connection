@@ -89,7 +89,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
 
       {/* Social Proof / Trust */}
       <section className="py-20 bg-gray-900 text-white px-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')] opacity-10 bg-cover bg-center"></div>
+        <div className="absolute inset-0 bg-[url('https://thebarbell.com/wp-content/uploads/2023/07/cbum-workout-1068x885.png')] opacity-10 bg-cover bg-center"></div>
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <Users className="w-16 h-16 mx-auto mb-6 text-blue-400" />
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
