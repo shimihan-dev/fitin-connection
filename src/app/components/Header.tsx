@@ -39,6 +39,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick }: Header
     email: '',
     password: '',
   });
+  const [rememberMe, setRememberMe] = useState(true);
 
   const [signupData, setSignupData] = useState({
     name: '',
@@ -55,7 +56,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick }: Header
     setLoading(true);
 
     try {
-      const { user: loggedInUser, error } = await signIn(loginData.email, loginData.password);
+      const { user: loggedInUser, error } = await signIn(loginData.email, loginData.password, rememberMe);
 
       if (error) {
         alert(error);
@@ -397,6 +398,19 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick }: Header
                 required
                 disabled={loading}
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded"
+                disabled={loading}
+              />
+              <label htmlFor="rememberMe" className="text-sm text-gray-600">
+                로그인 상태 유지하기
+              </label>
             </div>
             <div className="flex flex-col gap-2">
               <Button

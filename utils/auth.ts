@@ -95,7 +95,7 @@ export async function signUp(data: SignUpData): Promise<{ user: User | null; err
 }
 
 // 로그인
-export async function signIn(email: string, password: string): Promise<{ user: User | null; error: string | null }> {
+export async function signIn(email: string, password: string, rememberMe: boolean = true): Promise<{ user: User | null; error: string | null }> {
     try {
         // 이메일로 사용자 조회
         const { data: user, error } = await supabase
@@ -122,8 +122,9 @@ export async function signIn(email: string, password: string): Promise<{ user: U
         // password_hash 제외한 사용자 정보
         const { password_hash, ...userWithoutPassword } = user;
 
-        // 로컬 스토리지에 세션 저장
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userWithoutPassword));
+        // 로그인 상태 유지 여부에 따라 저장소 선택
+        const storage = rememberMe ? localStorage : sessionStorage;
+        storage.setItem(USER_STORAGE_KEY, JSON.stringify(userWithoutPassword));
 
         return { user: userWithoutPassword as User, error: null };
     } catch (err) {
@@ -135,6 +136,7 @@ export async function signIn(email: string, password: string): Promise<{ user: U
 // 로그아웃
 export function signOut(): void {
     localStorage.removeItem(USER_STORAGE_KEY);
+    sessionStorage.removeItem(USER_STORAGE_KEY);
 }
 
 // 회원 탈퇴 (Soft Delete)
@@ -184,7 +186,11 @@ export async function deleteAccount(email: string, password: string): Promise<{ 
 // 현재 로그인된 사용자 가져오기
 export function getCurrentUser(): User | null {
     try {
-        const userJson = localStorage.getItem(USER_STORAGE_KEY);
+        // localStorage 먼저 확인, 없으면 sessionStorage 확인
+        let userJson = localStorage.getItem(USER_STORAGE_KEY);
+        if (!userJson) {
+            userJson = sessionStorage.getItem(USER_STORAGE_KEY);
+        }
         if (!userJson) return null;
         return JSON.parse(userJson) as User;
     } catch {
