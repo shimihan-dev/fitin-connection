@@ -4,6 +4,7 @@ import { WorkoutGuide } from './components/WorkoutGuide';
 import { RoutinePlanner } from './components/RoutinePlanner';
 import { LifestyleTips } from './components/LifestyleTips';
 import { Progress } from './components/Progress';
+import { Diet } from './components/Diet';
 import { Navigation } from './components/Navigation';
 import { Header } from './components/Header';
 import { SignupPage } from './components/SignupPage';
@@ -11,7 +12,7 @@ import { WelcomeSlides } from './components/WelcomeSlides';
 import { LandingPage } from './components/LandingPage';
 import { getCurrentUser, signOut, User } from '../../utils/auth';
 
-type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress';
+type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress' | 'diet';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -105,6 +106,8 @@ export default function App() {
         return <LifestyleTips user={user} />;
       case 'progress':
         return <Progress user={user} />;
+      case 'diet':
+        return <Diet user={user} />;
       default:
         return <Home onNavigate={setCurrentPage} user={user} />;
     }

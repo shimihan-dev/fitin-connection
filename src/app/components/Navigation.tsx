@@ -1,6 +1,6 @@
-import { Home, Dumbbell, Calendar, Heart, TrendingUp } from 'lucide-react';
+import { Home, Dumbbell, Calendar, Heart, TrendingUp, Utensils } from 'lucide-react';
 
-type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress';
+type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress' | 'diet';
 
 interface NavigationProps {
   currentPage: Page;
@@ -12,6 +12,7 @@ export function Navigation({ currentPage, onNavigate }: NavigationProps) {
     { id: 'home' as Page, icon: Home, label: '홈' },
     { id: 'workout' as Page, icon: Dumbbell, label: '운동' },
     { id: 'routine' as Page, icon: Calendar, label: '루틴' },
+    { id: 'diet' as Page, icon: Utensils, label: '식단' },
     { id: 'lifestyle' as Page, icon: Heart, label: '라이프' },
     { id: 'progress' as Page, icon: TrendingUp, label: '진척도' },
   ];
@@ -23,16 +24,15 @@ export function Navigation({ currentPage, onNavigate }: NavigationProps) {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
-            
+
             return (
               <button
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
-                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all ${
-                  isActive
+                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all ${isActive
                     ? 'text-blue-600'
                     : 'text-gray-600 hover:text-blue-500'
-                }`}
+                  }`}
               >
                 <Icon className={`w-6 h-6 ${isActive ? 'scale-110' : ''} transition-transform`} />
                 <span className="text-xs">{item.label}</span>
