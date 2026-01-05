@@ -1,18 +1,23 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { TrendingUp, Award, Target, Flame, Calendar as CalendarIcon, PlusCircle } from 'lucide-react';
+import { TrendingUp, Award, Target, Flame, Calendar as CalendarIcon, PlusCircle, Trash2, X } from 'lucide-react';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface ProgressProps {
   user: { name: string; email: string } | null;
 }
 
 interface WorkoutLog {
+  id: string;
   date: string;
   minutes: number;
+  type: string;
 }
 
 export function Progress({ user }: ProgressProps) {
@@ -22,6 +27,11 @@ export function Progress({ user }: ProgressProps) {
     return saved ? JSON.parse(saved) : [];
   });
 
+  // 운동 추가 다이얼로그 상태
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [newWorkoutType, setNewWorkoutType] = useState('');
+  const [newWorkoutMinutes, setNewWorkoutMinutes] = useState(30);
+
   useEffect(() => {
     if (user?.email) {
       localStorage.setItem(`workouts_${user.email}`, JSON.stringify(workoutLogs));
@@ -29,12 +39,28 @@ export function Progress({ user }: ProgressProps) {
   }, [workoutLogs, user?.email]);
 
   const handleAddWorkout = () => {
-    const newLog = {
+    if (!newWorkoutType.trim()) {
+      alert('운동 종류를 입력해주세요.');
+      return;
+    }
+
+    const newLog: WorkoutLog = {
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       date: new Date().toISOString(),
-      minutes: 30, // 기본 30분
+      minutes: newWorkoutMinutes,
+      type: newWorkoutType.trim(),
     };
     setWorkoutLogs([...workoutLogs, newLog]);
-    alert('오늘의 운동이 기록되었습니다! (+30분)');
+    setShowAddDialog(false);
+    setNewWorkoutType('');
+    setNewWorkoutMinutes(30);
+    alert(`운동이 기록되었습니다! (${newWorkoutType} +${newWorkoutMinutes}분)`);
+  };
+
+  const handleDeleteWorkout = (id: string) => {
+    if (confirm('이 운동 기록을 삭제하시겠습니까?')) {
+      setWorkoutLogs(workoutLogs.filter(log => log.id !== id));
+    }
   };
 
   // 통계 계산
@@ -44,26 +70,35 @@ export function Progress({ user }: ProgressProps) {
   // 연속 운동일 계산 (단순화)
   const calculateStreak = () => {
     if (workoutLogs.length === 0) return 0;
-    // 실제로는 날짜별 정렬 및 비교가 필요하지만, 데모용으로 간단히 처리
     return workoutLogs.length > 0 ? 1 : 0;
   };
   const currentStreak = calculateStreak();
 
+  // 이번 주 운동 기록 필터링
+  const getThisWeekLogs = () => {
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    const day = now.getDay();
+    const diff = day === 0 ? 6 : day - 1; // 월요일 기준
+    startOfWeek.setDate(now.getDate() - diff);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    return workoutLogs.filter(log => new Date(log.date) >= startOfWeek);
+  };
+
+  const thisWeekLogs = getThisWeekLogs();
+
   // 차트 데이터 생성
   const generateChartData = () => {
     const days = ['월', '화', '수', '목', '금', '토', '일'];
-    const today = new Date().getDay(); // 0(일) ~ 6(토)
-    // 월요일을 0으로 조정 (0:월 ~ 6:일)
+    const today = new Date().getDay();
     const adjustedToday = today === 0 ? 6 : today - 1;
 
     return days.map((day, index) => {
-      // 간단히 오늘 기록한 횟수만큼 그래프에 표시 (실제 날짜 매핑은 생략하고 데모용)
-      // 현재는 "오늘" 기록하면 해당 요일에만 데이터가 쌓이는 것으로 시각화
       let count = 0;
       let mins = 0;
 
       if (index === adjustedToday) {
-        // 오늘 날짜에 해당하는 로그만 집계 (데모 로직)
         const todayLogs = workoutLogs.filter(log => {
           const logDate = new Date(log.date);
           return logDate.toDateString() === new Date().toDateString();
@@ -123,6 +158,9 @@ export function Progress({ user }: ProgressProps) {
     { label: '획득 배지', value: `${unlockedBadges}개`, icon: Award, color: 'text-purple-600' },
   ];
 
+  // 시간 옵션 (10분 단위)
+  const minuteOptions = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120];
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -142,11 +180,11 @@ export function Progress({ user }: ProgressProps) {
             </div>
           </div>
           <Button
-            onClick={handleAddWorkout}
+            onClick={() => setShowAddDialog(true)}
             className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white"
           >
             <PlusCircle className="w-4 h-4 mr-2" />
-            오늘 운동 완료 (+30분)
+            오늘 운동 추가
           </Button>
         </div>
       </motion.div>
@@ -186,7 +224,7 @@ export function Progress({ user }: ProgressProps) {
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="day" stroke="#888" />
-              <YAxis stroke="#888" allowDecimals={false} />
+              <YAxis stroke="#888" allowDecimals={false} domain={[0, 180]} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: 'white',
@@ -194,10 +232,70 @@ export function Progress({ user }: ProgressProps) {
                   borderRadius: '8px',
                 }}
               />
-              <Bar dataKey="workouts" name="운동 횟수" fill="#3b82f6" radius={[8, 8, 0, 0]} />
               <Bar dataKey="minutes" name="운동 시간(분)" fill="#10b981" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
+        </Card>
+      </motion.div>
+
+      {/* This Week's Workout Logs */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        <Card className="p-6">
+          <h3 className="mb-4">이번 주 운동 기록</h3>
+          {thisWeekLogs.length === 0 ? (
+            <p className="text-gray-500 text-center py-4 text-sm">
+              이번 주에 기록된 운동이 없습니다.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {['월', '화', '수', '목', '금', '토', '일'].map((dayName, dayIndex) => {
+                const dayLogs = thisWeekLogs.filter(log => {
+                  const logDay = new Date(log.date).getDay();
+                  const adjustedDay = logDay === 0 ? 6 : logDay - 1;
+                  return adjustedDay === dayIndex;
+                });
+
+                if (dayLogs.length === 0) return null;
+
+                const dayTotal = dayLogs.reduce((sum, log) => sum + log.minutes, 0);
+
+                return (
+                  <div key={dayName} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-gray-700">{dayName}요일</span>
+                      <span className="text-sm text-green-600">총 {dayTotal}분</span>
+                    </div>
+                    <div className="space-y-2 pl-2 border-l-2 border-gray-200">
+                      {dayLogs.map((log) => (
+                        <div
+                          key={log.id}
+                          className="flex items-center justify-between p-2 bg-gray-50 rounded-lg ml-2"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Flame className="w-4 h-4 text-orange-500" />
+                            <span className="text-sm text-gray-800">{log.type}</span>
+                            <span className="text-xs text-gray-500">({log.minutes}분)</span>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteWorkout(log.id)}
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50 h-6 w-6 p-0"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </Card>
       </motion.div>
 
@@ -215,8 +313,8 @@ export function Progress({ user }: ProgressProps) {
               <Card
                 key={achievement.title}
                 className={`p-4 ${achievement.unlocked
-                    ? 'border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-orange-50'
-                    : 'opacity-60 grayscale bg-gray-50'
+                  ? 'border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-orange-50'
+                  : 'opacity-60 grayscale bg-gray-50'
                   }`}
               >
                 <div
@@ -246,6 +344,69 @@ export function Progress({ user }: ProgressProps) {
           })}
         </div>
       </motion.div>
+
+      {/* Add Workout Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>오늘의 운동 추가</DialogTitle>
+            <DialogDescription>
+              완료한 운동을 기록하세요
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <Label htmlFor="workout-type">운동 종류</Label>
+              <Input
+                id="workout-type"
+                placeholder="예: 러닝, 웨이트, 요가, 수영..."
+                value={newWorkoutType}
+                onChange={(e) => setNewWorkoutType(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>운동 시간</Label>
+              <div className="grid grid-cols-4 gap-2">
+                {minuteOptions.map((min) => (
+                  <Button
+                    key={min}
+                    type="button"
+                    variant={newWorkoutMinutes === min ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setNewWorkoutMinutes(min)}
+                    className={newWorkoutMinutes === min ? 'bg-blue-600' : ''}
+                  >
+                    {min}분
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowAddDialog(false);
+                  setNewWorkoutType('');
+                  setNewWorkoutMinutes(30);
+                }}
+                className="flex-1"
+              >
+                취소
+              </Button>
+              <Button
+                onClick={handleAddWorkout}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-green-600"
+              >
+                <PlusCircle className="w-4 h-4 mr-2" />
+                추가하기
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
