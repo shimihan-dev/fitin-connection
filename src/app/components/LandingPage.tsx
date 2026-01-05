@@ -43,11 +43,11 @@ export function LandingPage({ onStart }: LandingPageProps) {
       {/* Features Grid */}
       <section className="bg-white py-20 px-4">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-16">
-            모든 서비스가 <span className="text-green-600">준비되어 있습니다</span>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 md:mb-16 px-2">
+            모든 서비스가 <span className="text-green-600 whitespace-nowrap">준비되어 있습니다</span>
           </h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
             {[
               {
                 icon: <Dumbbell className="w-6 h-6 text-blue-500" />,
@@ -75,12 +75,12 @@ export function LandingPage({ onStart }: LandingPageProps) {
                 desc: "자신만의 식단을 추가하고 관리해보세요."
               }
             ].map((feature, idx) => (
-              <div key={idx} className="group p-6 rounded-2xl bg-gray-50 hover:bg-white border border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-xl transition-all duration-300">
-                <div className="mb-3 p-2 bg-white rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-300 w-fit">
+              <div key={idx} className="group p-4 md:p-6 rounded-2xl bg-gray-50 hover:bg-white border border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-xl transition-all duration-300">
+                <div className="mb-2 md:mb-3 p-2 bg-white rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-300 w-fit">
                   {feature.icon}
                 </div>
-                <h3 className="text-lg font-bold mb-1 text-gray-900">{feature.title}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{feature.desc}</p>
+                <h3 className="text-base md:text-lg font-bold mb-1 text-gray-900">{feature.title}</h3>
+                <p className="text-xs md:text-sm text-gray-600 leading-relaxed">{feature.desc}</p>
               </div>
             ))}
           </div>
