@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Heart, Apple, Moon, Brain, Droplets, Coffee } from 'lucide-react';
+import { Heart, Apple, Moon, Brain, Droplets, Beef } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Card } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -23,14 +23,14 @@ export function LifestyleTips({ user }: LifestyleTipsProps) {
     },
     {
       title: '단백질 섭취',
-      icon: Coffee,
+      icon: Beef,
       tips: [
         '체중 1kg당 1.2-1.6g의 단백질 권장',
         '닭가슴살, 계란, 두부, 그릭요거트 추천',
         '운동 후 30분 이내 단백질 섭취',
         '식물성 단백질도 함께 섭취하기',
       ],
-      color: 'from-brown-500 to-brown-600',
+      color: 'from-amber-600 to-amber-700',
     },
     {
       title: '수분 섭취',

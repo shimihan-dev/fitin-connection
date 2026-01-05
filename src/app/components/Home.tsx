@@ -1,9 +1,9 @@
 import { motion } from 'motion/react';
-import { Dumbbell, Calendar, Heart, TrendingUp, Sparkles, Users } from 'lucide-react';
+import { Dumbbell, Calendar, Heart, TrendingUp, Sparkles, Users, Utensils } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Card } from './ui/card';
 
-type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress';
+type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress' | 'diet';
 
 interface HomeProps {
   onNavigate: (page: Page) => void;
@@ -39,6 +39,13 @@ export function Home({ onNavigate, user }: HomeProps) {
       description: '내 성장을 한눈에 확인하기',
       page: 'progress' as Page,
       color: 'from-purple-500 to-purple-600',
+    },
+    {
+      icon: Utensils,
+      title: '식단 기록',
+      description: '오늘 먹은 음식 기록하기',
+      page: 'diet' as Page,
+      color: 'from-orange-500 to-yellow-500',
     },
   ];
 
@@ -82,7 +89,7 @@ export function Home({ onNavigate, user }: HomeProps) {
           건강한 대학생활을 위한 모든 것<br />
           운동 초보자도 쉽게 시작할 수 있는 맞춤형 가이드
         </p>
-        
+
         <div className="flex items-center justify-center gap-2 pt-2">
           <Users className="w-5 h-5 text-blue-600" />
           <span className="text-sm text-gray-600">IGC 글로벌캠퍼스 5개 대학 전용</span>
