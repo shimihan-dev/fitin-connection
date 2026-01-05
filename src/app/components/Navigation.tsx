@@ -1,6 +1,6 @@
-import { Home, Dumbbell, Calendar, Heart, TrendingUp, Utensils } from 'lucide-react';
+import { Home, Dumbbell, Calendar, Heart, TrendingUp, Utensils, Trophy } from 'lucide-react';
 
-type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress' | 'diet';
+type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress' | 'diet' | 'competition';
 
 interface NavigationProps {
   currentPage: Page;
@@ -11,6 +11,7 @@ export function Navigation({ currentPage, onNavigate }: NavigationProps) {
   const navItems = [
     { id: 'home' as Page, icon: Home, label: '홈' },
     { id: 'workout' as Page, icon: Dumbbell, label: '운동' },
+    { id: 'competition' as Page, icon: Trophy, label: 'SBD대회' },
     { id: 'routine' as Page, icon: Calendar, label: '루틴' },
     { id: 'diet' as Page, icon: Utensils, label: '식단' },
     { id: 'lifestyle' as Page, icon: Heart, label: '라이프' },
@@ -30,8 +31,8 @@ export function Navigation({ currentPage, onNavigate }: NavigationProps) {
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
                 className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all ${isActive
-                    ? 'text-blue-600'
-                    : 'text-gray-600 hover:text-blue-500'
+                  ? 'text-blue-600'
+                  : 'text-gray-600 hover:text-blue-500'
                   }`}
               >
                 <Icon className={`w-6 h-6 ${isActive ? 'scale-110' : ''} transition-transform`} />

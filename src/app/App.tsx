@@ -10,9 +10,10 @@ import { Header } from './components/Header';
 import { SignupPage } from './components/SignupPage';
 import { WelcomeSlides } from './components/WelcomeSlides';
 import { LandingPage } from './components/LandingPage';
+import { CompetitionPage } from './components/Competition/CompetitionPage';
 import { getCurrentUser, signOut, User } from '../../utils/auth';
 
-type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress' | 'diet';
+type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress' | 'diet' | 'competition';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -100,6 +101,8 @@ export default function App() {
         return <Home onNavigate={setCurrentPage} user={user} />;
       case 'workout':
         return <WorkoutGuide user={user} />;
+      case 'competition':
+        return <CompetitionPage user={user} />;
       case 'routine':
         return <RoutinePlanner user={user} />;
       case 'lifestyle':
