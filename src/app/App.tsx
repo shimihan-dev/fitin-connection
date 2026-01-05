@@ -5,6 +5,7 @@ import { RoutinePlanner } from './components/RoutinePlanner';
 import { LifestyleTips } from './components/LifestyleTips';
 import { Progress } from './components/Progress';
 import { Diet } from './components/Diet';
+import { MyPage } from './components/MyPage';
 import { Navigation } from './components/Navigation';
 import { Header } from './components/Header';
 import { SignupPage } from './components/SignupPage';
@@ -18,13 +19,15 @@ type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress' | 'diet' |
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [isSignupPage, setIsSignupPage] = useState(false);
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  const [showMyPage, setShowMyPage] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string; id?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [showWelcomeSlides, setShowWelcomeSlides] = useState(false);
 
   // 로그인 성공 시 사용자 상태 업데이트 및 슬라이드 표시
   const handleLoginSuccess = (loggedInUser: User) => {
     setUser({
+      id: loggedInUser.id,
       name: loggedInUser.name || loggedInUser.email.split('@')[0] || '사용자',
       email: loggedInUser.email,
     });
@@ -52,6 +55,7 @@ export default function App() {
       const currentUser = getCurrentUser();
       if (currentUser) {
         setUser({
+          id: currentUser.id,
           name: currentUser.name || currentUser.email.split('@')[0] || '사용자',
           email: currentUser.email,
         });
@@ -66,6 +70,7 @@ export default function App() {
   const handleLogout = () => {
     signOut();
     setUser(null);
+    setShowMyPage(false);
     alert('로그아웃되었습니다.');
   };
 
@@ -123,11 +128,15 @@ export default function App() {
         <WelcomeSlides onComplete={handleWelcomeSlidesComplete} />
       )}
 
-      <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} />
+      <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} onMyPageClick={() => setShowMyPage(true)} />
       <div className="max-w-7xl mx-auto pt-16 pb-20">
-        {renderPage()}
+        {showMyPage ? (
+          <MyPage user={user} onBack={() => setShowMyPage(false)} />
+        ) : (
+          renderPage()
+        )}
       </div>
-      <Navigation currentPage={currentPage} onNavigate={setCurrentPage} />
+      {!showMyPage && <Navigation currentPage={currentPage} onNavigate={setCurrentPage} />}
     </div>
   );
 }

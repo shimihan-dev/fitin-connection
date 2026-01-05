@@ -11,9 +11,10 @@ interface HeaderProps {
   onLogout: () => void;
   onLoginSuccess?: (user: AuthUser) => void;
   onSignupClick?: () => void;
+  onMyPageClick?: () => void;
 }
 
-export function Header({ user, onLogout, onLoginSuccess, onSignupClick }: HeaderProps) {
+export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPageClick }: HeaderProps) {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [showSignupDialog, setShowSignupDialog] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -39,6 +40,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick }: Header
     email: '',
     password: '',
   });
+  const [rememberMe, setRememberMe] = useState(true);
 
   const [signupData, setSignupData] = useState({
     name: '',
@@ -55,7 +57,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick }: Header
     setLoading(true);
 
     try {
-      const { user: loggedInUser, error } = await signIn(loginData.email, loginData.password);
+      const { user: loggedInUser, error } = await signIn(loginData.email, loginData.password, rememberMe);
 
       if (error) {
         alert(error);
@@ -252,12 +254,15 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick }: Header
             <div className="hidden md:flex items-center gap-3">
               {user ? (
                 <>
-                  <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg">
+                  <button
+                    onClick={() => onMyPageClick?.()}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                  >
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-green-600 flex items-center justify-center">
                       <User className="w-4 h-4 text-white" />
                     </div>
                     <span className="font-medium text-gray-700">{user.name}님</span>
-                  </div>
+                  </button>
                   <Button
                     variant="outline"
                     onClick={() => setShowAccountMenuDialog(true)}
@@ -397,6 +402,19 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick }: Header
                 required
                 disabled={loading}
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded"
+                disabled={loading}
+              />
+              <label htmlFor="rememberMe" className="text-sm text-gray-600">
+                로그인 상태 유지하기
+              </label>
             </div>
             <div className="flex flex-col gap-2">
               <Button

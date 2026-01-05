@@ -9,6 +9,10 @@ export interface User {
     university?: string;
     gender?: string;
     created_at?: string;
+    height?: number;
+    weight?: number;
+    fitness_goal?: string;
+    sns_link?: string;
 }
 
 // 회원가입 데이터 타입
@@ -95,7 +99,7 @@ export async function signUp(data: SignUpData): Promise<{ user: User | null; err
 }
 
 // 로그인
-export async function signIn(email: string, password: string): Promise<{ user: User | null; error: string | null }> {
+export async function signIn(email: string, password: string, rememberMe: boolean = true): Promise<{ user: User | null; error: string | null }> {
     try {
         // 이메일로 사용자 조회
         const { data: user, error } = await supabase
@@ -122,8 +126,9 @@ export async function signIn(email: string, password: string): Promise<{ user: U
         // password_hash 제외한 사용자 정보
         const { password_hash, ...userWithoutPassword } = user;
 
-        // 로컬 스토리지에 세션 저장
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userWithoutPassword));
+        // 로그인 상태 유지 여부에 따라 저장소 선택
+        const storage = rememberMe ? localStorage : sessionStorage;
+        storage.setItem(USER_STORAGE_KEY, JSON.stringify(userWithoutPassword));
 
         return { user: userWithoutPassword as User, error: null };
     } catch (err) {
@@ -135,6 +140,7 @@ export async function signIn(email: string, password: string): Promise<{ user: U
 // 로그아웃
 export function signOut(): void {
     localStorage.removeItem(USER_STORAGE_KEY);
+    sessionStorage.removeItem(USER_STORAGE_KEY);
 }
 
 // 회원 탈퇴 (Soft Delete)
@@ -184,7 +190,11 @@ export async function deleteAccount(email: string, password: string): Promise<{ 
 // 현재 로그인된 사용자 가져오기
 export function getCurrentUser(): User | null {
     try {
-        const userJson = localStorage.getItem(USER_STORAGE_KEY);
+        // localStorage 먼저 확인, 없으면 sessionStorage 확인
+        let userJson = localStorage.getItem(USER_STORAGE_KEY);
+        if (!userJson) {
+            userJson = sessionStorage.getItem(USER_STORAGE_KEY);
+        }
         if (!userJson) return null;
         return JSON.parse(userJson) as User;
     } catch {
@@ -195,6 +205,58 @@ export function getCurrentUser(): User | null {
 // 로그인 상태 확인
 export function isLoggedIn(): boolean {
     return getCurrentUser() !== null;
+}
+
+// ============================================
+// 프로필 관련 함수
+// ============================================
+
+// 프로필 정보 가져오기
+export async function getUserProfile(userId: string): Promise<{ profile: User | null; error: string | null }> {
+    try {
+        const { data, error } = await supabase
+            .from('users')
+            .select('id, email, name, university, gender, created_at, height, weight, fitness_goal, sns_link')
+            .eq('id', userId)
+            .single();
+
+        if (error || !data) {
+            return { profile: null, error: '프로필을 불러올 수 없습니다.' };
+        }
+
+        return { profile: data as User, error: null };
+    } catch (err) {
+        console.error('프로필 조회 에러:', err);
+        return { profile: null, error: '프로필 조회 중 오류가 발생했습니다.' };
+    }
+}
+
+// 프로필 업데이트
+export interface ProfileUpdateData {
+    name?: string;
+    height?: number;
+    weight?: number;
+    fitness_goal?: string;
+    sns_link?: string;
+}
+
+export async function updateUserProfile(userId: string, profileData: ProfileUpdateData): Promise<{ success: boolean; error: string | null }> {
+    try {
+        const { error } = await supabase
+            .from('users')
+            .update(profileData)
+            .eq('id', userId);
+
+        if (error) {
+            console.error('프로필 업데이트 에러:', error);
+            return { success: false, error: '프로필 업데이트에 실패했습니다.' };
+        }
+
+        return { success: true, error: null };
+    } catch (err) {
+        console.error('프로필 업데이트 에러:', err);
+        return { success: false, error: '프로필 업데이트 중 오류가 발생했습니다.' };
+    }
 }
 
 // ============================================
