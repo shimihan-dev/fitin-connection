@@ -24,8 +24,8 @@ export function LandingPage({ onStart }: LandingPageProps) {
 
         <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 backdrop-blur-sm mb-6">
-            <span className="text-xs font-medium tracking-wider text-primary uppercase">
-              Fitin_Connection Platform
+            <span className="text-xs font-medium tracking-wider text-[#2F80FF] uppercase">
+              IGC Fitness Platform
             </span>
           </div>
 
@@ -66,7 +66,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-card to-background">
               <div className="text-center space-y-4">
                 <div className="w-24 h-24 mx-auto rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 animate-pulse">
-                  <Smartphone className="w-10 h-10 text-primary" />
+                  <Smartphone className="w-10 h-10 text-[#2F80FF]" />
                 </div>
                 <p className="text-muted-foreground text-sm font-light tracking-widest uppercase">Dashboard Preview</p>
               </div>
@@ -83,7 +83,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20 space-y-4">
             <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight">
-              ALL-IN-ONE <span className="text-primary">SOLUTION</span>
+              ALL-IN-ONE <span className="text-[#2F80FF]">SOLUTION</span>
             </h2>
             <p className="text-muted-foreground text-lg">
               완벽한 퍼포먼스를 위한 5가지 핵심 기능
@@ -124,7 +124,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
               }
             ].map((feature, idx) => (
               <div key={idx} className="group p-8 rounded-3xl bg-card border border-white/5 hover:border-primary/50 hover:bg-card/80 transition-all duration-300 hover:-translate-y-1">
-                <div className="mb-6 w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300 border border-white/5 group-hover:border-primary/20">
+                <div className="mb-6 w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-[#2F80FF] group-hover:scale-110 transition-transform duration-300 border border-white/5 group-hover:border-primary/20">
                   {feature.icon}
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-foreground tracking-tight">{feature.title}</h3>
@@ -139,7 +139,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
       <section className="py-32 border-t border-white/5 relative bg-[#080a0f]">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-sm text-muted-foreground mb-12">
-            <CheckCircle className="w-4 h-4 text-primary" />
+            <CheckCircle className="w-4 h-4 text-[#2F80FF]" />
             <span>Trusted by IGC Students</span>
           </div>
 
