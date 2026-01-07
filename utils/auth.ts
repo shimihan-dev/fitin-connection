@@ -13,6 +13,7 @@ export interface User {
     weight?: number;
     fitness_goal?: string;
     sns_link?: string;
+    profile_picture?: string;
 }
 
 // 회원가입 데이터 타입
@@ -104,7 +105,7 @@ export async function signIn(email: string, password: string, rememberMe: boolea
         // 이메일로 사용자 조회
         const { data: user, error } = await supabase
             .from('users')
-            .select('id, email, name, university, gender, created_at, password_hash, is_deleted')
+            .select('id, email, name, university, gender, created_at, password_hash, is_deleted, profile_picture')
             .eq('email', email.toLowerCase())
             .single();
 
@@ -216,7 +217,7 @@ export async function getUserProfile(userId: string): Promise<{ profile: User | 
     try {
         const { data, error } = await supabase
             .from('users')
-            .select('id, email, name, university, gender, created_at, height, weight, fitness_goal, sns_link')
+            .select('id, email, name, university, gender, created_at, height, weight, fitness_goal, sns_link, profile_picture')
             .eq('id', userId)
             .single();
 
@@ -238,6 +239,7 @@ export interface ProfileUpdateData {
     weight?: number;
     fitness_goal?: string;
     sns_link?: string;
+    profile_picture?: string;
 }
 
 export async function updateUserProfile(userId: string, profileData: ProfileUpdateData): Promise<{ success: boolean; error: string | null }> {
@@ -256,6 +258,35 @@ export async function updateUserProfile(userId: string, profileData: ProfileUpda
     } catch (err) {
         console.error('프로필 업데이트 에러:', err);
         return { success: false, error: '프로필 업데이트 중 오류가 발생했습니다.' };
+    }
+}
+
+// 프로필 사진 업로드 (Base64 인코딩 방식)
+export async function uploadProfilePicture(userId: string, file: File): Promise<{ url: string | null; error: string | null }> {
+    try {
+        // 파일을 Base64로 변환
+        const base64 = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+
+        // users 테이블에 Base64 이미지 저장
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({ profile_picture: base64 })
+            .eq('id', userId);
+
+        if (updateError) {
+            console.error('프로필 사진 저장 에러:', updateError);
+            return { url: null, error: '프로필 사진 저장에 실패했습니다.' };
+        }
+
+        return { url: base64, error: null };
+    } catch (err) {
+        console.error('프로필 사진 업로드 에러:', err);
+        return { url: null, error: '프로필 사진 업로드 중 오류가 발생했습니다.' };
     }
 }
 

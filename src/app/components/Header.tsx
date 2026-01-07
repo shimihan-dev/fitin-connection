@@ -7,7 +7,7 @@ import { Label } from './ui/label';
 import { signIn, signUp, isValidEmail, User as AuthUser, requestPasswordReset, verifyResetCode, resetPassword, deleteAccount } from '../../../utils/auth';
 
 interface HeaderProps {
-  user: { name: string; email: string } | null;
+  user: { name: string; email: string; profile_picture?: string } | null;
   onLogout: () => void;
   onLoginSuccess?: (user: AuthUser) => void;
   onSignupClick?: () => void;
@@ -258,8 +258,12 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                     onClick={() => onMyPageClick?.()}
                     className="flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-green-600 flex items-center justify-center">
-                      <User className="w-4 h-4 text-white" />
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-green-600 flex items-center justify-center overflow-hidden">
+                      {user.profile_picture ? (
+                        <img src={user.profile_picture} alt="프로필" className="w-full h-full object-cover" />
+                      ) : (
+                        <User className="w-4 h-4 text-white" />
+                      )}
                     </div>
                     <span className="font-medium text-gray-700">{user.name}님</span>
                   </button>

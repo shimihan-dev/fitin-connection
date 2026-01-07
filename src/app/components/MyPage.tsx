@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { User as UserIcon, Save, Calendar, Target, Link, Ruler, Scale } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { User as UserIcon, Save, Calendar, Target, Link, Ruler, Scale, Camera } from 'lucide-react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { getUserProfile, updateUserProfile, User, ProfileUpdateData } from '../../../utils/auth';
+import { getUserProfile, updateUserProfile, uploadProfilePicture, User, ProfileUpdateData } from '../../../utils/auth';
 
 interface MyPageProps {
     user: { name: string; email: string; id?: string };
@@ -14,7 +14,9 @@ interface MyPageProps {
 export function MyPage({ user, onBack }: MyPageProps) {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [uploadingPicture, setUploadingPicture] = useState(false);
     const [profile, setProfile] = useState<User | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [formData, setFormData] = useState({
         name: '',
         height: '',
@@ -98,11 +100,38 @@ export function MyPage({ user, onBack }: MyPageProps) {
             'utah': 'University of Utah (유타대학교)',
             'gmu': 'George Mason University (조지메이슨대학교)',
             'stony': 'Stony Brook University (스토니브룩대학교)',
-            'stonybrook': 'Stony Brook University (스토니브룩대학교)',
             'ghent': 'Ghent University (겐트대학교)',
             'fit': 'Fashion Institute of Technology (패션공과대학교)',
         };
         return universityMap[code.toLowerCase()] || code;
+    };
+
+    const handlePictureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !user.id) return;
+
+        // 파일 크기 제한 (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('파일 크기는 5MB 이하여야 합니다.');
+            return;
+        }
+
+        // 이미지 타입 확인
+        if (!file.type.startsWith('image/')) {
+            alert('이미지 파일만 업로드 가능합니다.');
+            return;
+        }
+
+        setUploadingPicture(true);
+        const { url, error } = await uploadProfilePicture(user.id, file);
+
+        if (error) {
+            alert(error);
+        } else {
+            alert('프로필 사진이 변경되었습니다!');
+            loadProfile();
+        }
+        setUploadingPicture(false);
     };
 
     if (loading) {
@@ -115,11 +144,40 @@ export function MyPage({ user, onBack }: MyPageProps) {
 
     return (
         <div className="p-6 space-y-6">
-            {/* Header */}
+            {/* Header with Profile Picture */}
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                        <UserIcon className="w-6 h-6 text-white" />
+                <div className="flex items-center gap-4">
+                    {/* 프로필 사진 */}
+                    <div className="relative">
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center overflow-hidden">
+                            {profile?.profile_picture ? (
+                                <img
+                                    src={profile.profile_picture}
+                                    alt="프로필"
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <UserIcon className="w-8 h-8 text-white" />
+                            )}
+                        </div>
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploadingPicture}
+                            className="absolute -bottom-1 -right-1 w-7 h-7 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center text-white shadow-lg transition-colors disabled:opacity-50"
+                        >
+                            {uploadingPicture ? (
+                                <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <Camera className="w-3.5 h-3.5" />
+                            )}
+                        </button>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handlePictureUpload}
+                            className="hidden"
+                        />
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold text-gray-800">마이페이지</h1>

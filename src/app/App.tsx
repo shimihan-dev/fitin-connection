@@ -20,7 +20,7 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [isSignupPage, setIsSignupPage] = useState(false);
   const [showMyPage, setShowMyPage] = useState(false);
-  const [user, setUser] = useState<{ name: string; email: string; id?: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; email: string; id?: string; profile_picture?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [showWelcomeSlides, setShowWelcomeSlides] = useState(false);
 
@@ -30,6 +30,7 @@ export default function App() {
       id: loggedInUser.id,
       name: loggedInUser.name || loggedInUser.email.split('@')[0] || '사용자',
       email: loggedInUser.email,
+      profile_picture: loggedInUser.profile_picture,
     });
     setShowWelcomeSlides(true);
   };
@@ -58,6 +59,7 @@ export default function App() {
           id: currentUser.id,
           name: currentUser.name || currentUser.email.split('@')[0] || '사용자',
           email: currentUser.email,
+          profile_picture: currentUser.profile_picture,
         });
       }
     } catch (error) {
