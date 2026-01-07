@@ -93,11 +93,11 @@ export default function App() {
   // 로그인하지 않은 경우 랜딩 페이지 표시
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+      <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground">
         <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} onSignupClick={() => setIsSignupPage(true)} />
-        <div className="max-w-7xl mx-auto pt-16 pb-20">
+        <main>
           <LandingPage onStart={() => setIsSignupPage(true)} />
-        </div>
+        </main>
       </div>
     );
   }

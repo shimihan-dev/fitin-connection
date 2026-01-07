@@ -236,17 +236,17 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 shadow-sm z-50">
+      <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-md border-b border-border z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-green-600 flex items-center justify-center">
-                <Dumbbell className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+                <Dumbbell className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h1 className="text-lg">IGC Fitness</h1>
-                <p className="text-xs text-gray-500 hidden sm:block">대학생 피트니스 가이드</p>
+                <h1 className="text-lg font-bold tracking-tight">IGC FITNESS</h1>
+                <p className="text-[10px] text-muted-foreground hidden sm:block tracking-widest uppercase">Performance & Guide</p>
               </div>
             </div>
 
@@ -300,27 +300,27 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="md:hidden p-2 hover:bg-muted rounded-lg transition-colors"
               onClick={() => setShowMobileMenu(!showMobileMenu)}
             >
               {showMobileMenu ? (
-                <X className="w-6 h-6 text-gray-700" />
+                <X className="w-6 h-6 text-foreground" />
               ) : (
-                <Menu className="w-6 h-6 text-gray-700" />
+                <Menu className="w-6 h-6 text-foreground" />
               )}
             </button>
           </div>
 
           {/* Mobile Menu */}
           {showMobileMenu && (
-            <div className="md:hidden py-4 space-y-2 border-t border-gray-200">
+            <div className="md:hidden py-4 space-y-2 border-t border-border bg-background/95 backdrop-blur-xl absolute left-0 right-0 px-4">
               {user ? (
                 <>
-                  <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg mb-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-green-600 flex items-center justify-center">
-                      <User className="w-4 h-4 text-white" />
+                  <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-lg mb-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+                      <User className="w-4 h-4 text-primary" />
                     </div>
-                    <span className="font-medium text-gray-700">{user.name}님</span>
+                    <span className="font-medium text-foreground">{user.name}님</span>
                   </div>
                   <Button
                     variant="ghost"
