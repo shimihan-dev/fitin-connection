@@ -19,10 +19,10 @@ export interface SBDRecord {
 
 export const UNIVERSITIES: University[] = [
     { id: 'utah', name: 'University of Utah', logo: '🔴', color: 'from-red-600 to-red-800' },
-    { id: 'suny', name: 'SUNY Korea', logo: '🔵', color: 'from-blue-600 to-blue-800' },
+    { id: 'stony', name: 'Stony Brook University', logo: '🔴', color: 'from-[#990000] to-[#660000]' },
     { id: 'gmu', name: 'George Mason University', logo: '🟢', color: 'from-green-600 to-green-800' },
     { id: 'ghent', name: 'Ghent University', logo: '🟡', color: 'from-yellow-500 to-blue-600' },
-    { id: 'fit', name: 'FIT', logo: '🐯', color: 'from-blue-400 to-navy-800' },
+    { id: 'fit', name: 'FIT', logo: '🔵', color: 'from-blue-400 to-blue-800' },
 ];
 
 // Mock Data
@@ -42,7 +42,7 @@ export const INITIAL_RECORDS: SBDRecord[] = [
         id: '2',
         userId: 'u2',
         userName: '이영희',
-        universityId: 'suny',
+        universityId: 'stony',
         squat: 120,
         bench: 60,
         deadlift: 140,
