@@ -30,8 +30,8 @@ export function LandingPage({ onStart }: LandingPageProps) {
           </div>
 
           <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-foreground uppercase leading-[0.9]">
-            Athflow<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/50">Performance</span>
+            IGC<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/50">Fitin_Connection</span>
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
@@ -43,7 +43,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
             <Button
               size="lg"
               onClick={onStart}
-              className="text-base px-8 py-6 rounded-full font-semibold shadow-[0_0_20px_rgba(94,234,212,0.3)] hover:shadow-[0_0_30px_rgba(94,234,212,0.5)] transition-all"
+              className="text-base px-8 py-6 rounded-full font-semibold shadow-[0_0_20px_rgba(47,128,255,0.3)] hover:shadow-[0_0_30px_rgba(47,128,255,0.5)] transition-all"
             >
               무료로 시작하기
               <ArrowRight className="ml-2 w-5 h-5" />

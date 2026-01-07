@@ -2,7 +2,7 @@
 
 :root {
   --font-size: 16px;
-  /* ATHFLOW Color System */
+  /* IGC Color System */
   --background: #050608;
   --foreground: rgba(255, 255, 255, 0.92);
 
@@ -12,8 +12,8 @@
   --popover: #0B0E14;
   --popover-foreground: rgba(255, 255, 255, 0.92);
 
-  /* Accent: Teal #5EEAD4 */
-  --primary: #5EEAD4;
+  /* Accent: Blue #2F80FF */
+  --primary: #2F80FF;
   --primary-foreground: #050608;
 
   --secondary: #0B0E14;
@@ -22,7 +22,7 @@
   --muted: #0B0E14;
   --muted-foreground: rgba(255, 255, 255, 0.64);
 
-  --accent: #5EEAD4;
+  --accent: #2F80FF;
   --accent-foreground: #050608;
 
   --destructive: #d4183d;
@@ -30,7 +30,7 @@
 
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.08);
-  --ring: #5EEAD4;
+  --ring: #2F80FF;
 
   --radius: 1rem;
   /* 16px as requested */
@@ -43,12 +43,12 @@
 
   --sidebar: #0B0E14;
   --sidebar-foreground: rgba(255, 255, 255, 0.92);
-  --sidebar-primary: #5EEAD4;
+  --sidebar-primary: #2F80FF;
   --sidebar-primary-foreground: #050608;
   --sidebar-accent: #0B0E14;
-  --sidebar-accent-foreground: #5EEAD4;
+  --sidebar-accent-foreground: #2F80FF;
   --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #5EEAD4;
+  --sidebar-ring: #2F80FF;
 
   font-family: 'Inter', 'Pretendard', sans-serif;
 }
