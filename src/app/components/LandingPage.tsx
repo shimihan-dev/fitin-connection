@@ -25,7 +25,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
         <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 backdrop-blur-sm mb-6">
             <span className="text-xs font-medium tracking-wider text-primary uppercase">
-              IGC Fitness Platform
+              Fitin_Connection Platform
             </span>
           </div>
 
@@ -171,7 +171,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
       <footer className="py-12 border-t border-white/5 bg-background text-center">
         <div className="flex items-center justify-center gap-2 mb-8 opacity-50">
           <Dumbbell className="w-6 h-6" />
-          <span className="font-bold tracking-tight">IGC FITNESS</span>
+          <span className="font-bold tracking-tight">Fitin_Connection</span>
         </div>
         <p className="text-muted-foreground/40 text-sm">
           © 2026 Fitin Connection. All rights reserved.

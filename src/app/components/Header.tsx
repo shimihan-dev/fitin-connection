@@ -245,7 +245,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                 <Dumbbell className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h1 className="text-lg font-bold tracking-tight">IGC FITNESS</h1>
+                <h1 className="text-lg font-bold tracking-tight">Fitin_Connection</h1>
                 <p className="text-[10px] text-muted-foreground hidden sm:block tracking-widest uppercase">Performance & Guide</p>
               </div>
             </div>
@@ -375,7 +375,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
           <DialogHeader>
             <DialogTitle>로그인</DialogTitle>
             <DialogDescription>
-              IGC Fitness에 오신 것을 환영합니다!
+              Fitin_Connection에 오신 것을 환영합니다!
             </DialogDescription>
           </DialogHeader>
 
@@ -460,7 +460,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
       <Dialog open={showSignupDialog} onOpenChange={setShowSignupDialog}>
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl">IGC Fitness 회원가입</DialogTitle>
+            <DialogTitle className="text-2xl">Fitin_Connection 회원가입</DialogTitle>
             <DialogDescription>
               건강한 대학생활을 함께 시작하세요!
             </DialogDescription>

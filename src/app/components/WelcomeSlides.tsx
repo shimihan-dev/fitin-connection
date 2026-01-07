@@ -18,7 +18,7 @@ const defaultSlides: Slide[] = [
     {
         imageUrl: '/slides/slide-1.png',
         title: '환영합니다!',
-        description: 'IGC Fitness와 함께 건강한 대학생활을 시작하세요',
+        description: 'Fitin_Connection과 함께 건강한 대학생활을 시작하세요',
     },
     {
         imageUrl: '/slides/slide-2.png',

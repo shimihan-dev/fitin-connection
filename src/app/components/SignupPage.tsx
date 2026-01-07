@@ -83,7 +83,7 @@ export function SignupPage({ onClose, onLoginClick }: SignupPageProps) {
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-600 to-green-600 flex items-center justify-center mx-auto mb-4">
               <Dumbbell className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl mb-2">IGC Fitness 회원가입</h1>
+            <h1 className="text-3xl mb-2">Fitin_Connection 회원가입</h1>
             <p className="text-gray-600">
               건강한 대학생활을 함께 시작하세요!
             </p>
