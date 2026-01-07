@@ -242,7 +242,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
             {/* Logo */}
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-                <Dumbbell className="w-5 h-5 text-primary" />
+                <Dumbbell className="w-5 h-5 text-[#2F80FF]" />
               </div>
               <div>
                 <h1 className="text-lg font-bold tracking-tight">Fitin_Connection</h1>
@@ -262,7 +262,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                       {user.profile_picture ? (
                         <img src={user.profile_picture} alt="프로필" className="w-full h-full object-cover" />
                       ) : (
-                        <User className="w-4 h-4 text-white" />
+                        <User className="w-4 h-4 text-[#2F80FF]" />
                       )}
                     </div>
                     <span className="font-medium text-gray-700">{user.name}님</span>
@@ -318,7 +318,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                 <>
                   <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-lg mb-2">
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-                      <User className="w-4 h-4 text-primary" />
+                      <User className="w-4 h-4 text-[#2F80FF]" />
                     </div>
                     <span className="font-medium text-foreground">{user.name}님</span>
                   </div>
