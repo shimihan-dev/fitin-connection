@@ -91,21 +91,28 @@ export function Progress({ user }: ProgressProps) {
   // 차트 데이터 생성
   const generateChartData = () => {
     const days = ['월', '화', '수', '목', '금', '토', '일'];
-    const today = new Date().getDay();
-    const adjustedToday = today === 0 ? 6 : today - 1;
+
+    // 이번 주 월요일 계산
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - diffToMonday);
+    monday.setHours(0, 0, 0, 0);
 
     return days.map((day, index) => {
-      let count = 0;
-      let mins = 0;
+      // 해당 요일의 날짜 계산
+      const targetDate = new Date(monday);
+      targetDate.setDate(monday.getDate() + index);
 
-      if (index === adjustedToday) {
-        const todayLogs = workoutLogs.filter(log => {
-          const logDate = new Date(log.date);
-          return logDate.toDateString() === new Date().toDateString();
-        });
-        count = todayLogs.length;
-        mins = todayLogs.reduce((acc, log) => acc + log.minutes, 0);
-      }
+      // 해당 날짜의 운동 기록 필터링
+      const dayLogs = workoutLogs.filter(log => {
+        const logDate = new Date(log.date);
+        return logDate.toDateString() === targetDate.toDateString();
+      });
+
+      const count = dayLogs.length;
+      const mins = dayLogs.reduce((acc, log) => acc + log.minutes, 0);
 
       return {
         day,
