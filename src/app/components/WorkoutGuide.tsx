@@ -414,15 +414,15 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                     return (
                       <div
                         key={muscle.id}
-                        className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${selectedMuscle === muscle.id ? 'bg-blue-50' : 'hover:bg-muted/50'}`}
+                        className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all ${selectedMuscle === muscle.id ? 'bg-primary/20 border border-primary/40 backdrop-blur-sm shadow-lg shadow-primary/10' : 'hover:bg-white/5 border border-transparent'}`}
                         onClick={() => setSelectedMuscle(muscle.id === selectedMuscle ? null : muscle.id)}
                       >
-                        <span className="font-medium">{muscle.name}</span>
+                        <span className="font-medium text-foreground">{muscle.name}</span>
                         <div className="flex items-center gap-2">
-                          <span className={`font-bold ${count >= 3 ? 'text-green-600' : count >= 1 ? 'text-amber-600' : 'text-gray-400'}`}>
+                          <span className={`font-bold ${count >= 3 ? 'text-emerald-400' : count >= 1 ? 'text-amber-400' : 'text-muted-foreground'}`}>
                             {count}회
                           </span>
-                          {count >= 3 && <Check className="w-4 h-4 text-green-600" />}
+                          {count >= 3 && <Check className="w-4 h-4 text-emerald-400" />}
                         </div>
                       </div>
                     );
@@ -433,14 +433,14 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
               {/* Selected Muscle Detail */}
               {selectedMuscleData && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                  <Card className="p-4 border-blue-200 bg-blue-50/50">
+                  <Card className="p-4 border-primary/30 bg-primary/10">
                     <div className="flex justify-between items-start mb-3">
                       <div>
                         <h4 className="font-semibold text-lg">{selectedMuscleData.name}</h4>
                         <p className="text-sm text-muted-foreground">{selectedMuscleData.nameEn}</p>
                       </div>
                       <div className="text-right">
-                        <span className="text-2xl font-bold text-blue-600">{getWeeklyCount(selectedMuscleData.id)}회</span>
+                        <span className="text-2xl font-bold text-primary">{getWeeklyCount(selectedMuscleData.id)}회</span>
                         <p className="text-xs text-muted-foreground">이번 주</p>
                       </div>
                     </div>
@@ -450,11 +450,11 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                       <div className="mb-3 space-y-1">
                         <p className="text-sm font-medium">기록된 운동:</p>
                         {getWeeklyLogs(selectedMuscleData.id).map(log => (
-                          <div key={log.id} className="flex items-center justify-between text-sm bg-white p-2 rounded">
-                            <span>{log.exerciseName} ({log.sets}세트 x {log.reps}회)</span>
+                          <div key={log.id} className="flex items-center justify-between text-sm bg-background/50 p-2 rounded border border-white/10">
+                            <span className="text-foreground">{log.exerciseName} ({log.sets}세트 x {log.reps}회)</span>
                             <button
                               onClick={() => handleDeleteLog(log.id)}
-                              className="text-red-500 hover:text-red-700"
+                              className="text-red-400 hover:text-red-300"
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -480,42 +480,42 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
         {/* Upper Body Tab */}
         <TabsContent value="upper" className="space-y-4">
           {muscleGroups.upper.map(muscle => (
-            <Card key={muscle.id} className="overflow-hidden">
+            <Card key={muscle.id} className="overflow-hidden bg-card/50 border-white/10">
               <div
                 className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
                 onClick={() => setExpandedExercise(expandedExercise === muscle.id ? null : muscle.id)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                      <Target className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Target className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">{muscle.name}</h3>
+                      <h3 className="font-semibold text-foreground">{muscle.name}</h3>
                       <p className="text-sm text-muted-foreground">{muscle.exercises.length}개 운동</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Badge variant="outline">{getWeeklyCount(muscle.id)}회/주</Badge>
+                    <Badge variant="outline" className="border-white/20">{getWeeklyCount(muscle.id)}회/주</Badge>
                     <ChevronRight className={`w-5 h-5 transition-transform ${expandedExercise === muscle.id ? 'rotate-90' : ''}`} />
                   </div>
                 </div>
               </div>
 
               {expandedExercise === muscle.id && (
-                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t">
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-white/10">
                   <div className="p-4 space-y-3">
                     {muscle.exercises.map((exercise, idx) => (
-                      <div key={idx} className="p-3 bg-muted/30 rounded-lg">
+                      <div key={idx} className="p-3 bg-background/50 rounded-lg border border-white/5">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">{exercise.name}</span>
+                          <span className="font-medium text-foreground">{exercise.name}</span>
                           <div className="flex items-center gap-2">
                             <Badge className={getDifficultyColor(exercise.difficulty)}>
                               {getDifficultyLabel(exercise.difficulty)}
                             </Badge>
                             <Button
                               size="sm"
-                              variant="outline"
+                              variant="outline" className="border-white/20"
                               onClick={() => {
                                 setLogExercise({ muscleId: muscle.id, name: exercise.name });
                                 setShowLogDialog(true);

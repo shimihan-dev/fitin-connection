@@ -110,13 +110,11 @@ export function MyPage({ user, onBack }: MyPageProps) {
         const file = e.target.files?.[0];
         if (!file || !user.id) return;
 
-        // 파일 크기 제한 (5MB)
         if (file.size > 5 * 1024 * 1024) {
             alert('파일 크기는 5MB 이하여야 합니다.');
             return;
         }
 
-        // 이미지 타입 확인
         if (!file.type.startsWith('image/')) {
             alert('이미지 파일만 업로드 가능합니다.');
             return;
@@ -137,7 +135,7 @@ export function MyPage({ user, onBack }: MyPageProps) {
     if (loading) {
         return (
             <div className="p-6 flex items-center justify-center min-h-[50vh]">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
             </div>
         );
     }
@@ -147,9 +145,8 @@ export function MyPage({ user, onBack }: MyPageProps) {
             {/* Header with Profile Picture */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    {/* 프로필 사진 */}
                     <div className="relative">
-                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center overflow-hidden">
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center overflow-hidden shadow-lg shadow-primary/20">
                             {profile?.profile_picture ? (
                                 <img
                                     src={profile.profile_picture}
@@ -163,7 +160,7 @@ export function MyPage({ user, onBack }: MyPageProps) {
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             disabled={uploadingPicture}
-                            className="absolute -bottom-1 -right-1 w-7 h-7 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center text-white shadow-lg transition-colors disabled:opacity-50"
+                            className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary hover:bg-primary/90 rounded-full flex items-center justify-center text-white shadow-lg transition-colors disabled:opacity-50"
                         >
                             {uploadingPicture ? (
                                 <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -180,37 +177,37 @@ export function MyPage({ user, onBack }: MyPageProps) {
                         />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">마이페이지</h1>
-                        <p className="text-sm text-gray-600">내 정보를 관리하세요</p>
+                        <h1 className="text-2xl font-bold text-foreground">마이페이지</h1>
+                        <p className="text-sm text-muted-foreground">내 정보를 관리하세요</p>
                     </div>
                 </div>
-                <Button variant="outline" onClick={onBack}>
+                <Button variant="outline" onClick={onBack} className="border-white/10">
                     뒤로가기
                 </Button>
             </div>
 
             {/* 가입 정보 카드 */}
-            <Card className="p-5 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+            <Card className="p-5 bg-gradient-to-r from-primary/10 to-violet-600/10 border-primary/30">
                 <div className="flex items-center gap-3 mb-3">
-                    <Calendar className="w-5 h-5 text-blue-600" />
-                    <h3 className="font-semibold text-gray-800">가입 정보</h3>
+                    <Calendar className="w-5 h-5 text-primary" />
+                    <h3 className="font-semibold text-foreground">가입 정보</h3>
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                        <p className="text-gray-500">이메일</p>
-                        <p className="font-medium text-gray-800">{profile?.email || user.email}</p>
+                        <p className="text-muted-foreground">이메일</p>
+                        <p className="font-medium text-foreground">{profile?.email || user.email}</p>
                     </div>
                     <div>
-                        <p className="text-gray-500">가입일</p>
-                        <p className="font-medium text-gray-800">{formatDate(profile?.created_at)}</p>
+                        <p className="text-muted-foreground">가입일</p>
+                        <p className="font-medium text-foreground">{formatDate(profile?.created_at)}</p>
                     </div>
                     <div>
-                        <p className="text-gray-500">대학교</p>
-                        <p className="font-medium text-gray-800">{formatUniversity(profile?.university)}</p>
+                        <p className="text-muted-foreground">대학교</p>
+                        <p className="font-medium text-foreground">{formatUniversity(profile?.university)}</p>
                     </div>
                     <div>
-                        <p className="text-gray-500">성별</p>
-                        <p className="font-medium text-gray-800">
+                        <p className="text-muted-foreground">성별</p>
+                        <p className="font-medium text-foreground">
                             {profile?.gender === 'male' ? '남성' : profile?.gender === 'female' ? '여성' : profile?.gender || '-'}
                         </p>
                     </div>
@@ -218,13 +215,12 @@ export function MyPage({ user, onBack }: MyPageProps) {
             </Card>
 
             {/* 프로필 수정 폼 */}
-            <Card className="p-5">
-                <h3 className="font-semibold text-gray-800 mb-4">프로필 수정</h3>
+            <Card className="p-5 bg-card/50 border-white/10">
+                <h3 className="font-semibold text-foreground mb-4">프로필 수정</h3>
 
                 <div className="space-y-4">
-                    {/* 이름 */}
                     <div className="space-y-2">
-                        <Label htmlFor="name" className="flex items-center gap-2">
+                        <Label htmlFor="name" className="flex items-center gap-2 text-foreground">
                             <UserIcon className="w-4 h-4" />
                             이름
                         </Label>
@@ -235,13 +231,13 @@ export function MyPage({ user, onBack }: MyPageProps) {
                             onChange={handleChange}
                             placeholder="이름을 입력하세요"
                             disabled={saving}
+                            className="bg-background/50 border-white/10"
                         />
                     </div>
 
-                    {/* 키/체중 */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="height" className="flex items-center gap-2">
+                            <Label htmlFor="height" className="flex items-center gap-2 text-foreground">
                                 <Ruler className="w-4 h-4" />
                                 키 (cm)
                             </Label>
@@ -253,10 +249,11 @@ export function MyPage({ user, onBack }: MyPageProps) {
                                 onChange={handleChange}
                                 placeholder="170"
                                 disabled={saving}
+                                className="bg-background/50 border-white/10"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="weight" className="flex items-center gap-2">
+                            <Label htmlFor="weight" className="flex items-center gap-2 text-foreground">
                                 <Scale className="w-4 h-4" />
                                 체중 (kg)
                             </Label>
@@ -268,13 +265,13 @@ export function MyPage({ user, onBack }: MyPageProps) {
                                 onChange={handleChange}
                                 placeholder="70"
                                 disabled={saving}
+                                className="bg-background/50 border-white/10"
                             />
                         </div>
                     </div>
 
-                    {/* 운동 목표 */}
                     <div className="space-y-2">
-                        <Label htmlFor="fitness_goal" className="flex items-center gap-2">
+                        <Label htmlFor="fitness_goal" className="flex items-center gap-2 text-foreground">
                             <Target className="w-4 h-4" />
                             운동 목표
                         </Label>
@@ -285,12 +282,12 @@ export function MyPage({ user, onBack }: MyPageProps) {
                             onChange={handleChange}
                             placeholder="예: 체중 10kg 감량, 근육량 증가, 마라톤 완주..."
                             disabled={saving}
+                            className="bg-background/50 border-white/10"
                         />
                     </div>
 
-                    {/* SNS 링크 */}
                     <div className="space-y-2">
-                        <Label htmlFor="sns_link" className="flex items-center gap-2">
+                        <Label htmlFor="sns_link" className="flex items-center gap-2 text-foreground">
                             <Link className="w-4 h-4" />
                             SNS 링크
                         </Label>
@@ -301,14 +298,14 @@ export function MyPage({ user, onBack }: MyPageProps) {
                             onChange={handleChange}
                             placeholder="https://instagram.com/username"
                             disabled={saving}
+                            className="bg-background/50 border-white/10"
                         />
                     </div>
 
-                    {/* 저장 버튼 */}
                     <Button
                         onClick={handleSave}
                         disabled={saving}
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                        className="w-full bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-700"
                     >
                         <Save className="w-4 h-4 mr-2" />
                         {saving ? '저장 중...' : '프로필 저장'}

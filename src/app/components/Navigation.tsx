@@ -19,8 +19,8 @@ export function Navigation({ currentPage, onNavigate }: NavigationProps) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-      <div className="max-w-7xl mx-auto px-4">
+    <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.3)] z-50">
+      <div className="max-w-7xl mx-auto px-2">
         <div className="flex justify-around items-center h-16">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -30,13 +30,13 @@ export function Navigation({ currentPage, onNavigate }: NavigationProps) {
               <button
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
-                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all ${isActive
-                  ? 'text-blue-600'
-                  : 'text-gray-600 hover:text-blue-500'
+                className={`flex flex-col items-center gap-0.5 px-2 py-2 rounded-lg transition-all ${isActive
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-primary/80'
                   }`}
               >
-                <Icon className={`w-6 h-6 ${isActive ? 'scale-110' : ''} transition-transform`} />
-                <span className="text-xs">{item.label}</span>
+                <Icon className={`w-5 h-5 ${isActive ? 'scale-110' : ''} transition-transform`} />
+                <span className="text-[10px]">{item.label}</span>
               </button>
             );
           })}

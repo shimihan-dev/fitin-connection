@@ -84,8 +84,8 @@ export default function App() {
   // 로딩 중 표시
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -124,7 +124,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Welcome Slides - 로그인 성공 시 표시 */}
       {showWelcomeSlides && (
         <WelcomeSlides onComplete={handleWelcomeSlidesComplete} />
