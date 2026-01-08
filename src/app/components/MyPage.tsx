@@ -142,48 +142,56 @@ export function MyPage({ user, onBack }: MyPageProps) {
 
     return (
         <div className="p-6 space-y-6">
-            {/* Header with Profile Picture */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <div className="relative">
-                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center overflow-hidden shadow-lg shadow-primary/20">
-                            {profile?.profile_picture ? (
-                                <img
-                                    src={profile.profile_picture}
-                                    alt="프로필"
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <UserIcon className="w-8 h-8 text-white" />
-                            )}
-                        </div>
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={uploadingPicture}
-                            className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary hover:bg-primary/90 rounded-full flex items-center justify-center text-white shadow-lg transition-colors disabled:opacity-50"
-                        >
-                            {uploadingPicture ? (
-                                <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                                <Camera className="w-3.5 h-3.5" />
-                            )}
-                        </button>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            onChange={handlePictureUpload}
-                            className="hidden"
-                        />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-foreground">마이페이지</h1>
-                        <p className="text-sm text-muted-foreground">내 정보를 관리하세요</p>
-                    </div>
-                </div>
+            {/* 뒤로가기 버튼 */}
+            <div className="flex justify-end">
                 <Button variant="outline" onClick={onBack} className="border-white/10">
                     뒤로가기
                 </Button>
+            </div>
+
+            {/* Profile Hero Section */}
+            <div className="flex flex-col items-center text-center py-6">
+                <div className="relative mb-4">
+                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center overflow-hidden shadow-2xl shadow-primary/30 ring-4 ring-primary/20">
+                        {profile?.profile_picture ? (
+                            <img
+                                src={profile.profile_picture}
+                                alt="프로필"
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <UserIcon className="w-14 h-14 text-white" />
+                        )}
+                    </div>
+                    <button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingPicture}
+                        className="absolute -bottom-1 -right-1 w-9 h-9 bg-primary hover:bg-primary/90 rounded-full flex items-center justify-center text-white shadow-lg transition-colors disabled:opacity-50 ring-2 ring-background"
+                    >
+                        {uploadingPicture ? (
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                            <Camera className="w-4 h-4" />
+                        )}
+                    </button>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePictureUpload}
+                        className="hidden"
+                    />
+                </div>
+                <h1 className="text-3xl font-bold text-foreground mb-1">
+                    {profile?.name || user.name}
+                </h1>
+                <p className="text-muted-foreground">{profile?.email || user.email}</p>
+                {profile?.fitness_goal && (
+                    <p className="text-sm text-primary mt-2 flex items-center gap-1">
+                        <Target className="w-4 h-4" />
+                        {profile.fitness_goal}
+                    </p>
+                )}
             </div>
 
             {/* 가입 정보 카드 */}
@@ -305,7 +313,7 @@ export function MyPage({ user, onBack }: MyPageProps) {
                     <Button
                         onClick={handleSave}
                         disabled={saving}
-                        className="w-full bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-700"
+                        className="w-full bg-gradient-to-r from-primary/70 to-violet-600/70 hover:from-primary/80 hover:to-violet-700/80"
                     >
                         <Save className="w-4 h-4 mr-2" />
                         {saving ? '저장 중...' : '프로필 저장'}
