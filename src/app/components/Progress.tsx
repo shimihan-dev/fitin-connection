@@ -115,12 +115,34 @@ export function Progress({ user }: ProgressProps) {
 
   const chartData = generateChartData();
 
-  const achievements = [
+  // 운동 횟수 기반 배지
+  const workoutCountBadges = [
     { icon: Flame, title: '첫 시작', description: '첫 운동을 완료하세요!', unlocked: totalWorkouts >= 1, color: 'from-orange-500 to-red-500' },
     { icon: Target, title: '작심삼일 탈출', description: '운동 3회 완료', unlocked: totalWorkouts >= 3, color: 'from-green-500 to-green-600' },
     { icon: Award, title: '운동 마니아', description: '운동 10회 완료', unlocked: totalWorkouts >= 10, color: 'from-blue-500 to-blue-600' },
-    { icon: CalendarIcon, title: '끈기의 화신', description: '총 300분 운동 달성', unlocked: totalMinutes >= 300, color: 'from-purple-500 to-purple-600' },
+    { icon: Award, title: '피트니스 전사', description: '운동 25회 완료', unlocked: totalWorkouts >= 25, color: 'from-violet-500 to-purple-600' },
+    { icon: Award, title: '헬스장 단골', description: '운동 50회 완료', unlocked: totalWorkouts >= 50, color: 'from-pink-500 to-rose-600' },
+    { icon: Award, title: '운동 마스터', description: '운동 100회 달성!', unlocked: totalWorkouts >= 100, color: 'from-amber-500 to-yellow-600' },
   ];
+
+  // 운동 시간 기반 배지
+  const timeBadges = [
+    { icon: CalendarIcon, title: '워밍업 완료', description: '총 60분 운동', unlocked: totalMinutes >= 60, color: 'from-cyan-500 to-cyan-600' },
+    { icon: CalendarIcon, title: '끈기의 시작', description: '총 300분 운동', unlocked: totalMinutes >= 300, color: 'from-purple-500 to-purple-600' },
+    { icon: CalendarIcon, title: '10시간 달성', description: '총 600분(10시간) 운동', unlocked: totalMinutes >= 600, color: 'from-indigo-500 to-indigo-600' },
+    { icon: CalendarIcon, title: '마라톤 러너', description: '총 1000분 운동', unlocked: totalMinutes >= 1000, color: 'from-teal-500 to-teal-600' },
+    { icon: CalendarIcon, title: '인내의 아이콘', description: '총 2000분 운동', unlocked: totalMinutes >= 2000, color: 'from-emerald-500 to-emerald-600' },
+  ];
+
+  // 이번 주 활동 기반 배지
+  const weeklyBadges = [
+    { icon: TrendingUp, title: '주 3회 챌린지', description: '이번 주 3회 운동', unlocked: thisWeekLogs.length >= 3, color: 'from-lime-500 to-lime-600' },
+    { icon: TrendingUp, title: '주간 파이터', description: '이번 주 5회 운동', unlocked: thisWeekLogs.length >= 5, color: 'from-red-500 to-red-600' },
+    { icon: TrendingUp, title: '매일매일 운동', description: '이번 주 7회 운동!', unlocked: thisWeekLogs.length >= 7, color: 'from-fuchsia-500 to-fuchsia-600' },
+  ];
+
+  // 모든 배지 합치기
+  const achievements = [...workoutCountBadges, ...timeBadges, ...weeklyBadges];
 
   const unlockedBadges = achievements.filter(a => a.unlocked).length;
 
