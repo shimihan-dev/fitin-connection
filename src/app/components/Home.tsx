@@ -84,12 +84,10 @@ export function Home({ onNavigate, user }: HomeProps) {
         className="text-center space-y-4 py-8"
       >
         <div className="flex items-center justify-center gap-3 mb-4">
-          <Sparkles className="w-8 h-8 text-primary" />
           <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground uppercase">
             IGC<br className="md:hidden" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-400 to-primary"> Fitin_Connection</span>
           </h1>
-          <Sparkles className="w-8 h-8 text-primary" />
         </div>
         <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
           건강한 대학생활을 위한 모든 것<br />
