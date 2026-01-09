@@ -3,7 +3,7 @@ import { Dumbbell, Calendar, Heart, TrendingUp, Sparkles, Users, Utensils, Chevr
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Card } from './ui/card';
 
-type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress' | 'diet';
+type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet';
 
 interface HomeProps {
   onNavigate: (page: Page) => void;
@@ -29,14 +29,6 @@ export function Home({ onNavigate, user }: HomeProps) {
       iconBg: 'bg-emerald-500/20',
     },
     {
-      icon: Heart,
-      title: '건강한 라이프스타일',
-      description: '영양, 수면, 멘탈 케어 팁',
-      page: 'lifestyle' as Page,
-      color: 'from-pink-500 to-pink-600',
-      iconBg: 'bg-pink-500/20',
-    },
-    {
       icon: TrendingUp,
       title: '진척도 추적',
       description: '내 성장을 한눈에 확인하기',
@@ -46,8 +38,8 @@ export function Home({ onNavigate, user }: HomeProps) {
     },
     {
       icon: Utensils,
-      title: '식단 기록',
-      description: '오늘 먹은 음식 기록하기',
+      title: '식단 & 라이프',
+      description: '식단 기록, 영양, 수면, 멘탈 케어',
       page: 'diet' as Page,
       color: 'from-amber-500 to-orange-500',
       iconBg: 'bg-amber-500/20',

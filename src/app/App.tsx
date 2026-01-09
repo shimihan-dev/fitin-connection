@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Home } from './components/Home';
 import { WorkoutGuide } from './components/WorkoutGuide';
 import { RoutinePlanner } from './components/RoutinePlanner';
-import { LifestyleTips } from './components/LifestyleTips';
 import { Progress } from './components/Progress';
 import { Diet } from './components/Diet';
 import { MyPage } from './components/MyPage';
@@ -14,7 +13,7 @@ import { LandingPage } from './components/LandingPage';
 import { CompetitionPage } from './components/Competition/CompetitionPage';
 import { getCurrentUser, signOut, User } from '../../utils/auth';
 
-type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress' | 'diet' | 'competition';
+type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -112,8 +111,6 @@ export default function App() {
         return <CompetitionPage user={user} />;
       case 'routine':
         return <RoutinePlanner user={user} />;
-      case 'lifestyle':
-        return <LifestyleTips user={user} />;
       case 'progress':
         return <Progress user={user} />;
       case 'diet':
