@@ -82,14 +82,16 @@ export async function signUp(data: SignUpData): Promise<{ user: User | null; err
                 name: data.name,
                 university: data.university || null,
                 gender: data.gender || null,
-                referrer: data.referrer || null,
             })
             .select('id, email, name, university, gender, created_at')
             .single();
 
         if (error) {
             console.error('회원가입 DB 에러:', error);
-            return { user: null, error: '회원가입 중 오류가 발생했습니다.' };
+            console.error('에러 코드:', error.code);
+            console.error('에러 메시지:', error.message);
+            console.error('에러 상세:', error.details);
+            return { user: null, error: `회원가입 중 오류가 발생했습니다: ${error.message}` };
         }
 
         return { user: newUser as User, error: null };
