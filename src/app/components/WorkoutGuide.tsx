@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Dumbbell, TrendingUp, Target, Clock, ChevronRight, Plus, Check, Calendar, X } from 'lucide-react';
+import { Dumbbell, TrendingUp, Target, Clock, ChevronRight, Plus, Check, Calendar, X, Footprints, Upload, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -250,6 +250,78 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
   const [showLogDialog, setShowLogDialog] = useState(false);
   const [logExercise, setLogExercise] = useState<{ muscleId: string; name: string } | null>(null);
 
+  // 러닝 기록 타입 (거리, 시간, 페이스 포함)
+  interface RunningRecord {
+    id: string;
+    date: string;
+    imageUrl: string;
+    distance: number; // km
+    duration: string; // "mm:ss" 형식
+    pace: string; // "m'ss\"/km" 형식
+  }
+
+  // 러닝 기록 상태
+  const [runningRecords, setRunningRecords] = useState<RunningRecord[]>(() => {
+    if (user) {
+      const stored = localStorage.getItem(`running_records_v2_${user.email}`);
+      return stored ? JSON.parse(stored) : [];
+    }
+    return [];
+  });
+
+  // 러닝 업로드 다이얼로그 상태
+  const [showRunningUploadDialog, setShowRunningUploadDialog] = useState(false);
+  const [pendingRunningImage, setPendingRunningImage] = useState<string | null>(null);
+  const [runningDate, setRunningDate] = useState(new Date().toISOString().split('T')[0]);
+  const [runningDistance, setRunningDistance] = useState('');
+  const [runningDuration, setRunningDuration] = useState('');
+  const [runningPace, setRunningPace] = useState('');
+
+  const saveRunningRecords = (records: RunningRecord[]) => {
+    setRunningRecords(records);
+    if (user) {
+      localStorage.setItem(`running_records_v2_${user.email}`, JSON.stringify(records));
+    }
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPendingRunningImage(reader.result as string);
+      setRunningDate(new Date().toISOString().split('T')[0]);
+      setRunningDistance('');
+      setRunningDuration('');
+      setRunningPace('');
+      setShowRunningUploadDialog(true);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleConfirmRunningUpload = () => {
+    if (!pendingRunningImage || !runningDistance) return;
+    const newRecord: RunningRecord = {
+      id: Date.now().toString(),
+      date: new Date(runningDate).toISOString(),
+      imageUrl: pendingRunningImage,
+      distance: parseFloat(runningDistance) || 0,
+      duration: runningDuration || '00:00',
+      pace: runningPace || '-',
+    };
+    saveRunningRecords([newRecord, ...runningRecords]); // 최신 기록이 위로
+    setPendingRunningImage(null);
+    setShowRunningUploadDialog(false);
+  };
+
+  const handleDeleteRunningRecord = (id: string) => {
+    saveRunningRecords(runningRecords.filter(r => r.id !== id));
+  };
+
+  // 이미지 상세보기 상태
+  const [viewingImage, setViewingImage] = useState<string | null>(null);
+
   useEffect(() => {
     if (user) {
       const stored = localStorage.getItem(`workout_logs_${user.email}`);
@@ -363,10 +435,11 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
       </motion.div>
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
-          <TabsTrigger value="overview">전체 보기</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsTrigger value="overview">전체</TabsTrigger>
           <TabsTrigger value="upper">상체</TabsTrigger>
-          <TabsTrigger value="lower">하체/코어</TabsTrigger>
+          <TabsTrigger value="lower">하체</TabsTrigger>
+          <TabsTrigger value="running">러닝</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -658,6 +731,114 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
             </Card>
           ))}
         </TabsContent>
+
+        {/* Running Tab */}
+        <TabsContent value="running" className="space-y-4">
+          {/* 헤더 및 업로드 버튼 */}
+          <Card className="p-4 bg-card/50 border-white/10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
+                  <Footprints className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-foreground">러닝 기록</h2>
+                  <p className="text-xs text-muted-foreground">총 {runningRecords.length}회</p>
+                </div>
+              </div>
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageSelect}
+                  className="hidden"
+                />
+                <div className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                  <Plus className="w-4 h-4" />
+                  기록 추가
+                </div>
+              </label>
+            </div>
+          </Card>
+
+          {/* 총 통계 */}
+          {runningRecords.length > 0 && (
+            <Card className="p-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-500/30">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-bold text-emerald-400">
+                    {runningRecords.reduce((sum, r) => sum + (r.distance || 0), 0).toFixed(1)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">총 거리 (km)</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-primary">{runningRecords.length}</p>
+                  <p className="text-xs text-muted-foreground">총 러닝 횟수</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-teal-400">
+                    {(runningRecords.reduce((sum, r) => sum + (r.distance || 0), 0) / runningRecords.length || 0).toFixed(1)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">평균 거리 (km)</p>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* 러닝 기록 리스트 */}
+          {runningRecords.length === 0 ? (
+            <Card className="p-8 bg-card/50 border-white/10 text-center">
+              <Footprints className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-30" />
+              <p className="text-muted-foreground mb-2">아직 러닝 기록이 없습니다</p>
+              <p className="text-sm text-muted-foreground">위의 "기록 추가" 버튼을 눌러 시작하세요</p>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {runningRecords.map((record) => (
+                <Card key={record.id} className="p-4 bg-card/50 border-white/10">
+                  <div className="flex gap-4">
+                    {/* 썸네일 이미지 */}
+                    <img
+                      src={record.imageUrl}
+                      alt="러닝 기록"
+                      onClick={() => setViewingImage(record.imageUrl)}
+                      className="w-20 h-20 object-cover rounded-lg border border-white/10 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                    />
+                    {/* 기록 정보 */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(record.date).toLocaleDateString('ko-KR', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </p>
+                        <button
+                          onClick={() => handleDeleteRunningRecord(record.id)}
+                          className="text-muted-foreground hover:text-red-400 transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <p className="text-3xl font-bold text-foreground">
+                        {record.distance?.toFixed(2) || '0.00'}
+                        <span className="text-lg font-normal text-muted-foreground ml-1">km</span>
+                      </p>
+                      <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {record.duration || '--:--'}
+                        </span>
+                        <span>{record.pace || '-'}/km</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
       </Tabs>
 
       {/* Log Exercise Dialog */}
@@ -702,6 +883,98 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                 기록 저장
               </Button>
             </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Running Upload Dialog */}
+      <Dialog open={showRunningUploadDialog} onOpenChange={setShowRunningUploadDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>러닝 기록 업로드</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {pendingRunningImage && (
+              <img
+                src={pendingRunningImage}
+                alt="미리보기"
+                className="w-full max-h-64 object-contain rounded-lg border border-white/10"
+              />
+            )}
+            <div>
+              <label className="text-sm text-muted-foreground">러닝 날짜</label>
+              <input
+                type="date"
+                value={runningDate}
+                onChange={(e) => setRunningDate(e.target.value)}
+                className="w-full p-2 border rounded-md mt-1 bg-card border-white/20 text-foreground"
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="text-sm text-muted-foreground">거리 (km)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={runningDistance}
+                  onChange={(e) => setRunningDistance(e.target.value)}
+                  className="w-full p-2 border rounded-md mt-1 bg-card border-white/20 text-foreground"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">시간</label>
+                <input
+                  type="text"
+                  placeholder="mm:ss"
+                  value={runningDuration}
+                  onChange={(e) => setRunningDuration(e.target.value)}
+                  className="w-full p-2 border rounded-md mt-1 bg-card border-white/20 text-foreground"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">페이스</label>
+                <input
+                  type="text"
+                  placeholder={"m'ss\""}
+                  value={runningPace}
+                  onChange={(e) => setRunningPace(e.target.value)}
+                  className="w-full p-2 border rounded-md mt-1 bg-card border-white/20 text-foreground"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setShowRunningUploadDialog(false);
+                  setPendingRunningImage(null);
+                }}
+              >
+                취소
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={handleConfirmRunningUpload}
+                disabled={!runningDistance}
+              >
+                업로드
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Image Viewer Dialog */}
+      <Dialog open={!!viewingImage} onOpenChange={() => setViewingImage(null)}>
+        <DialogContent className="sm:max-w-3xl p-2 bg-black/90">
+          {viewingImage && (
+            <img
+              src={viewingImage}
+              alt="러닝 기록 상세"
+              className="w-full max-h-[80vh] object-contain rounded-lg"
+            />
           )}
         </DialogContent>
       </Dialog>
