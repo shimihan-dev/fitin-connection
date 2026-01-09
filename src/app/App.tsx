@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Home } from './components/Home';
 import { WorkoutGuide } from './components/WorkoutGuide';
 import { RoutinePlanner } from './components/RoutinePlanner';
-import { LifestyleTips } from './components/LifestyleTips';
 import { Progress } from './components/Progress';
 import { Diet } from './components/Diet';
 import { MyPage } from './components/MyPage';
@@ -14,7 +13,7 @@ import { LandingPage } from './components/LandingPage';
 import { CompetitionPage } from './components/Competition/CompetitionPage';
 import { getCurrentUser, signOut, User } from '../../utils/auth';
 
-type Page = 'home' | 'workout' | 'routine' | 'lifestyle' | 'progress' | 'diet' | 'competition';
+type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -84,8 +83,8 @@ export default function App() {
   // 로딩 중 표시
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -112,8 +111,6 @@ export default function App() {
         return <CompetitionPage user={user} />;
       case 'routine':
         return <RoutinePlanner user={user} />;
-      case 'lifestyle':
-        return <LifestyleTips user={user} />;
       case 'progress':
         return <Progress user={user} />;
       case 'diet':
@@ -124,7 +121,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Welcome Slides - 로그인 성공 시 표시 */}
       {showWelcomeSlides && (
         <WelcomeSlides onComplete={handleWelcomeSlidesComplete} />
