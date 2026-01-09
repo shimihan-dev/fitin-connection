@@ -164,7 +164,7 @@ const muscleGroups: Record<string, MuscleGroup[]> = {
   ],
 };
 
-// SVG 인체 다이어그램 컴포넌트
+// SVG 인체 다이어그램 컴포넌트 - 해부학적 스타일
 function BodyDiagram({
   muscleData,
   selectedMuscle,
@@ -179,65 +179,93 @@ function BodyDiagram({
   const getColor = (count: number, isSelected: boolean) => {
     if (isSelected) return '#2F80FF';
     if (count >= 3) return '#22c55e'; // 3회 이상: green
-    if (count >= 2) return '#f59e0b'; // 2회: amber  
+    if (count >= 2) return '#facc15'; // 2회: yellow  
     if (count >= 1) return '#ef4444'; // 1회: red
-    return '#cbd5e1'; // 미시작: gray
+    return '#374151'; // 미시작: dark gray
   };
 
-  const MuscleZone = ({ id, d }: { id: string; d: string }) => (
+  const getGlow = (count: number, isSelected: boolean) => {
+    if (isSelected) return 'drop-shadow(0 0 12px rgba(47, 128, 255, 0.8))';
+    if (count >= 3) return 'drop-shadow(0 0 8px rgba(34, 197, 94, 0.6))';
+    if (count >= 2) return 'drop-shadow(0 0 8px rgba(250, 204, 21, 0.6))';
+    if (count >= 1) return 'drop-shadow(0 0 8px rgba(239, 68, 68, 0.6))';
+    return 'none';
+  };
+
+  const MuscleZone = ({ id, d, opacity = 1 }: { id: string; d: string; opacity?: number }) => (
     <path
       d={d}
       fill={getColor(getWeeklyCount(id), selectedMuscle === id)}
-      className="cursor-pointer transition-all duration-200 hover:brightness-110"
-      style={{ filter: selectedMuscle === id ? 'drop-shadow(0 0 8px rgba(47, 128, 255, 0.5))' : undefined }}
+      opacity={opacity}
+      stroke={getWeeklyCount(id) > 0 || selectedMuscle === id ? getColor(getWeeklyCount(id), selectedMuscle === id) : '#1f2937'}
+      strokeWidth="1"
+      className="cursor-pointer transition-all duration-300 hover:brightness-125"
+      style={{ filter: getGlow(getWeeklyCount(id), selectedMuscle === id) }}
       onClick={() => onMuscleClick(id)}
     />
   );
 
   return (
-    <svg viewBox="0 0 200 420" className="w-full max-w-[280px] mx-auto drop-shadow-lg">
+    <svg viewBox="0 0 240 480" className="w-full max-w-[320px] mx-auto">
       <defs>
-        <linearGradient id="skinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#f1f5f9" />
-          <stop offset="100%" stopColor="#e2e8f0" />
+        <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#0f172a" />
+          <stop offset="100%" stopColor="#1e293b" />
+        </linearGradient>
+        <linearGradient id="bodyOutline" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#475569" />
+          <stop offset="100%" stopColor="#334155" />
         </linearGradient>
       </defs>
 
-      {/* Body silhouette */}
-      <g>
-        <ellipse cx="100" cy="38" rx="26" ry="30" fill="url(#skinGradient)" />
-        <path d="M88 65 Q88 58 92 55 L108 55 Q112 58 112 65 L112 78 L88 78 Z" fill="url(#skinGradient)" />
-        <path d="M52 82 Q48 85 46 95 L44 105 Q42 115 44 130 L46 175 Q48 195 55 205 L60 210 L65 215 L80 220 L100 222 L120 220 L135 215 L140 210 L145 205 Q152 195 154 175 L156 130 Q158 115 156 105 L154 95 Q152 85 148 82 Z" fill="url(#skinGradient)" />
-        <path d="M44 95 Q30 100 25 110 L18 140 Q15 155 18 170 L22 200 Q24 210 30 215 L35 210 Q38 200 36 185 L34 155 Q32 140 35 125 L40 105 Z" fill="url(#skinGradient)" />
-        <path d="M156 95 Q170 100 175 110 L182 140 Q185 155 182 170 L178 200 Q176 210 170 215 L165 210 Q162 200 164 185 L166 155 Q168 140 165 125 L160 105 Z" fill="url(#skinGradient)" />
-        <path d="M65 218 L60 260 Q58 290 60 320 L62 360 Q64 380 70 395 L80 400 Q85 398 88 390 L92 360 Q95 330 93 290 L90 250 L85 220 Z" fill="url(#skinGradient)" />
-        <path d="M135 218 L140 260 Q142 290 140 320 L138 360 Q136 380 130 395 L120 400 Q115 398 112 390 L108 360 Q105 330 107 290 L110 250 L115 220 Z" fill="url(#skinGradient)" />
+      <rect x="0" y="0" width="240" height="480" fill="url(#bgGradient)" rx="12" />
+
+      <g stroke="#475569" strokeWidth="1.5" fill="none">
+        <ellipse cx="120" cy="45" rx="28" ry="32" />
+        <path d="M108 75 L108 90 L132 90 L132 75" />
+        <path d="M70 95 Q55 100 50 115 L45 160 Q42 200 48 230 L55 245 Q70 260 90 265 L120 268 L150 265 Q170 260 185 245 L192 230 Q198 200 195 160 L190 115 Q185 100 170 95 Z" />
+        <path d="M50 110 Q35 115 28 135 L18 180 Q12 210 18 240 L28 275" />
+        <path d="M190 110 Q205 115 212 135 L222 180 Q228 210 222 240 L212 275" />
+        <path d="M85 265 L78 320 Q72 370 75 420 L80 455" />
+        <path d="M155 265 L162 320 Q168 370 165 420 L160 455" />
       </g>
 
-      {/* Muscle Groups */}
-      <MuscleZone id="shoulder" d="M46 88 Q38 92 35 102 L34 115 Q34 120 38 118 L50 108 Q55 100 52 92 Z" />
-      <MuscleZone id="shoulder" d="M154 88 Q162 92 165 102 L166 115 Q166 120 162 118 L150 108 Q145 100 148 92 Z" />
-      <MuscleZone id="chest" d="M55 95 Q52 105 54 120 L58 135 Q70 145 85 148 L100 150 L100 95 Q80 90 55 95 Z" />
-      <MuscleZone id="chest" d="M145 95 Q148 105 146 120 L142 135 Q130 145 115 148 L100 150 L100 95 Q120 90 145 95 Z" />
-      <MuscleZone id="back" d="M48 115 Q45 130 46 150 L48 175 Q50 185 55 180 L58 160 Q60 135 55 115 Z" />
-      <MuscleZone id="back" d="M152 115 Q155 130 154 150 L152 175 Q150 185 145 180 L142 160 Q140 135 145 115 Z" />
-      <MuscleZone id="bicep" d="M35 115 Q28 118 26 130 L25 148 Q25 158 30 155 L38 145 Q42 130 40 118 Z" />
-      <MuscleZone id="bicep" d="M165 115 Q172 118 174 130 L175 148 Q175 158 170 155 L162 145 Q158 130 160 118 Z" />
-      <MuscleZone id="tricep" d="M40 120 Q45 125 45 140 L44 155 Q42 165 38 160 L35 145 Q32 130 36 120 Z" />
-      <MuscleZone id="tricep" d="M160 120 Q155 125 155 140 L156 155 Q158 165 162 160 L165 145 Q168 130 164 120 Z" />
-      <MuscleZone id="abs" d="M80 152 Q75 155 75 165 L76 175 Q78 185 82 188 L100 190 L118 188 Q122 185 124 175 L125 165 Q125 155 120 152 L100 150 Z" />
-      <MuscleZone id="abs" d="M78 190 Q76 195 77 205 L80 215 Q85 220 100 222 Q115 220 120 215 L123 205 Q124 195 122 190 L100 192 Z" />
-      <path d="M55 150 Q50 160 50 175 L52 195 Q55 205 60 210 L65 200 Q68 185 65 165 L60 150 Z" fill={getColor(getWeeklyCount('obliques'), selectedMuscle === 'obliques')} opacity="0.85" className="cursor-pointer transition-all duration-200 hover:brightness-110" onClick={() => onMuscleClick('obliques')} />
-      <path d="M145 150 Q150 160 150 175 L148 195 Q145 205 140 210 L135 200 Q132 185 135 165 L140 150 Z" fill={getColor(getWeeklyCount('obliques'), selectedMuscle === 'obliques')} opacity="0.85" className="cursor-pointer transition-all duration-200 hover:brightness-110" onClick={() => onMuscleClick('obliques')} />
-      <path d="M75 175 Q72 185 73 200 L78 215 L100 218 L122 215 L127 200 Q128 185 125 175 L100 172 Z" fill={getColor(getWeeklyCount('lowerback'), selectedMuscle === 'lowerback')} opacity="0.6" className="cursor-pointer transition-all duration-200 hover:brightness-110" onClick={() => onMuscleClick('lowerback')} />
-      <MuscleZone id="glutes" d="M65 215 Q60 225 62 238 L70 250 Q80 255 90 252 L85 235 Q82 220 75 215 Z" />
-      <MuscleZone id="glutes" d="M135 215 Q140 225 138 238 L130 250 Q120 255 110 252 L115 235 Q118 220 125 215 Z" />
-      <MuscleZone id="quadriceps" d="M68 252 Q62 265 60 290 L62 320 Q65 335 72 340 L82 338 Q88 330 90 305 L92 275 Q92 260 88 250 Z" />
-      <MuscleZone id="quadriceps" d="M132 252 Q138 265 140 290 L138 320 Q135 335 128 340 L118 338 Q112 330 110 305 L108 275 Q108 260 112 250 Z" />
-      <path d="M72 255 Q78 270 80 295 L78 325 Q75 335 70 330 L65 305 Q62 280 68 255 Z" fill={getColor(getWeeklyCount('hamstring'), selectedMuscle === 'hamstring')} opacity="0.5" className="cursor-pointer transition-all duration-200 hover:brightness-110" onClick={() => onMuscleClick('hamstring')} />
-      <path d="M128 255 Q122 270 120 295 L122 325 Q125 335 130 330 L135 305 Q138 280 132 255 Z" fill={getColor(getWeeklyCount('hamstring'), selectedMuscle === 'hamstring')} opacity="0.5" className="cursor-pointer transition-all duration-200 hover:brightness-110" onClick={() => onMuscleClick('hamstring')} />
-      <MuscleZone id="calves" d="M64 345 Q60 355 62 375 L65 390 Q70 398 78 395 L82 380 Q85 365 82 350 L75 342 Z" />
-      <MuscleZone id="calves" d="M136 345 Q140 355 138 375 L135 390 Q130 398 122 395 L118 380 Q115 365 118 350 L125 342 Z" />
+      <MuscleZone id="shoulder" d="M50 100 Q38 105 32 120 L30 140 Q32 150 40 148 L55 135 Q62 120 58 105 Z" />
+      <MuscleZone id="shoulder" d="M190 100 Q202 105 208 120 L210 140 Q208 150 200 148 L185 135 Q178 120 182 105 Z" />
+
+      <MuscleZone id="chest" d="M68 100 Q60 115 62 135 L70 155 Q85 168 105 172 L120 174 L120 100 Q95 95 68 100 Z" />
+      <MuscleZone id="chest" d="M172 100 Q180 115 178 135 L170 155 Q155 168 135 172 L120 174 L120 100 Q145 95 172 100 Z" />
+
+      <MuscleZone id="back" d="M52 130 Q48 150 50 175 L55 205 Q60 220 68 215 L72 190 Q75 160 70 130 Z" opacity={0.8} />
+      <MuscleZone id="back" d="M188 130 Q192 150 190 175 L185 205 Q180 220 172 215 L168 190 Q165 160 170 130 Z" opacity={0.8} />
+
+      <MuscleZone id="bicep" d="M32 145 Q22 150 18 170 L15 195 Q15 210 22 208 L35 195 Q42 175 40 155 Z" />
+      <MuscleZone id="bicep" d="M208 145 Q218 150 222 170 L225 195 Q225 210 218 208 L205 195 Q198 175 200 155 Z" />
+
+      <MuscleZone id="tricep" d="M40 155 Q48 165 48 185 L45 210 Q42 225 35 218 L30 200 Q25 175 32 155 Z" />
+      <MuscleZone id="tricep" d="M200 155 Q192 165 192 185 L195 210 Q198 225 205 218 L210 200 Q215 175 208 155 Z" />
+
+      <MuscleZone id="abs" d="M100 175 L100 195 L120 195 L120 175 Q115 172 100 175 Z" />
+      <MuscleZone id="abs" d="M120 175 L120 195 L140 195 L140 175 Q125 172 120 175 Z" />
+      <MuscleZone id="abs" d="M98 198 L98 218 L120 218 L120 198 Z" />
+      <MuscleZone id="abs" d="M120 198 L120 218 L142 218 L142 198 Z" />
+      <MuscleZone id="abs" d="M96 222 L96 242 L120 242 L120 222 Z" />
+      <MuscleZone id="abs" d="M120 222 L120 242 L144 242 L144 222 Z" />
+
+      <MuscleZone id="lowerback" d="M68 175 Q62 190 62 210 L65 235 Q70 250 78 248 L82 225 Q85 200 80 175 Z" />
+      <MuscleZone id="lowerback" d="M172 175 Q178 190 178 210 L175 235 Q170 250 162 248 L158 225 Q155 200 160 175 Z" />
+
+      <MuscleZone id="quadriceps" d="M85 268 Q75 290 72 330 L75 380 Q80 400 92 405 L105 400 Q115 385 118 345 L120 300 Q118 275 110 265 Z" />
+      <MuscleZone id="quadriceps" d="M155 268 Q165 290 168 330 L165 380 Q160 400 148 405 L135 400 Q125 385 122 345 L120 300 Q122 275 130 265 Z" />
+
+      <MuscleZone id="hamstring" d="M90 285 Q98 310 100 350 L95 395 Q88 405 80 395 L75 355 Q72 315 82 285 Z" opacity={0.6} />
+      <MuscleZone id="hamstring" d="M150 285 Q142 310 140 350 L145 395 Q152 405 160 395 L165 355 Q168 315 158 285 Z" opacity={0.6} />
+
+      <MuscleZone id="glutes" d="M82 252 Q72 265 75 285 L85 300 Q100 308 112 302 L108 280 Q105 260 95 252 Z" />
+      <MuscleZone id="glutes" d="M158 252 Q168 265 165 285 L155 300 Q140 308 128 302 L132 280 Q135 260 145 252 Z" />
+
+      <MuscleZone id="calves" d="M75 410 Q68 425 72 450 L78 465 Q85 472 95 468 L100 450 Q105 430 100 412 L88 405 Z" />
+      <MuscleZone id="calves" d="M165 410 Q172 425 168 450 L162 465 Q155 472 145 468 L140 450 Q135 430 140 412 L152 405 Z" />
     </svg>
   );
 }
