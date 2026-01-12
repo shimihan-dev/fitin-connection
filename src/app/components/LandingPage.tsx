@@ -29,7 +29,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
             </span>
           </div>
 
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-foreground uppercase leading-[0.9]">
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter text-foreground uppercase leading-[0.9]">
             IGC<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/50">Fitin_Connection</span>
           </h1>
