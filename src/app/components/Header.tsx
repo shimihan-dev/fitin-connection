@@ -316,12 +316,33 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
             <div className="md:hidden py-4 space-y-2 border-t border-border bg-background/95 backdrop-blur-xl absolute left-0 right-0 px-4">
               {user ? (
                 <>
-                  <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-lg mb-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-                      <User className="w-4 h-4 text-[#2F80FF]" />
+                  <button
+                    onClick={() => {
+                      onMyPageClick?.();
+                      setShowMobileMenu(false);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-muted/50 hover:bg-muted rounded-lg mb-2 w-full transition-colors cursor-pointer"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-green-600 flex items-center justify-center overflow-hidden border border-primary/30">
+                      {user.profile_picture ? (
+                        <img src={user.profile_picture} alt="프로필" className="w-full h-full object-cover" />
+                      ) : (
+                        <User className="w-4 h-4 text-white" />
+                      )}
                     </div>
                     <span className="font-medium text-foreground">{user.name}님</span>
-                  </div>
+                  </button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      onMyPageClick?.();
+                      setShowMobileMenu(false);
+                    }}
+                    className="w-full justify-start flex items-center gap-2"
+                  >
+                    <User className="w-4 h-4" />
+                    마이페이지
+                  </Button>
                   <Button
                     variant="ghost"
                     onClick={() => {
