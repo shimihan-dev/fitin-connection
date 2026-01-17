@@ -164,6 +164,79 @@ const muscleGroups: Record<string, MuscleGroup[]> = {
   ],
 };
 
+// 고해상도 해부학 SVG 경로 데이터
+const anatomyPaths = {
+  // 분리된 바디 실루엣 (머리, 목, 몸통, 팔, 다리)
+  head: "M120 15 C102 15 90 32 90 52 C90 72 102 85 120 85 C138 85 150 72 150 52 C150 32 138 15 120 15 Z",
+  neck: "M108 85 L108 100 L132 100 L132 85 Z",
+  torso: "M70 100 Q55 105 52 120 L48 180 Q45 220 50 260 L55 290 Q70 300 90 305 L120 308 L150 305 Q170 300 185 290 L190 260 Q195 220 192 180 L188 120 Q185 105 170 100 Z",
+  leftArm: "M52 115 Q38 120 30 140 L22 180 Q18 210 22 240 L28 270 Q32 285 40 280 L48 250 Q52 220 50 190 L52 150 Q54 130 52 115 Z",
+  rightArm: "M188 115 Q202 120 210 140 L218 180 Q222 210 218 240 L212 270 Q208 285 200 280 L192 250 Q188 220 190 190 L188 150 Q186 130 188 115 Z",
+  leftLeg: "M50 290 L45 350 Q40 400 50 460 L55 475 Q70 480 90 475 L95 460 Q100 400 95 350 L90 290 Z",
+  rightLeg: "M150 290 L155 350 Q160 400 150 460 L145 475 Q170 480 185 475 L190 460 Q200 400 195 350 L190 290 Z",
+
+  // 각 근육 부위 경로
+  muscles: {
+    // 상체
+    shoulder: [
+      { d: "M30 130 Q25 150 20 170 Q35 180 50 160 Q55 140 50 120 Q40 120 30 130 Z", side: 'left' },
+      { d: "M210 130 Q215 150 220 170 Q205 180 190 160 Q185 140 190 120 Q200 120 210 130 Z", side: 'right' }
+    ],
+    chest: [
+      { d: "M60 105 Q55 130 60 155 Q80 165 118 165 L118 100 Q90 100 60 105 Z", side: 'left' },
+      { d: "M180 105 Q185 130 180 155 Q160 165 122 165 L122 100 Q150 100 180 105 Z", side: 'right' }
+    ],
+    bicep: [
+      { d: "M20 170 Q15 200 25 220 L45 210 Q40 190 50 160 Z", side: 'left' },
+      { d: "M220 170 Q225 200 215 220 L195 210 Q200 190 190 160 Z", side: 'right' }
+    ],
+    tricep: [
+      { d: "M18 170 L15 200 L25 220 L28 215 Z", side: 'left' },
+      { d: "M222 170 L225 200 L215 220 L212 215 Z", side: 'right' }
+    ],
+    back: [
+      { d: "M50 160 L55 210 L65 230 L75 200 L60 155 Z", side: 'left' },
+      { d: "M190 160 L185 210 L175 230 L165 200 L180 155 Z", side: 'right' }
+    ],
+
+    // 코어
+    abs: [
+      { d: "M100 170 L95 190 L118 190 L118 170 Z", side: 'left_upper' },
+      { d: "M140 170 L145 190 L122 190 L122 170 Z", side: 'right_upper' },
+      { d: "M95 195 L92 220 L118 220 L118 195 Z", side: 'left_mid' },
+      { d: "M145 195 L148 220 L122 220 L122 195 Z", side: 'right_mid' },
+      { d: "M92 225 L95 250 L118 250 L118 225 Z", side: 'left_lower' },
+      { d: "M148 225 L145 250 L122 250 L122 225 Z", side: 'right_lower' }
+    ],
+    obliques: [
+      { d: "M65 230 L70 260 L90 260 L92 225 L75 200 Z", side: 'left' },
+      { d: "M175 230 L170 260 L150 260 L148 225 L165 200 Z", side: 'right' }
+    ],
+    lowerback: [
+      { d: "M75 200 L80 230 L90 260 L95 250 L92 225 L88 200 Z", side: 'left' },
+      { d: "M165 200 L160 230 L150 260 L145 250 L148 225 L152 200 Z", side: 'right' }
+    ],
+
+    // 하체
+    quadriceps: [
+      { d: "M55 290 Q40 350 55 400 L85 390 Q95 350 90 300 Z", side: 'left' },
+      { d: "M185 290 Q200 350 185 400 L155 390 Q145 350 150 300 Z", side: 'right' }
+    ],
+    hamstring: [
+      { d: "M90 300 L85 350 L75 390 L55 400 L60 350 L70 300 Z", side: 'left' },
+      { d: "M150 300 L155 350 L165 390 L185 400 L180 350 L170 300 Z", side: 'right' }
+    ],
+    calves: [
+      { d: "M55 405 Q45 430 55 460 L85 450 Q80 420 85 400 Z", side: 'left' },
+      { d: "M185 405 Q195 430 185 460 L155 450 Q160 420 155 400 Z", side: 'right' }
+    ],
+    glutes: [
+      { d: "M70 285 Q60 295 65 315 L80 320 Q95 315 90 300 L80 285 Z", side: 'left' },
+      { d: "M170 285 Q180 295 175 315 L160 320 Q145 315 150 300 L160 285 Z", side: 'right' }
+    ]
+  }
+};
+
 // SVG 인체 다이어그램 컴포넌트 - 해부학적 스타일
 function BodyDiagram({
   muscleData,
@@ -176,97 +249,153 @@ function BodyDiagram({
   onMuscleClick: (id: string) => void;
   getWeeklyCount: (id: string) => number;
 }) {
-  const getColor = (count: number, isSelected: boolean) => {
-    if (isSelected) return '#2F80FF';
-    if (count >= 3) return '#22c55e'; // 3회 이상: green
-    if (count >= 2) return '#facc15'; // 2회: yellow  
-    if (count >= 1) return '#ef4444'; // 1회: red
-    return '#374151'; // 미시작: dark gray
+  // 부위별 그룹 정의
+  const upperBodyMuscles = ['shoulder', 'chest', 'back'];
+  const armMuscles = ['bicep', 'tricep'];
+  const coreMuscles = ['abs', 'obliques', 'lowerback'];
+  const lowerBodyMuscles = ['quadriceps', 'hamstring', 'calves', 'glutes'];
+
+  // 부위별 선택 색상 반환
+  const getSelectedColor = (muscleId: string) => {
+    if (upperBodyMuscles.includes(muscleId)) return '#3b82f6'; // Blue - 상체
+    if (armMuscles.includes(muscleId)) return '#8b5cf6'; // Violet - 팔
+    if (coreMuscles.includes(muscleId)) return '#f97316'; // Orange - 코어
+    if (lowerBodyMuscles.includes(muscleId)) return '#10b981'; // Emerald - 하체
+    return '#3b82f6'; // 기본값
   };
 
-  const getGlow = (count: number, isSelected: boolean) => {
-    if (isSelected) return 'drop-shadow(0 0 12px rgba(47, 128, 255, 0.8))';
-    if (count >= 3) return 'drop-shadow(0 0 8px rgba(34, 197, 94, 0.6))';
-    if (count >= 2) return 'drop-shadow(0 0 8px rgba(250, 204, 21, 0.6))';
-    if (count >= 1) return 'drop-shadow(0 0 8px rgba(239, 68, 68, 0.6))';
+  // 색상 정책: 부위별 다른 색상 적용
+  const getColor = (muscleId: string, count: number, isSelected: boolean) => {
+    if (isSelected) return getSelectedColor(muscleId);
+    if (count >= 3) return '#22c55e'; // Green-500 (3회 이상)
+    if (count >= 2) return '#f59e0b'; // Amber-500 (2회)
+    if (count >= 1) return '#ef4444'; // Red-500 (1회)
+    return '#334155'; // Slate-700 (미시작)
+  };
+
+  // 글로우 효과 개선
+  const getFilter = (count: number, isSelected: boolean) => {
+    if (isSelected) return 'url(#glow-selected)';
+    if (count >= 3) return 'url(#glow-high)';
+    if (count >= 1) return 'url(#glow-low)';
     return 'none';
   };
 
-  const MuscleZone = ({ id, d, opacity = 1 }: { id: string; d: string; opacity?: number }) => (
-    <path
-      d={d}
-      fill={getColor(getWeeklyCount(id), selectedMuscle === id)}
-      opacity={opacity}
-      stroke={getWeeklyCount(id) > 0 || selectedMuscle === id ? getColor(getWeeklyCount(id), selectedMuscle === id) : '#1f2937'}
-      strokeWidth="1"
-      className="cursor-pointer transition-all duration-300 hover:brightness-125"
-      style={{ filter: getGlow(getWeeklyCount(id), selectedMuscle === id) }}
-      onClick={() => onMuscleClick(id)}
-    />
-  );
+  const renderMuscleGroup = (id: string, paths: { d: string }[]) => {
+    const count = getWeeklyCount(id);
+    const isSelected = selectedMuscle === id;
+    const color = getColor(id, count, isSelected);
+
+    return (
+      <g
+        key={id}
+        onClick={() => onMuscleClick(id)}
+        className="cursor-pointer transition-all duration-300"
+        style={{ filter: getFilter(count, isSelected) }}
+      >
+        {paths.map((path, idx) => (
+          <motion.path
+            key={idx}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            d={path.d}
+            fill={color}
+            stroke={isSelected ? '#60a5fa' : 'rgba(255,255,255,0.1)'}
+            strokeWidth={isSelected ? 2 : 1}
+            className="hover:opacity-80 transition-opacity"
+            whileTap={{ scale: 0.98, transformOrigin: "center" }}
+          />
+        ))}
+      </g>
+    );
+  };
 
   return (
-    <svg viewBox="0 0 240 480" className="w-full max-w-[320px] mx-auto">
-      <defs>
-        <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#0f172a" />
-          <stop offset="100%" stopColor="#1e293b" />
-        </linearGradient>
-        <linearGradient id="bodyOutline" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#475569" />
-          <stop offset="100%" stopColor="#334155" />
-        </linearGradient>
-      </defs>
+    <div className="relative w-full max-w-[320px] mx-auto">
+      <svg viewBox="0 0 240 480" className="w-full h-auto drop-shadow-2xl">
+        <defs>
+          {/* 글로우 효과 정의 */}
+          <filter id="glow-selected" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <filter id="glow-high" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <filter id="glow-low" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
 
-      <rect x="0" y="0" width="240" height="480" fill="url(#bgGradient)" rx="12" />
+          <linearGradient id="headGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#475569" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#334155" stopOpacity="0.5" />
+          </linearGradient>
+          <linearGradient id="torsoGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#1e3a5f" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#172554" stopOpacity="0.5" />
+          </linearGradient>
+          <linearGradient id="armGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#3b2f5f" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#2d2348" stopOpacity="0.5" />
+          </linearGradient>
+          <linearGradient id="legGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#1e4035" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#14342a" stopOpacity="0.5" />
+          </linearGradient>
+        </defs>
 
-      <g stroke="#475569" strokeWidth="1.5" fill="none">
-        <ellipse cx="120" cy="45" rx="28" ry="32" />
-        <path d="M108 75 L108 90 L132 90 L132 75" />
-        <path d="M70 95 Q55 100 50 115 L45 160 Q42 200 48 230 L55 245 Q70 260 90 265 L120 268 L150 265 Q170 260 185 245 L192 230 Q198 200 195 160 L190 115 Q185 100 170 95 Z" />
-        <path d="M50 110 Q35 115 28 135 L18 180 Q12 210 18 240 L28 275" />
-        <path d="M190 110 Q205 115 212 135 L222 180 Q228 210 222 240 L212 275" />
-        <path d="M85 265 L78 320 Q72 370 75 420 L80 455" />
-        <path d="M155 265 L162 320 Q168 370 165 420 L160 455" />
-      </g>
+        {/* 1. 분리된 바디 실루엣 (배경) - 부위별 색상 */}
+        {/* 머리 */}
+        <path d={anatomyPaths.head} fill="url(#headGradient)" stroke="#64748b" strokeWidth="1.5" />
+        {/* 목 */}
+        <path d={anatomyPaths.neck} fill="url(#headGradient)" stroke="#64748b" strokeWidth="1" />
+        {/* 몸통 */}
+        <path d={anatomyPaths.torso} fill="url(#torsoGradient)" stroke="#3b82f6" strokeWidth="1.5" />
+        {/* 왼쪽 팔 */}
+        <path d={anatomyPaths.leftArm} fill="url(#armGradient)" stroke="#8b5cf6" strokeWidth="1.5" />
+        {/* 오른쪽 팔 */}
+        <path d={anatomyPaths.rightArm} fill="url(#armGradient)" stroke="#8b5cf6" strokeWidth="1.5" />
+        {/* 왼쪽 다리 */}
+        <path d={anatomyPaths.leftLeg} fill="url(#legGradient)" stroke="#10b981" strokeWidth="1.5" />
+        {/* 오른쪽 다리 */}
+        <path d={anatomyPaths.rightLeg} fill="url(#legGradient)" stroke="#10b981" strokeWidth="1.5" />
 
-      <MuscleZone id="shoulder" d="M50 100 Q38 105 32 120 L30 140 Q32 150 40 148 L55 135 Q62 120 58 105 Z" />
-      <MuscleZone id="shoulder" d="M190 100 Q202 105 208 120 L210 140 Q208 150 200 148 L185 135 Q178 120 182 105 Z" />
+        {/* 2. 각 근육 그룹 렌더링 */}
+        {/* 상체 */}
+        {renderMuscleGroup('shoulder', anatomyPaths.muscles.shoulder)}
+        {renderMuscleGroup('chest', anatomyPaths.muscles.chest)}
+        {renderMuscleGroup('bicep', anatomyPaths.muscles.bicep)}
+        {renderMuscleGroup('tricep', anatomyPaths.muscles.tricep)}
+        {renderMuscleGroup('back', anatomyPaths.muscles.back)}
 
-      <MuscleZone id="chest" d="M68 100 Q60 115 62 135 L70 155 Q85 168 105 172 L120 174 L120 100 Q95 95 68 100 Z" />
-      <MuscleZone id="chest" d="M172 100 Q180 115 178 135 L170 155 Q155 168 135 172 L120 174 L120 100 Q145 95 172 100 Z" />
+        {/* 코어 */}
+        {renderMuscleGroup('abs', anatomyPaths.muscles.abs)}
+        {renderMuscleGroup('obliques', anatomyPaths.muscles.obliques)}
+        {renderMuscleGroup('lowerback', anatomyPaths.muscles.lowerback)}
 
-      <MuscleZone id="back" d="M52 130 Q48 150 50 175 L55 205 Q60 220 68 215 L72 190 Q75 160 70 130 Z" opacity={0.8} />
-      <MuscleZone id="back" d="M188 130 Q192 150 190 175 L185 205 Q180 220 172 215 L168 190 Q165 160 170 130 Z" opacity={0.8} />
+        {/* 하체 */}
+        {renderMuscleGroup('quadriceps', anatomyPaths.muscles.quadriceps)}
+        {renderMuscleGroup('hamstring', anatomyPaths.muscles.hamstring)}
+        {renderMuscleGroup('calves', anatomyPaths.muscles.calves)}
+        {renderMuscleGroup('glutes', anatomyPaths.muscles.glutes)}
+      </svg>
 
-      <MuscleZone id="bicep" d="M32 145 Q22 150 18 170 L15 195 Q15 210 22 208 L35 195 Q42 175 40 155 Z" />
-      <MuscleZone id="bicep" d="M208 145 Q218 150 222 170 L225 195 Q225 210 218 208 L205 195 Q198 175 200 155 Z" />
-
-      <MuscleZone id="tricep" d="M40 155 Q48 165 48 185 L45 210 Q42 225 35 218 L30 200 Q25 175 32 155 Z" />
-      <MuscleZone id="tricep" d="M200 155 Q192 165 192 185 L195 210 Q198 225 205 218 L210 200 Q215 175 208 155 Z" />
-
-      <MuscleZone id="abs" d="M100 175 L100 195 L120 195 L120 175 Q115 172 100 175 Z" />
-      <MuscleZone id="abs" d="M120 175 L120 195 L140 195 L140 175 Q125 172 120 175 Z" />
-      <MuscleZone id="abs" d="M98 198 L98 218 L120 218 L120 198 Z" />
-      <MuscleZone id="abs" d="M120 198 L120 218 L142 218 L142 198 Z" />
-      <MuscleZone id="abs" d="M96 222 L96 242 L120 242 L120 222 Z" />
-      <MuscleZone id="abs" d="M120 222 L120 242 L144 242 L144 222 Z" />
-
-      <MuscleZone id="lowerback" d="M68 175 Q62 190 62 210 L65 235 Q70 250 78 248 L82 225 Q85 200 80 175 Z" />
-      <MuscleZone id="lowerback" d="M172 175 Q178 190 178 210 L175 235 Q170 250 162 248 L158 225 Q155 200 160 175 Z" />
-
-      <MuscleZone id="quadriceps" d="M85 268 Q75 290 72 330 L75 380 Q80 400 92 405 L105 400 Q115 385 118 345 L120 300 Q118 275 110 265 Z" />
-      <MuscleZone id="quadriceps" d="M155 268 Q165 290 168 330 L165 380 Q160 400 148 405 L135 400 Q125 385 122 345 L120 300 Q122 275 130 265 Z" />
-
-      <MuscleZone id="hamstring" d="M90 285 Q98 310 100 350 L95 395 Q88 405 80 395 L75 355 Q72 315 82 285 Z" opacity={0.6} />
-      <MuscleZone id="hamstring" d="M150 285 Q142 310 140 350 L145 395 Q152 405 160 395 L165 355 Q168 315 158 285 Z" opacity={0.6} />
-
-      <MuscleZone id="glutes" d="M82 252 Q72 265 75 285 L85 300 Q100 308 112 302 L108 280 Q105 260 95 252 Z" />
-      <MuscleZone id="glutes" d="M158 252 Q168 265 165 285 L155 300 Q140 308 128 302 L132 280 Q135 260 145 252 Z" />
-
-      <MuscleZone id="calves" d="M75 410 Q68 425 72 450 L78 465 Q85 472 95 468 L100 450 Q105 430 100 412 L88 405 Z" />
-      <MuscleZone id="calves" d="M165 410 Q172 425 168 450 L162 465 Q155 472 145 468 L140 450 Q135 430 140 412 L152 405 Z" />
-    </svg>
+      {/* 장식용 라벨 */}
+      <div className="absolute top-4 right-4 text-[10px] text-slate-500 font-mono">
+        ANATOMY VIEW
+      </div>
+    </div>
   );
 }
 
