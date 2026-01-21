@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { User as UserIcon, Save, Calendar, Target, Link, Ruler, Scale, Camera } from 'lucide-react';
+import { User as UserIcon, Save, Calendar, Target, Link, Ruler, Scale, Camera, Cake, Percent, Dumbbell } from 'lucide-react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -21,7 +21,10 @@ export function MyPage({ user, onBack }: MyPageProps) {
         name: '',
         height: '',
         weight: '',
+        age: '',
         fitness_goal: '',
+        body_fat_goal: '',
+        preferred_exercise: '',
         sns_link: '',
     });
 
@@ -42,7 +45,10 @@ export function MyPage({ user, onBack }: MyPageProps) {
                 name: fetchedProfile.name || '',
                 height: fetchedProfile.height?.toString() || '',
                 weight: fetchedProfile.weight?.toString() || '',
+                age: fetchedProfile.age?.toString() || '',
                 fitness_goal: fetchedProfile.fitness_goal || '',
+                body_fat_goal: fetchedProfile.body_fat_goal?.toString() || '',
+                preferred_exercise: fetchedProfile.preferred_exercise || '',
                 sns_link: fetchedProfile.sns_link || '',
             });
         }
@@ -68,7 +74,10 @@ export function MyPage({ user, onBack }: MyPageProps) {
             name: formData.name,
             height: formData.height ? parseFloat(formData.height) : undefined,
             weight: formData.weight ? parseFloat(formData.weight) : undefined,
+            age: formData.age ? parseInt(formData.age) : undefined,
             fitness_goal: formData.fitness_goal || undefined,
+            body_fat_goal: formData.body_fat_goal ? parseInt(formData.body_fat_goal) : undefined,
+            preferred_exercise: formData.preferred_exercise as 'running' | 'gym' | 'crossfit' | undefined,
             sns_link: formData.sns_link || undefined,
         };
 
@@ -276,6 +285,63 @@ export function MyPage({ user, onBack }: MyPageProps) {
                                 className="bg-background/50 border-white/10"
                             />
                         </div>
+                    </div>
+
+                    {/* 나이 & 체지방 목표 */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="age" className="flex items-center gap-2 text-foreground">
+                                <Cake className="w-4 h-4" />
+                                나이
+                            </Label>
+                            <Input
+                                id="age"
+                                name="age"
+                                type="number"
+                                value={formData.age}
+                                onChange={handleChange}
+                                placeholder="22"
+                                disabled={saving}
+                                className="bg-background/50 border-white/10"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="body_fat_goal" className="flex items-center gap-2 text-foreground">
+                                <Percent className="w-4 h-4" />
+                                목표 체지방률 (%)
+                            </Label>
+                            <Input
+                                id="body_fat_goal"
+                                name="body_fat_goal"
+                                type="number"
+                                value={formData.body_fat_goal}
+                                onChange={handleChange}
+                                placeholder="15"
+                                disabled={saving}
+                                className="bg-background/50 border-white/10"
+                            />
+                        </div>
+                    </div>
+
+                    {/* 선호 운동 */}
+                    <div className="space-y-2">
+                        <Label htmlFor="preferred_exercise" className="flex items-center gap-2 text-foreground">
+                            <Dumbbell className="w-4 h-4" />
+                            선호 운동
+                        </Label>
+                        <select
+                            id="preferred_exercise"
+                            name="preferred_exercise"
+                            value={formData.preferred_exercise}
+                            onChange={(e) => setFormData({ ...formData, preferred_exercise: e.target.value })}
+                            disabled={saving}
+                            className="w-full px-3 py-2 bg-background/50 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
+                        >
+                            <option value="" className="bg-background">선택하세요</option>
+                            <option value="running" className="bg-background">러닝</option>
+                            <option value="gym" className="bg-background">헬스</option>
+                            <option value="crossfit" className="bg-background">크로스핏</option>
+                        </select>
                     </div>
 
                     <div className="space-y-2">

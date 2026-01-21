@@ -10,7 +10,7 @@ import { Navigation } from './components/Navigation';
 import { Header } from './components/Header';
 import { SignupPage } from './components/SignupPage';
 import { WelcomeSlides } from './components/WelcomeSlides';
-import { LandingPage } from './components/LandingPage';
+import { OnboardingFlow } from './components/OnboardingFlow';
 import { CompetitionPage } from './components/Competition/CompetitionPage';
 import { getCurrentUser, signOut, User } from '../../utils/auth';
 
@@ -20,6 +20,7 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [isSignupPage, setIsSignupPage] = useState(false);
   const [showMyPage, setShowMyPage] = useState(false);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [user, setUser] = useState<{ name: string; email: string; id?: string; profile_picture?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [showWelcomeSlides, setShowWelcomeSlides] = useState(false);
@@ -90,14 +91,33 @@ export default function App() {
     );
   }
 
-  // 로그인하지 않은 경우 랜딩 페이지 표시
+  // 로그인하지 않은 경우 온보딩 플로우 표시
   if (!user) {
     return (
       <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground">
-        <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} onSignupClick={() => setIsSignupPage(true)} />
-        <main>
-          <LandingPage onStart={() => setIsSignupPage(true)} />
-        </main>
+        <OnboardingFlow
+          onComplete={(completedUser) => {
+            setUser({
+              id: completedUser.id,
+              name: completedUser.name || completedUser.email.split('@')[0] || '사용자',
+              email: completedUser.email,
+              profile_picture: completedUser.profile_picture,
+            });
+            setCurrentPage('workout'); // 온보딩 완료 후 운동 페이지로 이동
+          }}
+          onLoginClick={() => setShowLoginDialog(true)}
+        />
+        {/* 로그인 다이얼로그는 Header에서 제공 */}
+        {showLoginDialog && (
+          <div className="fixed inset-0 z-50">
+            <Header
+              user={null}
+              onLogout={handleLogout}
+              onLoginSuccess={handleLoginSuccess}
+              onSignupClick={() => setShowLoginDialog(false)}
+            />
+          </div>
+        )}
       </div>
     );
   }
