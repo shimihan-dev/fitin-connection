@@ -65,11 +65,10 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
       } else if (loggedInUser) {
         setShowLoginDialog(false);
         setLoginData({ email: '', password: '' });
-        // 로그인 성공 시 콜백 호출 (사용자 정보 전달)
         onLoginSuccess?.(loggedInUser);
       }
     } catch (error) {
-      console.error('로그인 에러:', error);
+      console.error('Login Error in Header:', error);
       alert('로그인 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);

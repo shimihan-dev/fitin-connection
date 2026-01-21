@@ -421,9 +421,14 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
 
   // 러닝 기록 상태
   const [runningRecords, setRunningRecords] = useState<RunningRecord[]>(() => {
-    if (user) {
-      const stored = localStorage.getItem(`running_records_v2_${user.email}`);
-      return stored ? JSON.parse(stored) : [];
+    if (user && user.email) {
+      try {
+        const stored = localStorage.getItem(`running_records_v2_${user.email}`);
+        return stored ? JSON.parse(stored) : [];
+      } catch (err) {
+        console.error('Failed to parse running records:', err);
+        return [];
+      }
     }
     return [];
   });
@@ -482,9 +487,18 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
   const [viewingImage, setViewingImage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user) {
-      const stored = localStorage.getItem(`workout_logs_${user.email}`);
-      if (stored) setWorkoutLogs(JSON.parse(stored));
+    if (user && user.email) {
+      try {
+        const stored = localStorage.getItem(`workout_logs_${user.email}`);
+        if (stored) {
+          const parsedLogs = JSON.parse(stored);
+          if (Array.isArray(parsedLogs)) {
+            setWorkoutLogs(parsedLogs);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to parse workout logs:', err);
+      }
     }
   }, [user]);
 
