@@ -11,7 +11,10 @@ export interface User {
     created_at?: string;
     height?: number;
     weight?: number;
+    age?: number;
     fitness_goal?: string;
+    body_fat_goal?: number;
+    preferred_exercise?: 'running' | 'gym' | 'crossfit';
     sns_link?: string;
     profile_picture?: string;
 }
@@ -239,7 +242,10 @@ export interface ProfileUpdateData {
     name?: string;
     height?: number;
     weight?: number;
+    age?: number;
     fitness_goal?: string;
+    body_fat_goal?: number;
+    preferred_exercise?: 'running' | 'gym' | 'crossfit';
     sns_link?: string;
     profile_picture?: string;
 }
