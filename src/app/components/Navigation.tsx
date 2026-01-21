@@ -1,6 +1,6 @@
 import { Home, Dumbbell, Calendar, TrendingUp, Utensils, Trophy, MessageSquare } from 'lucide-react';
 
-type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
+type Page = 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
 
 interface NavigationProps {
   currentPage: Page;
@@ -9,11 +9,8 @@ interface NavigationProps {
 
 export function Navigation({ currentPage, onNavigate }: NavigationProps) {
   const navItems = [
-    { id: 'home' as Page, icon: Home, label: '홈' },
     { id: 'workout' as Page, icon: Dumbbell, label: '운동' },
     { id: 'competition' as Page, icon: Trophy, label: 'SBD대회' },
-    { id: 'routine' as Page, icon: Calendar, label: '루틴' },
-    { id: 'diet' as Page, icon: Utensils, label: '식단' },
     { id: 'board' as Page, icon: MessageSquare, label: '게시판' },
     { id: 'progress' as Page, icon: TrendingUp, label: '진척도' },
   ];

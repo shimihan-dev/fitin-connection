@@ -6,6 +6,8 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+import { RoutinePlanner } from './RoutinePlanner';
+import { Diet } from './Diet';
 
 interface MuscleGroup {
   id: string;
@@ -592,11 +594,13 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
       </motion.div>
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6">
+        <TabsList className="grid w-full grid-cols-6 mb-6">
           <TabsTrigger value="overview">전체</TabsTrigger>
           <TabsTrigger value="upper">상체</TabsTrigger>
           <TabsTrigger value="lower">하체</TabsTrigger>
           <TabsTrigger value="running">러닝</TabsTrigger>
+          <TabsTrigger value="routine">루틴</TabsTrigger>
+          <TabsTrigger value="diet">식단</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -889,10 +893,20 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
           ))}
         </TabsContent>
 
+        {/* Routine Tab */}
+        <TabsContent value="routine" className="space-y-4">
+          <RoutinePlanner user={user} />
+        </TabsContent>
+
+        {/* Diet Tab */}
+        <TabsContent value="diet" className="space-y-4">
+          <Diet user={user as any} />
+        </TabsContent>
+
         {/* Running Tab */}
-        <TabsContent value="running" className="space-y-4">
+        < TabsContent value="running" className="space-y-4" >
           {/* 헤더 및 업로드 버튼 */}
-          <Card className="p-4 bg-card/50 border-white/10">
+          < Card className="p-4 bg-card/50 border-white/10" >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
@@ -916,90 +930,94 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                 </div>
               </label>
             </div>
-          </Card>
+          </Card >
 
           {/* 총 통계 */}
-          {runningRecords.length > 0 && (
-            <Card className="p-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-500/30">
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-2xl font-bold text-emerald-400">
-                    {runningRecords.reduce((sum, r) => sum + (r.distance || 0), 0).toFixed(1)}
-                  </p>
-                  <p className="text-xs text-muted-foreground">총 거리 (km)</p>
+          {
+            runningRecords.length > 0 && (
+              <Card className="p-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-500/30">
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <p className="text-2xl font-bold text-emerald-400">
+                      {runningRecords.reduce((sum, r) => sum + (r.distance || 0), 0).toFixed(1)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">총 거리 (km)</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-primary">{runningRecords.length}</p>
+                    <p className="text-xs text-muted-foreground">총 러닝 횟수</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-teal-400">
+                      {(runningRecords.reduce((sum, r) => sum + (r.distance || 0), 0) / runningRecords.length || 0).toFixed(1)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">평균 거리 (km)</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-primary">{runningRecords.length}</p>
-                  <p className="text-xs text-muted-foreground">총 러닝 횟수</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-teal-400">
-                    {(runningRecords.reduce((sum, r) => sum + (r.distance || 0), 0) / runningRecords.length || 0).toFixed(1)}
-                  </p>
-                  <p className="text-xs text-muted-foreground">평균 거리 (km)</p>
-                </div>
-              </div>
-            </Card>
-          )}
+              </Card>
+            )
+          }
 
           {/* 러닝 기록 리스트 */}
-          {runningRecords.length === 0 ? (
-            <Card className="p-8 bg-card/50 border-white/10 text-center">
-              <Footprints className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-30" />
-              <p className="text-muted-foreground mb-2">아직 러닝 기록이 없습니다</p>
-              <p className="text-sm text-muted-foreground">위의 "기록 추가" 버튼을 눌러 시작하세요</p>
-            </Card>
-          ) : (
-            <div className="space-y-3">
-              {runningRecords.map((record) => (
-                <Card key={record.id} className="p-4 bg-card/50 border-white/10">
-                  <div className="flex gap-4">
-                    {/* 썸네일 이미지 */}
-                    <img
-                      src={record.imageUrl}
-                      alt="러닝 기록"
-                      onClick={() => setViewingImage(record.imageUrl)}
-                      className="w-20 h-20 object-cover rounded-lg border border-white/10 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-                    />
-                    {/* 기록 정보 */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(record.date).toLocaleDateString('ko-KR', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                          })}
+          {
+            runningRecords.length === 0 ? (
+              <Card className="p-8 bg-card/50 border-white/10 text-center">
+                <Footprints className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-30" />
+                <p className="text-muted-foreground mb-2">아직 러닝 기록이 없습니다</p>
+                <p className="text-sm text-muted-foreground">위의 "기록 추가" 버튼을 눌러 시작하세요</p>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {runningRecords.map((record) => (
+                  <Card key={record.id} className="p-4 bg-card/50 border-white/10">
+                    <div className="flex gap-4">
+                      {/* 썸네일 이미지 */}
+                      <img
+                        src={record.imageUrl}
+                        alt="러닝 기록"
+                        onClick={() => setViewingImage(record.imageUrl)}
+                        className="w-20 h-20 object-cover rounded-lg border border-white/10 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                      />
+                      {/* 기록 정보 */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(record.date).toLocaleDateString('ko-KR', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </p>
+                          <button
+                            onClick={() => handleDeleteRunningRecord(record.id)}
+                            className="text-muted-foreground hover:text-red-400 transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <p className="text-3xl font-bold text-foreground">
+                          {record.distance?.toFixed(2) || '0.00'}
+                          <span className="text-lg font-normal text-muted-foreground ml-1">km</span>
                         </p>
-                        <button
-                          onClick={() => handleDeleteRunningRecord(record.id)}
-                          className="text-muted-foreground hover:text-red-400 transition-colors"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <p className="text-3xl font-bold text-foreground">
-                        {record.distance?.toFixed(2) || '0.00'}
-                        <span className="text-lg font-normal text-muted-foreground ml-1">km</span>
-                      </p>
-                      <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {record.duration || '--:--'}
-                        </span>
-                        <span>{record.pace || '-'}/km</span>
+                        <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {record.duration || '--:--'}
+                          </span>
+                          <span>{record.pace || '-'}/km</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+                  </Card>
+                ))}
+              </div>
+            )
+          }
+        </TabsContent >
+      </Tabs >
 
       {/* Log Exercise Dialog */}
-      <Dialog open={showLogDialog} onOpenChange={setShowLogDialog}>
+      < Dialog open={showLogDialog} onOpenChange={setShowLogDialog} >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>운동 기록</DialogTitle>
@@ -1042,10 +1060,10 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
             </div>
           )}
         </DialogContent>
-      </Dialog>
+      </Dialog >
 
       {/* Running Upload Dialog */}
-      <Dialog open={showRunningUploadDialog} onOpenChange={setShowRunningUploadDialog}>
+      < Dialog open={showRunningUploadDialog} onOpenChange={setShowRunningUploadDialog} >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>러닝 기록 업로드</DialogTitle>
@@ -1121,10 +1139,10 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
             </div>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog >
 
       {/* Image Viewer Dialog */}
-      <Dialog open={!!viewingImage} onOpenChange={() => setViewingImage(null)}>
+      < Dialog open={!!viewingImage} onOpenChange={() => setViewingImage(null)}>
         <DialogContent className="sm:max-w-3xl p-2 bg-black/90">
           {viewingImage && (
             <img
@@ -1134,7 +1152,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
             />
           )}
         </DialogContent>
-      </Dialog>
-    </div>
+      </Dialog >
+    </div >
   );
 }

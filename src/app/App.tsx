@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Home } from './components/Home';
 import { WorkoutGuide } from './components/WorkoutGuide';
 import { RoutinePlanner } from './components/RoutinePlanner';
 import { Progress } from './components/Progress';
@@ -14,10 +13,10 @@ import { OnboardingFlow } from './components/OnboardingFlow';
 import { CompetitionPage } from './components/Competition/CompetitionPage';
 import { getCurrentUser, signOut, User } from '../../utils/auth';
 
-type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
+type Page = 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [currentPage, setCurrentPage] = useState<Page>('workout');
   const [isSignupPage, setIsSignupPage] = useState(false);
   const [showMyPage, setShowMyPage] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
@@ -124,8 +123,6 @@ export default function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'home':
-        return <Home onNavigate={setCurrentPage} user={user} />;
       case 'workout':
         return <WorkoutGuide user={user} />;
       case 'competition':
@@ -139,7 +136,7 @@ export default function App() {
       case 'board':
         return <Board user={user} />;
       default:
-        return <Home onNavigate={setCurrentPage} user={user} />;
+        return <WorkoutGuide user={user} />;
     }
   };
 
