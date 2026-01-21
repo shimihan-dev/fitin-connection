@@ -12,10 +12,11 @@ interface HeaderProps {
   onLoginSuccess?: (user: AuthUser) => void;
   onSignupClick?: () => void;
   onMyPageClick?: () => void;
+  defaultShowLogin?: boolean;
 }
 
-export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPageClick }: HeaderProps) {
-  const [showLoginDialog, setShowLoginDialog] = useState(false);
+export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPageClick, defaultShowLogin = false }: HeaderProps) {
+  const [showLoginDialog, setShowLoginDialog] = useState(defaultShowLogin);
   const [showSignupDialog, setShowSignupDialog] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [loading, setLoading] = useState(false);

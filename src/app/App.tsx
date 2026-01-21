@@ -11,7 +11,11 @@ import { SignupPage } from './components/SignupPage';
 import { WelcomeSlides } from './components/WelcomeSlides';
 import { OnboardingFlow } from './components/OnboardingFlow';
 import { CompetitionPage } from './components/Competition/CompetitionPage';
-import { getCurrentUser, signOut, User } from '../../utils/auth';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './components/ui/dialog';
+import { Button as UIButton } from './components/ui/button';
+import { Input } from './components/ui/input';
+import { Label } from './components/ui/label';
+import { getCurrentUser, signOut, signIn, User } from '../../utils/auth';
 
 type Page = 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
 
@@ -23,6 +27,36 @@ export default function App() {
   const [user, setUser] = useState<{ name: string; email: string; id?: string; profile_picture?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [showWelcomeSlides, setShowWelcomeSlides] = useState(false);
+
+  // 로그인 폼 상태
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [loginData, setLoginData] = useState({ email: '', password: '' });
+  const [rememberMe, setRememberMe] = useState(true);
+
+  // 로그인 폼 핸들러
+  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoginData({ ...loginData, [e.target.name]: e.target.value });
+  };
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginLoading(true);
+    try {
+      const { user: loggedInUser, error } = await signIn(loginData.email, loginData.password, rememberMe);
+      if (error) {
+        alert(error);
+      } else if (loggedInUser) {
+        setShowLoginDialog(false);
+        setLoginData({ email: '', password: '' });
+        handleLoginSuccess(loggedInUser);
+      }
+    } catch (error) {
+      console.error('로그인 에러:', error);
+      alert('로그인 중 오류가 발생했습니다.');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
 
   // 로그인 성공 시 사용자 상태 업데이트 및 슬라이드 표시
   const handleLoginSuccess = (loggedInUser: User) => {
@@ -106,17 +140,75 @@ export default function App() {
           }}
           onLoginClick={() => setShowLoginDialog(true)}
         />
-        {/* 로그인 다이얼로그는 Header에서 제공 */}
-        {showLoginDialog && (
-          <div className="fixed inset-0 z-50">
-            <Header
-              user={null}
-              onLogout={handleLogout}
-              onLoginSuccess={handleLoginSuccess}
-              onSignupClick={() => setShowLoginDialog(false)}
-            />
-          </div>
-        )}
+        {/* 로그인 다이얼로그 */}
+        <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>로그인</DialogTitle>
+              <DialogDescription>
+                Fitin_Connection에 오신 것을 환영합니다!
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleLoginSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="login-email">이메일</Label>
+                <Input
+                  id="login-email"
+                  name="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={loginData.email}
+                  onChange={handleLoginChange}
+                  required
+                  disabled={loginLoading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="login-password">비밀번호</Label>
+                <Input
+                  id="login-password"
+                  name="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={loginData.password}
+                  onChange={handleLoginChange}
+                  required
+                  disabled={loginLoading}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="login-rememberMe"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 rounded"
+                  disabled={loginLoading}
+                />
+                <label htmlFor="login-rememberMe" className="text-sm text-muted-foreground">
+                  로그인 상태 유지하기
+                </label>
+              </div>
+              <div className="flex flex-col gap-2">
+                <UIButton
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  disabled={loginLoading}
+                >
+                  {loginLoading ? '로그인 중...' : '로그인'}
+                </UIButton>
+                <button
+                  type="button"
+                  onClick={() => setShowLoginDialog(false)}
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  disabled={loginLoading}
+                >
+                  취소
+                </button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
