@@ -240,7 +240,7 @@ export default function App() {
       )}
 
       <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} onMyPageClick={() => setShowMyPage(true)} />
-      <div className="max-w-7xl mx-auto pt-16 pb-20">
+      <div className="max-w-7xl mx-auto pt-16 pb-24">
         {showMyPage ? (
           <MyPage user={user} onBack={() => setShowMyPage(false)} />
         ) : (
