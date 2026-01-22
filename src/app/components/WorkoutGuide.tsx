@@ -404,6 +404,7 @@ function BodyDiagram({
 export function WorkoutGuide({ user }: WorkoutGuideProps) {
   const [selectedTab, setSelectedTab] = useState('overview');
   const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
+  const [routineSubTab, setRoutineSubTab] = useState('planner'); // 'planner', 'upper', 'lower'
   const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
   const [showLogDialog, setShowLogDialog] = useState(false);
@@ -608,12 +609,10 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
       </motion.div>
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-6 mb-6">
+        <TabsList className="grid w-full grid-cols-4 mb-6">
           <TabsTrigger value="overview">전체</TabsTrigger>
-          <TabsTrigger value="upper">상체</TabsTrigger>
-          <TabsTrigger value="lower">하체</TabsTrigger>
-          <TabsTrigger value="running">러닝</TabsTrigger>
           <TabsTrigger value="routine">루틴</TabsTrigger>
+          <TabsTrigger value="running">러닝</TabsTrigger>
           <TabsTrigger value="diet">식단</TabsTrigger>
         </TabsList>
 
@@ -714,7 +713,11 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                     <Button
                       size="sm"
                       className="w-full"
-                      onClick={() => setSelectedTab(muscleGroups.upper.some(m => m.id === selectedMuscleData.id) ? 'upper' : 'lower')}
+                      onClick={() => {
+                        const isUpper = muscleGroups.upper.some(m => m.id === selectedMuscleData.id);
+                        setSelectedTab('routine');
+                        setRoutineSubTab(isUpper ? 'upper' : 'lower');
+                      }}
                     >
                       운동 기록하기 <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
@@ -725,191 +728,236 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
           </div>
         </TabsContent>
 
-        {/* Upper Body Tab */}
-        <TabsContent value="upper" className="space-y-4">
-          {muscleGroups.upper.map(muscle => (
-            <Card key={muscle.id} className="overflow-hidden bg-card/50 border-white/10">
-              <div
-                className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => setExpandedExercise(expandedExercise === muscle.id ? null : muscle.id)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Target className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">{muscle.name}</h3>
-                      <p className="text-sm text-muted-foreground">{muscle.exercises.length}개 운동</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="border-white/20">{getWeeklyCount(muscle.id)}회/주</Badge>
-                    <ChevronRight className={`w-5 h-5 transition-transform ${expandedExercise === muscle.id ? 'rotate-90' : ''}`} />
-                  </div>
-                </div>
-              </div>
-
-              {expandedExercise === muscle.id && (
-                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-white/10">
-                  <div className="p-4 space-y-3">
-                    {muscle.exercises.map((exercise, idx) => (
-                      <div key={idx} className="p-3 bg-background/50 rounded-lg border border-white/5">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-foreground">{exercise.name}</span>
-                          <div className="flex items-center gap-2">
-                            <Badge className={getDifficultyColor(exercise.difficulty)}>
-                              {getDifficultyLabel(exercise.difficulty)}
-                            </Badge>
-                            <Button
-                              size="sm"
-                              variant="outline" className="border-white/20"
-                              onClick={() => {
-                                setLogExercise({ muscleId: muscle.id, name: exercise.name });
-                                setShowLogDialog(true);
-                              }}
-                            >
-                              <Plus className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="flex gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {exercise.duration}</span>
-                          <span>{exercise.sets}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </Card>
-          ))}
-        </TabsContent>
-
-        {/* Lower Body / Core Tab */}
-        <TabsContent value="lower" className="space-y-4">
-          <h3 className="font-semibold text-lg">하체</h3>
-          {muscleGroups.lower.map(muscle => (
-            <Card key={muscle.id} className="overflow-hidden">
-              <div
-                className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => setExpandedExercise(expandedExercise === muscle.id ? null : muscle.id)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                      <Target className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">{muscle.name}</h3>
-                      <p className="text-sm text-muted-foreground">{muscle.exercises.length}개 운동</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="outline">{getWeeklyCount(muscle.id)}회/주</Badge>
-                    <ChevronRight className={`w-5 h-5 transition-transform ${expandedExercise === muscle.id ? 'rotate-90' : ''}`} />
-                  </div>
-                </div>
-              </div>
-
-              {expandedExercise === muscle.id && (
-                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t">
-                  <div className="p-4 space-y-3">
-                    {muscle.exercises.map((exercise, idx) => (
-                      <div key={idx} className="p-3 bg-muted/30 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">{exercise.name}</span>
-                          <div className="flex items-center gap-2">
-                            <Badge className={getDifficultyColor(exercise.difficulty)}>
-                              {getDifficultyLabel(exercise.difficulty)}
-                            </Badge>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                setLogExercise({ muscleId: muscle.id, name: exercise.name });
-                                setShowLogDialog(true);
-                              }}
-                            >
-                              <Plus className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="flex gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {exercise.duration}</span>
-                          <span>{exercise.sets}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </Card>
-          ))}
-
-          <h3 className="font-semibold text-lg pt-4">코어</h3>
-          {muscleGroups.core.map(muscle => (
-            <Card key={muscle.id} className="overflow-hidden">
-              <div
-                className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => setExpandedExercise(expandedExercise === muscle.id ? null : muscle.id)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                      <Target className="w-5 h-5 text-orange-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">{muscle.name}</h3>
-                      <p className="text-sm text-muted-foreground">{muscle.exercises.length}개 운동</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="outline">{getWeeklyCount(muscle.id)}회/주</Badge>
-                    <ChevronRight className={`w-5 h-5 transition-transform ${expandedExercise === muscle.id ? 'rotate-90' : ''}`} />
-                  </div>
-                </div>
-              </div>
-
-              {expandedExercise === muscle.id && (
-                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t">
-                  <div className="p-4 space-y-3">
-                    {muscle.exercises.map((exercise, idx) => (
-                      <div key={idx} className="p-3 bg-muted/30 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">{exercise.name}</span>
-                          <div className="flex items-center gap-2">
-                            <Badge className={getDifficultyColor(exercise.difficulty)}>
-                              {getDifficultyLabel(exercise.difficulty)}
-                            </Badge>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                setLogExercise({ muscleId: muscle.id, name: exercise.name });
-                                setShowLogDialog(true);
-                              }}
-                            >
-                              <Plus className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="flex gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {exercise.duration}</span>
-                          <span>{exercise.sets}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </Card>
-          ))}
-        </TabsContent>
-
         {/* Routine Tab */}
-        <TabsContent value="routine" className="space-y-4">
-          <RoutinePlanner user={user} />
+        <TabsContent value="routine" className="space-y-6">
+          {/* Routine Sub-tabs */}
+          <div className="flex bg-muted/50 p-1 rounded-xl border border-white/5 w-fit mx-auto sm:mx-0">
+            <button
+              onClick={() => setRoutineSubTab('planner')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${routineSubTab === 'planner' ? 'bg-primary text-white shadow-lg shadow-primary/25' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              루틴 플래너
+            </button>
+            <button
+              onClick={() => setRoutineSubTab('upper')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${routineSubTab === 'upper' ? 'bg-primary text-white shadow-lg shadow-primary/25' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              상체 운동
+            </button>
+            <button
+              onClick={() => setRoutineSubTab('lower')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${routineSubTab === 'lower' ? 'bg-primary text-white shadow-lg shadow-primary/25' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              하체 운동
+            </button>
+          </div>
+
+          <motion.div
+            key={routineSubTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {routineSubTab === 'planner' && <RoutinePlanner user={user} />}
+
+            {routineSubTab === 'upper' && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-1 h-6 bg-blue-500 rounded-full" />
+                  <h3 className="font-semibold text-lg">상체 운동 가이드</h3>
+                </div>
+                {muscleGroups.upper.map(muscle => (
+                  <Card key={muscle.id} className="overflow-hidden bg-card/50 border-white/10 hover:border-primary/30 transition-colors shadow-sm">
+                    <div
+                      className="p-4 cursor-pointer hover:bg-muted/30 transition-colors"
+                      onClick={() => setExpandedExercise(expandedExercise === muscle.id ? null : muscle.id)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                            <Target className="w-5 h-5 text-blue-500" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-foreground">{muscle.name}</h3>
+                            <p className="text-sm text-muted-foreground">{muscle.exercises.length}개 운동</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Badge variant="outline" className="border-white/10 bg-white/5">{getWeeklyCount(muscle.id)}회 / 주</Badge>
+                          <ChevronRight className={`w-5 h-5 transition-transform text-muted-foreground ${expandedExercise === muscle.id ? 'rotate-90' : ''}`} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {expandedExercise === muscle.id && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-white/5 bg-background/30">
+                        <div className="p-4 space-y-3">
+                          {muscle.exercises.map((exercise, idx) => (
+                            <div key={idx} className="p-4 bg-background/50 rounded-xl border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-foreground">{exercise.name}</span>
+                                  <Badge className={`${getDifficultyColor(exercise.difficulty)} border-none text-[10px]`}>
+                                    {getDifficultyLabel(exercise.difficulty)}
+                                  </Badge>
+                                </div>
+                                <div className="flex gap-4 text-xs text-muted-foreground">
+                                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {exercise.duration}</span>
+                                  <span>{exercise.sets}</span>
+                                </div>
+                              </div>
+                              <Button
+                                size="sm"
+                                className="bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20"
+                                onClick={() => {
+                                  setLogExercise({ muscleId: muscle.id, name: exercise.name });
+                                  setShowLogDialog(true);
+                                }}
+                              >
+                                <Plus className="w-4 h-4 mr-1" /> 기록
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            {routineSubTab === 'lower' && (
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-1 h-6 bg-emerald-500 rounded-full" />
+                    <h3 className="font-semibold text-lg">하체 운동 가이드</h3>
+                  </div>
+                  {muscleGroups.lower.map(muscle => (
+                    <Card key={muscle.id} className="overflow-hidden bg-card/50 border-white/10 hover:border-primary/30 transition-colors shadow-sm">
+                      <div
+                        className="p-4 cursor-pointer hover:bg-muted/30 transition-colors"
+                        onClick={() => setExpandedExercise(expandedExercise === muscle.id ? null : muscle.id)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                              <Target className="w-5 h-5 text-emerald-500" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-foreground">{muscle.name}</h3>
+                              <p className="text-sm text-muted-foreground">{muscle.exercises.length}개 운동</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Badge variant="outline" className="border-white/10 bg-white/5">{getWeeklyCount(muscle.id)}회 / 주</Badge>
+                            <ChevronRight className={`w-5 h-5 transition-transform text-muted-foreground ${expandedExercise === muscle.id ? 'rotate-90' : ''}`} />
+                          </div>
+                        </div>
+                      </div>
+
+                      {expandedExercise === muscle.id && (
+                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-white/5 bg-background/30">
+                          <div className="p-4 space-y-3">
+                            {muscle.exercises.map((exercise, idx) => (
+                              <div key={idx} className="p-4 bg-background/50 rounded-xl border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium text-foreground">{exercise.name}</span>
+                                    <Badge className={`${getDifficultyColor(exercise.difficulty)} border-none text-[10px]`}>
+                                      {getDifficultyLabel(exercise.difficulty)}
+                                    </Badge>
+                                  </div>
+                                  <div className="flex gap-4 text-xs text-muted-foreground">
+                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {exercise.duration}</span>
+                                    <span>{exercise.sets}</span>
+                                  </div>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  className="bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20"
+                                  onClick={() => {
+                                    setLogExercise({ muscleId: muscle.id, name: exercise.name });
+                                    setShowLogDialog(true);
+                                  }}
+                                >
+                                  <Plus className="w-4 h-4 mr-1" /> 기록
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </Card>
+                  ))}
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-1 h-6 bg-orange-500 rounded-full" />
+                    <h3 className="font-semibold text-lg">코어 운동 가이드</h3>
+                  </div>
+                  {muscleGroups.core.map(muscle => (
+                    <Card key={muscle.id} className="overflow-hidden bg-card/50 border-white/10 hover:border-primary/30 transition-colors shadow-sm">
+                      <div
+                        className="p-4 cursor-pointer hover:bg-muted/30 transition-colors"
+                        onClick={() => setExpandedExercise(expandedExercise === muscle.id ? null : muscle.id)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
+                              <Target className="w-5 h-5 text-orange-500" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-foreground">{muscle.name}</h3>
+                              <p className="text-sm text-muted-foreground">{muscle.exercises.length}개 운동</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Badge variant="outline" className="border-white/10 bg-white/5">{getWeeklyCount(muscle.id)}회 / 주</Badge>
+                            <ChevronRight className={`w-5 h-5 transition-transform text-muted-foreground ${expandedExercise === muscle.id ? 'rotate-90' : ''}`} />
+                          </div>
+                        </div>
+                      </div>
+
+                      {expandedExercise === muscle.id && (
+                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-white/5 bg-background/30">
+                          <div className="p-4 space-y-3">
+                            {muscle.exercises.map((exercise, idx) => (
+                              <div key={idx} className="p-4 bg-background/50 rounded-xl border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium text-foreground">{exercise.name}</span>
+                                    <Badge className={`${getDifficultyColor(exercise.difficulty)} border-none text-[10px]`}>
+                                      {getDifficultyLabel(exercise.difficulty)}
+                                    </Badge>
+                                  </div>
+                                  <div className="flex gap-4 text-xs text-muted-foreground">
+                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {exercise.duration}</span>
+                                    <span>{exercise.sets}</span>
+                                  </div>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  className="bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20"
+                                  onClick={() => {
+                                    setLogExercise({ muscleId: muscle.id, name: exercise.name });
+                                    setShowLogDialog(true);
+                                  }}
+                                >
+                                  <Plus className="w-4 h-4 mr-1" /> 기록
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+          </motion.div>
         </TabsContent>
 
         {/* Diet Tab */}
