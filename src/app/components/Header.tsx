@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Dumbbell, LogIn, UserPlus, Download, Menu, X, User, LogOut, UserMinus } from 'lucide-react';
+import { Dumbbell, LogIn, UserPlus, Download, Menu, X, User, LogOut, UserMinus, Bell, BookOpen } from 'lucide-react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { signIn, signUp, isValidEmail, User as AuthUser, requestPasswordReset, verifyResetCode, resetPassword, deleteAccount } from '../../../utils/auth';
+import { WorkoutDictionary } from './WorkoutDictionary';
 
 interface HeaderProps {
   user: { name: string; email: string; profile_picture?: string } | null;
@@ -36,6 +37,9 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
 
   // 계정 메뉴 다이얼로그
   const [showAccountMenuDialog, setShowAccountMenuDialog] = useState(false);
+
+  // 운동 사전 다이얼로그
+  const [showDictionary, setShowDictionary] = useState(false);
 
   const [loginData, setLoginData] = useState({
     email: '',
@@ -252,6 +256,23 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-3">
+              <div className="flex items-center gap-2 mr-2 border-r border-border pr-4">
+                <button
+                  onClick={() => setShowDictionary(true)}
+                  className="p-2 hover:bg-muted rounded-lg transition-colors relative group"
+                  aria-label="운동 사전"
+                >
+                  <BookOpen className="w-5 h-5 text-foreground/70 group-hover:text-[#2F80FF]" />
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#2F80FF] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+                <button
+                  className="p-2 hover:bg-muted rounded-lg transition-colors relative group"
+                  aria-label="알림"
+                >
+                  <Bell className="w-5 h-5 text-foreground/70 group-hover:text-[#2F80FF]" />
+                  <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-background" />
+                </button>
+              </div>
               {user ? (
                 <>
                   <button
@@ -298,17 +319,31 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
               )}
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden p-2 hover:bg-muted rounded-lg transition-colors"
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
-            >
-              {showMobileMenu ? (
-                <X className="w-6 h-6 text-foreground" />
-              ) : (
-                <Menu className="w-6 h-6 text-foreground" />
-              )}
-            </button>
+            {/* Mobile Actions */}
+            <div className="flex md:hidden items-center gap-1">
+              <button
+                onClick={() => setShowDictionary(true)}
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
+              >
+                <BookOpen className="w-5 h-5 text-foreground" />
+              </button>
+              <button
+                className="p-2 hover:bg-muted rounded-lg transition-colors relative"
+              >
+                <Bell className="w-5 h-5 text-foreground" />
+                <span className="absolute top-2 right-2.5 w-1.5 h-1.5 bg-red-500 rounded-full" />
+              </button>
+              <button
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+              >
+                {showMobileMenu ? (
+                  <X className="w-6 h-6 text-foreground" />
+                ) : (
+                  <Menu className="w-6 h-6 text-foreground" />
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Mobile Menu */}
@@ -389,6 +424,8 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
           )}
         </div>
       </header>
+
+      <WorkoutDictionary open={showDictionary} onOpenChange={setShowDictionary} />
 
       {/* Login Dialog */}
       <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
