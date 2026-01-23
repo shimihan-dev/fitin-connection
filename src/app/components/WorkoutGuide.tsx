@@ -242,12 +242,10 @@ const anatomyPaths = {
 // SVG 인체 다이어그램 컴포넌트 - 해부학적 스타일
 function BodyDiagram({
   muscleData,
-  selectedMuscle,
   onMuscleClick,
   getWeeklyCount
 }: {
   muscleData: MuscleGroup[];
-  selectedMuscle: string | null;
   onMuscleClick: (id: string) => void;
   getWeeklyCount: (id: string) => number;
 }) {
@@ -276,8 +274,7 @@ function BodyDiagram({
   };
 
   // 글로우 효과 개선 (네온 스타일)
-  const getFilter = (count: number, isSelected: boolean) => {
-    if (isSelected) return 'url(#neon-glow-selected)';
+  const getFilter = (count: number) => {
     if (count >= 3) return 'url(#neon-glow-green)';
     if (count >= 2) return 'url(#neon-glow-amber)';
     if (count >= 1) return 'url(#neon-glow-red)';
@@ -286,15 +283,14 @@ function BodyDiagram({
 
   const renderMuscleGroup = (id: string, paths: { d: string }[]) => {
     const count = getWeeklyCount(id);
-    const isSelected = selectedMuscle === id;
-    const color = getColor(id, count, isSelected);
+    const color = getColor(id, count, false);
 
     return (
       <g
         key={id}
         onClick={() => onMuscleClick(id)}
         className="cursor-pointer transition-all duration-300"
-        style={{ filter: getFilter(count, isSelected) }}
+        style={{ filter: getFilter(count) }}
       >
         {paths.map((path, idx) => (
           <motion.path
@@ -303,8 +299,8 @@ function BodyDiagram({
             animate={{ opacity: 1 }}
             d={path.d}
             fill={color}
-            stroke={isSelected ? '#60a5fa' : 'rgba(255,255,255,0.1)'}
-            strokeWidth={isSelected ? 2 : 1}
+            stroke="rgba(255,255,255,0.1)"
+            strokeWidth={1}
             className="hover:opacity-80 transition-opacity"
             whileTap={{ scale: 0.98, transformOrigin: "center" }}
           />
@@ -424,7 +420,6 @@ function BodyDiagram({
 
 export function WorkoutGuide({ user }: WorkoutGuideProps) {
   const [selectedTab, setSelectedTab] = useState('overview');
-  const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
   const [routineSubTab, setRoutineSubTab] = useState('planner'); // 'planner', 'upper', 'lower'
   const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
@@ -594,8 +589,6 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
     ...muscleGroups.core,
   ];
 
-  const selectedMuscleData = allMuscles.find(m => m.id === selectedMuscle);
-
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'beginner': return 'bg-green-100 text-green-700';
@@ -612,6 +605,29 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
       case 'advanced': return '고급';
       default: return difficulty;
     }
+  };
+
+  const handleMuscleNavigation = (muscleId: string) => {
+    const isUpper = muscleGroups.upper.some(m => m.id === muscleId);
+    const isLower = muscleGroups.lower.some(m => m.id === muscleId);
+
+    setSelectedTab('routine');
+    if (isUpper) {
+      setRoutineSubTab('upper');
+    } else if (isLower) {
+      setRoutineSubTab('lower');
+    } else {
+      setRoutineSubTab('planner');
+    }
+
+    // 해당 부위로 스크롤 이동을 위한 지연 실행
+    setTimeout(() => {
+      setExpandedExercise(muscleId);
+      const element = document.getElementById(`exercise-${muscleId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
   };
 
   return (
@@ -645,8 +661,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
               <h3 className="text-sm font-semibold mb-8 text-slate-300 uppercase tracking-widest">이번 주 운동 현황</h3>
               <BodyDiagram
                 muscleData={allMuscles}
-                selectedMuscle={selectedMuscle}
-                onMuscleClick={(id) => setSelectedMuscle(id === selectedMuscle ? null : id)}
+                onMuscleClick={handleMuscleNavigation}
                 getWeeklyCount={getWeeklyCount}
               />
             </Card>
@@ -661,18 +676,17 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                 <div className="space-y-0.5">
                   {allMuscles.map(muscle => {
                     const count = getWeeklyCount(muscle.id);
-                    const isSelected = selectedMuscle === muscle.id;
                     const colorClass = count >= 3 ? 'text-emerald-400' : count >= 2 ? 'text-amber-400' : count >= 1 ? 'text-rose-400' : 'text-slate-500';
 
                     return (
                       <div
                         key={muscle.id}
-                        className={`group flex items-center justify-between py-3 px-3 rounded-xl cursor-pointer transition-all duration-200 ${isSelected ? 'bg-blue-600/15 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.1)]' : 'hover:bg-white/5 border border-transparent'}`}
-                        onClick={() => setSelectedMuscle(muscle.id === selectedMuscle ? null : muscle.id)}
+                        className="group flex items-center justify-between py-3 px-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-white/5 border border-transparent"
+                        onClick={() => handleMuscleNavigation(muscle.id)}
                       >
                         <div className="flex items-center gap-3">
                           <div className={`w-1.5 h-1.5 rounded-full ${count >= 3 ? 'bg-emerald-400' : count >= 2 ? 'bg-amber-400' : count >= 1 ? 'bg-rose-400' : 'bg-slate-700'}`} />
-                          <span className={`text-sm font-medium transition-colors ${isSelected ? 'text-blue-400' : 'text-slate-300 group-hover:text-white'}`}>
+                          <span className="text-sm font-medium transition-colors text-slate-300 group-hover:text-white">
                             {muscle.name}
                           </span>
                         </div>
@@ -680,74 +694,13 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                           <span className={`text-sm font-bold ${colorClass}`}>
                             {count}회
                           </span>
+                          <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-blue-400 transition-colors" />
                         </div>
                       </div>
                     );
                   })}
                 </div>
               </Card>
-
-              {/* Selected Muscle Detail */}
-              {selectedMuscleData && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="mb-12"
-                >
-                  <Card className="p-6 border-blue-500/20 bg-[#1e293b]/60 backdrop-blur-md shadow-xl overflow-hidden relative">
-                    {/* Background Accent */}
-                    <div className="absolute -right-8 -top-8 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl" />
-
-                    <div className="flex justify-between items-start mb-6 relative z-10">
-                      <div>
-                        <h4 className="font-bold text-xl text-white tracking-tight">{selectedMuscleData.name}</h4>
-                        <p className="text-sm text-slate-400 font-mono tracking-widest uppercase">{selectedMuscleData.nameEn}</p>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-3xl font-black text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]">
-                          {getWeeklyCount(selectedMuscleData.id)}회
-                        </span>
-                        <p className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter mt-1">THIS WEEK</p>
-                      </div>
-                    </div>
-
-                    {/* 이번 주 기록된 운동들 */}
-                    {getWeeklyLogs(selectedMuscleData.id).length > 0 && (
-                      <div className="mb-6 space-y-2 relative z-10">
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">RECENTS</p>
-                        <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar">
-                          {getWeeklyLogs(selectedMuscleData.id).map(log => (
-                            <div key={log.id} className="group flex items-center justify-between text-sm bg-white/5 p-3 rounded-xl border border-white/5 hover:border-white/10 transition-all">
-                              <div className="flex flex-col">
-                                <span className="text-slate-200 font-medium">{log.exerciseName}</span>
-                                <span className="text-[10px] text-slate-500">{log.sets} SETS • {log.reps} REPS</span>
-                              </div>
-                              <button
-                                onClick={() => handleDeleteLog(log.id)}
-                                className="p-1.5 opacity-0 group-hover:opacity-100 text-slate-500 hover:text-rose-400 transition-all"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <Button
-                      className="w-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-all py-6 rounded-xl font-bold text-sm"
-                      onClick={() => {
-                        const isUpper = muscleGroups.upper.some(m => m.id === selectedMuscleData.id);
-                        setSelectedTab('routine');
-                        setRoutineSubTab(isUpper ? 'upper' : 'lower');
-                      }}
-                    >
-                      상세 운동 가이드 보기
-                      <ChevronRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Card>
-                </motion.div>
-              )}
             </div>
           </div>
         </TabsContent>
