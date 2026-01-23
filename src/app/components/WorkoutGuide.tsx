@@ -242,12 +242,10 @@ const anatomyPaths = {
 // SVG 인체 다이어그램 컴포넌트 - 해부학적 스타일
 function BodyDiagram({
   muscleData,
-  selectedMuscle,
   onMuscleClick,
   getWeeklyCount
 }: {
   muscleData: MuscleGroup[];
-  selectedMuscle: string | null;
   onMuscleClick: (id: string) => void;
   getWeeklyCount: (id: string) => number;
 }) {
@@ -275,25 +273,24 @@ function BodyDiagram({
     return '#334155'; // Slate-700 (미시작)
   };
 
-  // 글로우 효과 개선
-  const getFilter = (count: number, isSelected: boolean) => {
-    if (isSelected) return 'url(#glow-selected)';
-    if (count >= 3) return 'url(#glow-high)';
-    if (count >= 1) return 'url(#glow-low)';
+  // 글로우 효과 개선 (네온 스타일)
+  const getFilter = (count: number) => {
+    if (count >= 3) return 'url(#neon-glow-green)';
+    if (count >= 2) return 'url(#neon-glow-amber)';
+    if (count >= 1) return 'url(#neon-glow-red)';
     return 'none';
   };
 
   const renderMuscleGroup = (id: string, paths: { d: string }[]) => {
     const count = getWeeklyCount(id);
-    const isSelected = selectedMuscle === id;
-    const color = getColor(id, count, isSelected);
+    const color = getColor(id, count, false);
 
     return (
       <g
         key={id}
         onClick={() => onMuscleClick(id)}
         className="cursor-pointer transition-all duration-300"
-        style={{ filter: getFilter(count, isSelected) }}
+        style={{ filter: getFilter(count) }}
       >
         {paths.map((path, idx) => (
           <motion.path
@@ -302,8 +299,8 @@ function BodyDiagram({
             animate={{ opacity: 1 }}
             d={path.d}
             fill={color}
-            stroke={isSelected ? '#60a5fa' : 'rgba(255,255,255,0.1)'}
-            strokeWidth={isSelected ? 2 : 1}
+            stroke="rgba(255,255,255,0.1)"
+            strokeWidth={1}
             className="hover:opacity-80 transition-opacity"
             whileTap={{ scale: 0.98, transformOrigin: "center" }}
           />
@@ -316,62 +313,67 @@ function BodyDiagram({
     <div className="relative w-full max-w-[320px] mx-auto">
       <svg viewBox="0 0 240 480" className="w-full h-auto drop-shadow-2xl">
         <defs>
-          {/* 글로우 효과 정의 */}
-          <filter id="glow-selected" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+          {/* 네온 글로우 효과 정의 */}
+          <filter id="neon-glow-selected" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="blur" />
+            <feComposite in="blur" in2="SourceGraphic" operator="out" result="glow" />
+            <feFlood floodColor="#60a5fa" floodOpacity="0.8" result="color" />
+            <feComposite in="color" in2="glow" operator="in" result="coloredGlow" />
             <feMerge>
-              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="coloredGlow" />
+              <feMergeNode in="coloredGlow" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
-          <filter id="glow-high" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+
+          <filter id="neon-glow-green" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feFlood floodColor="#22c55e" floodOpacity="0.6" result="color" />
+            <feComposite in="color" in2="blur" operator="in" result="glow" />
             <feMerge>
-              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="glow" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
-          <filter id="glow-low" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+
+          <filter id="neon-glow-amber" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feFlood floodColor="#f59e0b" floodOpacity="0.6" result="color" />
+            <feComposite in="color" in2="blur" operator="in" result="glow" />
             <feMerge>
-              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="glow" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+
+          <filter id="neon-glow-red" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feFlood floodColor="#ef4444" floodOpacity="0.6" result="color" />
+            <feComposite in="color" in2="blur" operator="in" result="glow" />
+            <feMerge>
+              <feMergeNode in="glow" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
 
           <linearGradient id="headGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#475569" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#334155" stopOpacity="0.5" />
+            <stop offset="0%" stopColor="#1e293b" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#0f172a" stopOpacity="0.7" />
           </linearGradient>
           <linearGradient id="torsoGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#1e3a5f" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#172554" stopOpacity="0.5" />
-          </linearGradient>
-          <linearGradient id="armGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#3b2f5f" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#2d2348" stopOpacity="0.5" />
-          </linearGradient>
-          <linearGradient id="legGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#1e4035" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#14342a" stopOpacity="0.5" />
+            <stop offset="0%" stopColor="#1e293b" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#0f172a" stopOpacity="0.7" />
           </linearGradient>
         </defs>
 
-        {/* 1. 분리된 바디 실루엣 (배경) - 부위별 색상 */}
-        {/* 머리 */}
-        <path d={anatomyPaths.head} fill="url(#headGradient)" stroke="#64748b" strokeWidth="1.5" />
-        {/* 목 */}
-        <path d={anatomyPaths.neck} fill="url(#headGradient)" stroke="#64748b" strokeWidth="1" />
-        {/* 몸통 */}
-        <path d={anatomyPaths.torso} fill="url(#torsoGradient)" stroke="#3b82f6" strokeWidth="1.5" />
-        {/* 왼쪽 팔 */}
-        <path d={anatomyPaths.leftArm} fill="url(#armGradient)" stroke="#8b5cf6" strokeWidth="1.5" />
-        {/* 오른쪽 팔 */}
-        <path d={anatomyPaths.rightArm} fill="url(#armGradient)" stroke="#8b5cf6" strokeWidth="1.5" />
-        {/* 왼쪽 다리 */}
-        <path d={anatomyPaths.leftLeg} fill="url(#legGradient)" stroke="#10b981" strokeWidth="1.5" />
-        {/* 오른쪽 다리 */}
-        <path d={anatomyPaths.rightLeg} fill="url(#legGradient)" stroke="#10b981" strokeWidth="1.5" />
+        {/* 1. 바디 실루엣 (배경) */}
+        <path d={anatomyPaths.head} fill="url(#headGradient)" stroke="#334155" strokeWidth="1" />
+        <path d={anatomyPaths.neck} fill="url(#headGradient)" stroke="#334155" strokeWidth="1" />
+        <path d={anatomyPaths.torso} fill="url(#torsoGradient)" stroke="#334155" strokeWidth="1" />
+        <path d={anatomyPaths.leftArm} fill="url(#torsoGradient)" stroke="#334155" strokeWidth="1" />
+        <path d={anatomyPaths.rightArm} fill="url(#torsoGradient)" stroke="#334155" strokeWidth="1" />
+        <path d={anatomyPaths.leftLeg} fill="url(#torsoGradient)" stroke="#334155" strokeWidth="1" />
+        <path d={anatomyPaths.rightLeg} fill="url(#torsoGradient)" stroke="#334155" strokeWidth="1" />
 
         {/* 2. 각 근육 그룹 렌더링 */}
         {/* 상체 */}
@@ -393,9 +395,24 @@ function BodyDiagram({
         {renderMuscleGroup('glutes', anatomyPaths.muscles.glutes)}
       </svg>
 
-      {/* 장식용 라벨 */}
-      <div className="absolute top-4 right-4 text-[10px] text-slate-500 font-mono">
-        ANATOMY VIEW
+      {/* 컬러 범례 - 네온 도트 스타일 */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center gap-4 w-full">
+        <div className="flex items-center gap-1.5 px-2">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#22c55e] shadow-[0_0_8px_#22c55e]" />
+          <span className="text-[10px] text-slate-400 font-medium">3회+</span>
+        </div>
+        <div className="flex items-center gap-1.5 px-2">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] shadow-[0_0_8px_#f59e0b]" />
+          <span className="text-[10px] text-slate-400 font-medium">2회</span>
+        </div>
+        <div className="flex items-center gap-1.5 px-2">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#ef4444] shadow-[0_0_8px_#ef4444]" />
+          <span className="text-[10px] text-slate-400 font-medium">1회</span>
+        </div>
+        <div className="flex items-center gap-1.5 px-2">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#64748b] opacity-60" />
+          <span className="text-[10px] text-slate-400 font-medium">미시작</span>
+        </div>
       </div>
     </div>
   );
@@ -403,7 +420,6 @@ function BodyDiagram({
 
 export function WorkoutGuide({ user }: WorkoutGuideProps) {
   const [selectedTab, setSelectedTab] = useState('overview');
-  const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
   const [routineSubTab, setRoutineSubTab] = useState('planner'); // 'planner', 'upper', 'lower'
   const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
@@ -573,8 +589,6 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
     ...muscleGroups.core,
   ];
 
-  const selectedMuscleData = allMuscles.find(m => m.id === selectedMuscle);
-
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'beginner': return 'bg-green-100 text-green-700';
@@ -593,17 +607,40 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
     }
   };
 
+  const handleMuscleNavigation = (muscleId: string) => {
+    const isUpper = muscleGroups.upper.some(m => m.id === muscleId);
+    const isLower = muscleGroups.lower.some(m => m.id === muscleId);
+
+    setSelectedTab('routine');
+    if (isUpper) {
+      setRoutineSubTab('upper');
+    } else if (isLower) {
+      setRoutineSubTab('lower');
+    } else {
+      setRoutineSubTab('planner');
+    }
+
+    // 해당 부위로 스크롤 이동을 위한 지연 실행
+    setTimeout(() => {
+      setExpandedExercise(muscleId);
+      const element = document.getElementById(`exercise-${muscleId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  };
+
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-            <Dumbbell className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-500/30 flex items-center justify-center">
+            <Dumbbell className="w-6 h-6 text-blue-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">이번 주 운동 기록</h1>
-            <p className="text-muted-foreground">부위별 운동 횟수를 기록해보세요</p>
+            <h1 className="text-2xl font-bold tracking-tight">이번 주 운동 기록</h1>
+            <p className="text-muted-foreground text-sm">부위별 리커버리 및 성장을 체크하세요</p>
           </div>
         </div>
       </motion.div>
@@ -617,113 +654,53 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
         </TabsList>
 
         {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Body Diagram */}
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4 text-center">이번 주 운동 현황</h3>
+        <TabsContent value="overview" className="space-y-6 pt-2">
+          <div className="grid lg:grid-cols-[1.2fr,1fr] gap-6">
+            {/* Body Diagram Card */}
+            <Card className="p-6 bg-[#1e293b]/50 border-white/5 backdrop-blur-sm shadow-2xl flex flex-col items-center">
+              <h3 className="text-sm font-semibold mb-8 text-slate-300 uppercase tracking-widest">이번 주 운동 현황</h3>
               <BodyDiagram
                 muscleData={allMuscles}
-                selectedMuscle={selectedMuscle}
-                onMuscleClick={(id) => setSelectedMuscle(id === selectedMuscle ? null : id)}
+                onMuscleClick={handleMuscleNavigation}
                 getWeeklyCount={getWeeklyCount}
               />
-              <div className="flex justify-center gap-4 mt-4 text-xs">
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-[#22c55e]" />
-                  <span>3회+</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-[#f59e0b]" />
-                  <span>2회</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-[#ef4444]" />
-                  <span>1회</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-[#cbd5e1]" />
-                  <span>미시작</span>
-                </div>
-              </div>
             </Card>
 
-            {/* Weekly Stats */}
+            {/* Weekly Stats List Card */}
             <div className="space-y-4">
-              <Card className="p-4">
-                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
+              <Card className="p-6 bg-[#1e293b]/50 border-white/5 backdrop-blur-sm shadow-2xl h-full">
+                <h3 className="text-base font-semibold mb-6 flex items-center gap-2 text-slate-200">
+                  <Calendar className="w-4 h-4 text-blue-400" />
                   이번 주 부위별 운동 횟수
                 </h3>
-                <div className="space-y-2">
+                <div className="space-y-0.5">
                   {allMuscles.map(muscle => {
                     const count = getWeeklyCount(muscle.id);
+                    const colorClass = count >= 3 ? 'text-emerald-400' : count >= 2 ? 'text-amber-400' : count >= 1 ? 'text-rose-400' : 'text-slate-500';
+
                     return (
                       <div
                         key={muscle.id}
-                        className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all ${selectedMuscle === muscle.id ? 'bg-primary/20 border border-primary/40 backdrop-blur-sm shadow-lg shadow-primary/10' : 'hover:bg-white/5 border border-transparent'}`}
-                        onClick={() => setSelectedMuscle(muscle.id === selectedMuscle ? null : muscle.id)}
+                        className="group flex items-center justify-between py-3 px-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-white/5 border border-transparent"
+                        onClick={() => handleMuscleNavigation(muscle.id)}
                       >
-                        <span className="font-medium text-foreground">{muscle.name}</span>
-                        <div className="flex items-center gap-2">
-                          <span className={`font-bold ${count >= 3 ? 'text-emerald-400' : count >= 1 ? 'text-amber-400' : 'text-muted-foreground'}`}>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-1.5 h-1.5 rounded-full ${count >= 3 ? 'bg-emerald-400' : count >= 2 ? 'bg-amber-400' : count >= 1 ? 'bg-rose-400' : 'bg-slate-700'}`} />
+                          <span className="text-sm font-medium transition-colors text-slate-300 group-hover:text-white">
+                            {muscle.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`text-sm font-bold ${colorClass}`}>
                             {count}회
                           </span>
-                          {count >= 3 && <Check className="w-4 h-4 text-emerald-400" />}
+                          <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-blue-400 transition-colors" />
                         </div>
                       </div>
                     );
                   })}
                 </div>
               </Card>
-
-              {/* Selected Muscle Detail */}
-              {selectedMuscleData && (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                  <Card className="p-4 border-primary/30 bg-primary/10">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h4 className="font-semibold text-lg">{selectedMuscleData.name}</h4>
-                        <p className="text-sm text-muted-foreground">{selectedMuscleData.nameEn}</p>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-2xl font-bold text-primary">{getWeeklyCount(selectedMuscleData.id)}회</span>
-                        <p className="text-xs text-muted-foreground">이번 주</p>
-                      </div>
-                    </div>
-
-                    {/* 이번 주 기록된 운동들 */}
-                    {getWeeklyLogs(selectedMuscleData.id).length > 0 && (
-                      <div className="mb-3 space-y-1">
-                        <p className="text-sm font-medium">기록된 운동:</p>
-                        {getWeeklyLogs(selectedMuscleData.id).map(log => (
-                          <div key={log.id} className="flex items-center justify-between text-sm bg-background/50 p-2 rounded border border-white/10">
-                            <span className="text-foreground">{log.exerciseName} ({log.sets}세트 x {log.reps}회)</span>
-                            <button
-                              onClick={() => handleDeleteLog(log.id)}
-                              className="text-red-400 hover:text-red-300"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    <Button
-                      size="sm"
-                      className="w-full"
-                      onClick={() => {
-                        const isUpper = muscleGroups.upper.some(m => m.id === selectedMuscleData.id);
-                        setSelectedTab('routine');
-                        setRoutineSubTab(isUpper ? 'upper' : 'lower');
-                      }}
-                    >
-                      운동 기록하기 <ChevronRight className="w-4 h-4 ml-1" />
-                    </Button>
-                  </Card>
-                </motion.div>
-              )}
             </div>
           </div>
         </TabsContent>

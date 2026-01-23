@@ -233,20 +233,24 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="flex flex-col h-[100dvh] bg-background text-foreground overflow-hidden">
       {/* Welcome Slides - 로그인 성공 시 표시 */}
       {showWelcomeSlides && (
         <WelcomeSlides onComplete={handleWelcomeSlidesComplete} />
       )}
 
       <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} onMyPageClick={() => setShowMyPage(true)} />
-      <div className="max-w-7xl mx-auto pt-16 pb-20">
-        {showMyPage ? (
-          <MyPage user={user} onBack={() => setShowMyPage(false)} />
-        ) : (
-          renderPage()
-        )}
-      </div>
+
+      <main className="flex-1 overflow-y-auto pt-16 scroll-smooth">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-48">
+          {showMyPage ? (
+            <MyPage user={user} onBack={() => setShowMyPage(false)} />
+          ) : (
+            renderPage()
+          )}
+        </div>
+      </main>
+
       {!showMyPage && <Navigation currentPage={currentPage} onNavigate={setCurrentPage} />}
     </div>
   );
