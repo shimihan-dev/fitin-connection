@@ -615,7 +615,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
   };
 
   return (
-    <div className="p-4 md:p-6 space-y-6 pb-24">
+    <div className="p-4 md:p-6 space-y-6">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
         <div className="flex items-center gap-3">

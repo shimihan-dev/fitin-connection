@@ -242,12 +242,14 @@ export default function App() {
       <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} onMyPageClick={() => setShowMyPage(true)} />
 
       <main className="flex-1 overflow-y-auto pt-16">
-        <div className="max-w-7xl mx-auto pb-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {showMyPage ? (
             <MyPage user={user} onBack={() => setShowMyPage(false)} />
           ) : (
             renderPage()
           )}
+          {/* 하단 탭 바 공간 확보를 위한 여백 (Cushion) */}
+          <div className="h-24" />
         </div>
       </main>
 
