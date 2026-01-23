@@ -233,7 +233,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden">
+    <div className="flex flex-col h-[100dvh] bg-background text-foreground overflow-hidden">
       {/* Welcome Slides - 로그인 성공 시 표시 */}
       {showWelcomeSlides && (
         <WelcomeSlides onComplete={handleWelcomeSlidesComplete} />
@@ -248,8 +248,10 @@ export default function App() {
           ) : (
             renderPage()
           )}
-          {/* 하단 탭 바 공간 확보를 위한 여백 (Cushion) */}
-          <div className="h-24" />
+          <div className="flex-1" />
+          {/* 하단 탭 바 공간 확보를 위한 강력한 여백 (Cushion) */}
+          <div className="h-28 flex-shrink-0" />
+          <div className="h-10 flex-shrink-0" />
         </div>
       </main>
 
