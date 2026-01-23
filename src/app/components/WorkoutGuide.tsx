@@ -689,7 +689,11 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
 
               {/* Selected Muscle Detail */}
               {selectedMuscleData && (
-                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="mb-12"
+                >
                   <Card className="p-6 border-blue-500/20 bg-[#1e293b]/60 backdrop-blur-md shadow-xl overflow-hidden relative">
                     {/* Background Accent */}
                     <div className="absolute -right-8 -top-8 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl" />
