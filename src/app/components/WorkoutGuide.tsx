@@ -8,6 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { RoutinePlanner } from './RoutinePlanner';
 import { Diet } from './Diet';
+import { ExerciseSearchModal } from './ExerciseSearchModal';
+import { WorkoutLogModal } from './WorkoutLogModal';
+import { WorkoutLog as NewWorkoutLog, SetEntry, RoutineExercise, Exercise as DictExercise } from '../types/workout';
+import { EXERCISE_DICTIONARY } from '../data/exercises';
 
 interface MuscleGroup {
   id: string;
@@ -414,6 +418,28 @@ function BodyDiagram({
           <span className="text-[10px] text-slate-400 font-medium">미시작</span>
         </div>
       </div>
+      {/* Render Modals */}
+      <ExerciseSearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onAddExercise={handleAddExercise}
+        targetSection={muscleGroups.upper.find(m => m.id === searchTargetSection)?.name || '운동'}
+        existingExerciseIds={addedExercises[searchTargetSection]?.map(e => e.exerciseId) || []}
+      />
+
+      <WorkoutLogModal
+        isOpen={isLogOpen}
+        onClose={() => setIsLogOpen(false)}
+        exerciseName={currentLogTarget?.exerciseName || ''}
+        initialSets={
+          // Load existing sets for this target if avail
+          currentLogTarget ? detailedLogs.find(l =>
+            l.date === new Date().toISOString().split('T')[0] &&
+            (currentLogTarget.routineExerciseId ? l.routineExerciseId === currentLogTarget.routineExerciseId : l.exerciseId === 'static' && l.id.includes(currentLogTarget.exerciseName))
+          )?.sets || [] : []
+        }
+        onSave={handleSaveLogSets}
+      />
     </div>
   );
 }
@@ -425,6 +451,35 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
   const [showLogDialog, setShowLogDialog] = useState(false);
   const [logExercise, setLogExercise] = useState<{ muscleId: string; name: string } | null>(null);
+
+  // Routine & Logging State
+  const [addedExercises, setAddedExercises] = useState<Record<string, RoutineExercise[]>>({}); // Key: muscleId
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchTargetSection, setSearchTargetSection] = useState<string>(''); // muscleId being added to
+
+  const [isLogOpen, setIsLogOpen] = useState(false);
+  const [currentLogTarget, setCurrentLogTarget] = useState<{
+    muscleId: string;
+    exerciseName: string; // fallback for static
+    exerciseId?: string;  // for new exercises
+    routineExerciseId?: string; // unique ID for the specific added instance
+  } | null>(null);
+
+  // Load added exercises from local storage if needed (Skipping specific load logic for brevity, initializing empty)
+  // But let's try to persist 'addedExercises'
+  useEffect(() => {
+    if (user?.email) {
+      const stored = localStorage.getItem(`added_exercises_${user.email}`);
+      if (stored) {
+        try { setAddedExercises(JSON.parse(stored)); } catch (e) { console.error(e); }
+      }
+    }
+  }, [user]);
+
+  const saveAddedExercises = (newMap: Record<string, RoutineExercise[]>) => {
+    setAddedExercises(newMap);
+    if (user?.email) localStorage.setItem(`added_exercises_${user.email}`, JSON.stringify(newMap));
+  };
 
   // 러닝 기록 타입 (거리, 시간, 페이스 포함)
   interface RunningRecord {
@@ -571,9 +626,149 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
       reps,
     };
 
+
     saveWorkoutLogs([...workoutLogs, newLog]);
     setShowLogDialog(false);
     setLogExercise(null);
+  };
+
+  // --- New Logic for Dictionary & Detailed Logging ---
+
+  const openSearch = (muscleId: string) => {
+    setSearchTargetSection(muscleId);
+    setIsSearchOpen(true);
+  };
+
+  const handleAddExercise = (exercise: DictExercise) => {
+    // Check if already added? (The modal handles disabling, but double check)
+    const existing = addedExercises[searchTargetSection] || [];
+    if (existing.some(e => e.exerciseId === exercise.id)) return;
+
+    const newRoutineExercise: RoutineExercise = {
+      id: Date.now().toString(),
+      exerciseId: exercise.id,
+      sectionId: searchTargetSection,
+      order: existing.length,
+      createdAt: Date.now(),
+    };
+
+    const newMap = { ...addedExercises, [searchTargetSection]: [...existing, newRoutineExercise] };
+    saveAddedExercises(newMap);
+    // Don't close modal immediately if we want to add multiple? User requirement says "click -> add to list".
+    // Usually standard to keep open or close. Let's keep open for multiple adds or close?
+    // User flow: "Click item -> Immediately add".
+    // Let's just add and maybe show toast/visual feedback. Modal stays open.
+  };
+
+  const openLogModal = (muscleId: string, name: string, exerciseId?: string, routineExerciseId?: string) => {
+    setCurrentLogTarget({ muscleId, exerciseName: name, exerciseId, routineExerciseId });
+    setIsLogOpen(true);
+  };
+
+  const handleSaveLogSets = (sets: SetEntry[]) => {
+    if (!user || !currentLogTarget) return;
+
+    // We need to save this into 'workoutLogs'.
+    // Current 'workoutLogs' structure involves flattened entries or we need to migrate.
+    // The existing 'WorkoutLog' interface in this file is:
+    // { id, date, muscleId, exerciseName, sets(number), reps(number) }
+    // The new one is detailed.
+    // I will STRETCH the definition of the existing state or use a new state?
+    // To avoid breaking the heatmap (BodyDiagram), which uses 'workoutLogs', I should try to map it.
+    // 'BodyDiagram' uses 'getWeeklyCount' -> 'workoutLogs.filter...'.
+
+    // Let's adapt the new detailed log to the old structure for compatibility with the Diagram,
+    // OR update the Diagram logic.
+    // Reviewing 'BodyDiagram': it just counts logs.
+
+    // I will store the detailed logs in a NEW storage key/state for full fidelity,
+    // AND push a simplified entry to 'workoutLogs' for the heatmap and legacy compatibility.
+    // Ideally, I should refactor 'workoutLogs' to be the detailed one, and fix 'BodyDiagram'.
+    // 'BodyDiagram' just checks length. So if I store detailed logs, I just need to make sure I can count them.
+
+    // Let's try to piggyback on the existing 'workoutLogs' state but add an optional 'details' field?
+    // No, local interface is strict.
+
+    // Compromise: Save a simple log for the heatmap count.
+    // "3 sets" -> Create 1 entry? Or 3 entries? 
+    // Usually 'count' in 'getWeeklyCount' counts SESSIONS or LOG ENTRIES.
+    // If I do 3 sets, counts as 1 workout? yes.
+
+    // I will assume for now we just want to save the DETAILED log for the card summary.
+    // But where do we store it?
+    // I'll add a new state `detailedLogs` : Record<string, NewWorkoutLog> (key: routineExerciseId + date?)
+
+    // Actually, let's keep it simple. I will just use localStorage for the detailed logs
+    // and let the heatmap use the old logs. They can be separate for now to minimize risk.
+
+    const dateKey = new Date().toISOString().split('T')[0];
+    const logId = `${dateKey}_${currentLogTarget.routineExerciseId || currentLogTarget.exerciseName}`;
+
+    // Persist detailed log
+    const detailedLog: NewWorkoutLog = {
+      id: logId,
+      date: dateKey,
+      routineExerciseId: currentLogTarget.routineExerciseId || 'static',
+      exerciseId: currentLogTarget.exerciseId || 'static',
+      sets,
+    };
+
+    const storageKey = `detailed_logs_${user.email}`;
+    const existingDetails = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    // Upsert
+    const filtered = existingDetails.filter((l: NewWorkoutLog) => l.id !== logId);
+    localStorage.setItem(storageKey, JSON.stringify([...filtered, detailedLog]));
+
+    // Update visual state (force re-render or local state?)
+    // I'll add a trigger state or just accept it might not reflect instantly without a reload if I don't set state.
+    // Let's add `detailedLogs` state.
+    setDetailedLogs([...filtered, detailedLog]);
+
+    // ALSO add to `workoutLogs` for the heatmap if not exists for today
+    const alreadyLoggedToday = workoutLogs.some(
+      l => l.muscleId === currentLogTarget.muscleId && l.exerciseName === currentLogTarget.exerciseName && l.date.startsWith(dateKey)
+    );
+
+    if (!alreadyLoggedToday) {
+      // Add a dummy entry for the heatmap count
+      const heatmapLog = {
+        id: Date.now().toString(),
+        date: new Date().toISOString(),
+        muscleId: currentLogTarget.muscleId,
+        exerciseName: currentLogTarget.exerciseName,
+        sets: sets.length,
+        reps: sets.reduce((acc, s) => acc + s.reps, 0) / sets.length, // avg
+      };
+      saveWorkoutLogs([...workoutLogs, heatmapLog]);
+    }
+
+    setIsLogOpen(false);
+  };
+
+  const [detailedLogs, setDetailedLogs] = useState<NewWorkoutLog[]>([]);
+  useEffect(() => {
+    if (user?.email) {
+      try {
+        const stored = localStorage.getItem(`detailed_logs_${user.email}`);
+        if (stored) setDetailedLogs(JSON.parse(stored));
+      } catch (e) { }
+    }
+  }, [user]);
+
+  // Helper to get summary text
+  const getLogSummary = (muscleId: string, name: string, routineId?: string) => {
+    const dateKey = new Date().toISOString().split('T')[0];
+    // Find log for today
+    // Match by routineId if available, else name
+    const log = detailedLogs.find(l =>
+      l.date === dateKey &&
+      (routineId ? l.routineExerciseId === routineId : l.exerciseId === 'static' && l.id.includes(name))
+    );
+
+    if (!log) return null;
+    const totalSets = log.sets.length;
+    const maxWeight = Math.max(...log.sets.map(s => s.weight || 0));
+    return `${totalSets}세트 / ${maxWeight > 0 ? `${maxWeight}kg` : '맨몸'}`;
   };
 
   // 운동 기록 삭제
@@ -756,10 +951,23 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                           </div>
                           <div>
                             <h3 className="font-semibold text-foreground">{muscle.name}</h3>
-                            <p className="text-sm text-muted-foreground">{muscle.exercises.length}개 운동</p>
+                            <p className="text-sm text-muted-foreground">
+                              {muscle.exercises.length + (addedExercises[muscle.id]?.length || 0)}개 운동
+                            </p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-blue-400 hover:text-blue-300 hover:bg-blue-400/10 p-2 h-auto"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openSearch(muscle.id);
+                            }}
+                          >
+                            <Plus className="w-4 h-4 mr-1" /> 운동 추가
+                          </Button>
                           <Badge variant="outline" className="border-white/10 bg-white/5">{getWeeklyCount(muscle.id)}회 / 주</Badge>
                           <ChevronRight className={`w-5 h-5 transition-transform text-muted-foreground ${expandedExercise === muscle.id ? 'rotate-90' : ''}`} />
                         </div>
@@ -769,32 +977,78 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                     {expandedExercise === muscle.id && (
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-white/5 bg-background/30">
                         <div className="p-4 space-y-3">
-                          {muscle.exercises.map((exercise, idx) => (
-                            <div key={idx} className="p-4 bg-background/50 rounded-xl border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-medium text-foreground">{exercise.name}</span>
-                                  <Badge className={`${getDifficultyColor(exercise.difficulty)} border-none text-[10px]`}>
-                                    {getDifficultyLabel(exercise.difficulty)}
-                                  </Badge>
+                          {/* Static Exercises */}
+                          {muscle.exercises.map((exercise, idx) => {
+                            const summary = getLogSummary(muscle.id, exercise.name);
+                            return (
+                              <div key={`static-${idx}`} className="p-4 bg-background/50 rounded-xl border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium text-foreground">{exercise.name}</span>
+                                    <Badge className={`${getDifficultyColor(exercise.difficulty)} border-none text-[10px]`}>
+                                      {getDifficultyLabel(exercise.difficulty)}
+                                    </Badge>
+                                  </div>
+                                  <div className="flex gap-4 text-xs text-muted-foreground">
+                                    {summary ? (
+                                      <span className="text-emerald-400 font-bold">{summary}</span>
+                                    ) : (
+                                      <>
+                                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {exercise.duration}</span>
+                                        <span>{exercise.sets}</span>
+                                      </>
+                                    )}
+                                  </div>
                                 </div>
-                                <div className="flex gap-4 text-xs text-muted-foreground">
-                                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {exercise.duration}</span>
-                                  <span>{exercise.sets}</span>
-                                </div>
+                                <Button
+                                  size="sm"
+                                  variant={summary ? "outline" : "default"}
+                                  className={summary ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500/10" : "bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20"}
+                                  onClick={() => {
+                                    openLogModal(muscle.id, exercise.name);
+                                  }}
+                                >
+                                  {summary ? '기록 수정' : <><Plus className="w-4 h-4 mr-1" /> 기록</>}
+                                </Button>
                               </div>
-                              <Button
-                                size="sm"
-                                className="bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20"
-                                onClick={() => {
-                                  setLogExercise({ muscleId: muscle.id, name: exercise.name });
-                                  setShowLogDialog(true);
-                                }}
-                              >
-                                <Plus className="w-4 h-4 mr-1" /> 기록
-                              </Button>
-                            </div>
-                          ))}
+                            );
+                          })}
+
+                          {/* Added Exercises */}
+                          {addedExercises[muscle.id]?.map((routineExercise) => {
+                            const dictExercise = EXERCISE_DICTIONARY.find(e => e.id === routineExercise.exerciseId);
+                            if (!dictExercise) return null;
+                            const summary = getLogSummary(muscle.id, dictExercise.name, routineExercise.id);
+
+                            return (
+                              <div key={routineExercise.id} className="p-4 bg-slate-900/80 rounded-xl border border-blue-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500" />
+                                <div className="space-y-1 pl-2">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium text-foreground">{dictExercise.name}</span>
+                                    {dictExercise.nameEn && <span className="text-xs text-muted-foreground">{dictExercise.nameEn}</span>}
+                                  </div>
+                                  <div className="flex gap-4 text-xs text-muted-foreground">
+                                    {summary ? (
+                                      <span className="text-emerald-400 font-bold">{summary}</span>
+                                    ) : (
+                                      <span>{dictExercise.equipment} • {dictExercise.difficulty}</span>
+                                    )}
+                                  </div>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant={summary ? "outline" : "secondary"}
+                                  className={summary ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500/10" : "bg-slate-700 hover:bg-slate-600 text-slate-200"}
+                                  onClick={() => {
+                                    openLogModal(muscle.id, dictExercise.name, dictExercise.id, routineExercise.id);
+                                  }}
+                                >
+                                  {summary ? '기록 수정' : <><Plus className="w-4 h-4 mr-1" /> 기록</>}
+                                </Button>
+                              </div>
+                            );
+                          })}
                         </div>
                       </motion.div>
                     )}

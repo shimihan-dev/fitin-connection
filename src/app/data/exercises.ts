@@ -1,0 +1,143 @@
+import { Exercise } from '../types/workout';
+
+export const EXERCISE_DICTIONARY: Exercise[] = [
+    // 가슴 (Chest)
+    {
+        id: 'benz_press_barbell',
+        name: '벤치 프레스',
+        nameEn: 'Bench Press',
+        scope: '상체',
+        groups: ['chest', 'tricep'],
+        equipment: '바벨',
+        difficulty: 'intermediate',
+        tips: ['바벨을 가슴 중앙으로 내리세요', '팔꿈치가 너무 벌어지지 않게 주의'],
+    },
+    {
+        id: 'incline_press_dumbbell',
+        name: '인클라인 덤벨 프레스',
+        nameEn: 'Incline Dumbbell Press',
+        scope: '상체',
+        groups: ['chest', 'shoulder'],
+        equipment: '덤벨',
+        difficulty: 'beginner',
+        tips: ['벤치 각도를 30-45도로 설정', '가슴 상부에 집중'],
+    },
+    {
+        id: 'chest_fly_machine',
+        name: '펙 덱 플라이',
+        nameEn: 'Pec Deck Fly',
+        scope: '상체',
+        groups: ['chest'],
+        equipment: '머신',
+        difficulty: 'beginner',
+        tips: ['팔을 안아주는 느낌으로', '반동을 쓰지 마세요'],
+    },
+
+    // 등 (Back)
+    {
+        id: 'pull_up',
+        name: '풀업',
+        nameEn: 'Pull Up',
+        scope: '상체',
+        groups: ['back', 'bicep'],
+        equipment: '맨몸',
+        difficulty: 'advanced',
+        tips: ['가슴을 바에 닿게 당기세요', '내려올 때 천천히'],
+    },
+    {
+        id: 'lat_pulldown',
+        name: '래트 풀다운',
+        nameEn: 'Lat Pulldown',
+        scope: '상체',
+        groups: ['back'],
+        equipment: '머신',
+        difficulty: 'beginner',
+        tips: ['상체를 살짝 뒤로 젖히세요', '바를 쇄골 쪽으로 당기기'],
+    },
+    {
+        id: 'seated_row_cable',
+        name: '시티드 케이블 로우',
+        nameEn: 'Seated Cable Row',
+        scope: '상체',
+        groups: ['back'],
+        equipment: '케이블',
+        difficulty: 'intermediate',
+        tips: ['허리를 곧게 펴세요', '날개뼈를 접는 느낌으로'],
+    },
+
+    // 어깨 (Shoulder)
+    {
+        id: 'ohp_barbell',
+        name: '오버헤드 프레스',
+        nameEn: 'Overhead Press',
+        scope: '상체',
+        groups: ['shoulder', 'tricep'],
+        equipment: '바벨',
+        difficulty: 'advanced',
+        tips: ['코어에 힘을 주세요', '바가 얼굴을 스치듯 올리기'],
+    },
+    {
+        id: 'lateral_raise',
+        name: '사이드 레터럴 레이즈',
+        nameEn: 'Side Lateral Raise',
+        scope: '상체',
+        groups: ['shoulder'],
+        equipment: '덤벨',
+        difficulty: 'beginner',
+        tips: ['어깨 높이까지만 올리기', '승모근 개입 최소화'],
+    },
+
+    // 하체 (Legs)
+    {
+        id: 'squat_barbell',
+        name: '백 스쿼트',
+        nameEn: 'Back Squat',
+        scope: '하체',
+        groups: ['quadriceps', 'glutes', 'hamstring'],
+        equipment: '바벨',
+        difficulty: 'intermediate',
+        tips: ['무릎 방향과 발끝 방향 일치', '복압 유지'],
+    },
+    {
+        id: 'leg_press',
+        name: '레그 프레스',
+        nameEn: 'Leg Press',
+        scope: '하체',
+        groups: ['quadriceps', 'glutes'],
+        equipment: '머신',
+        difficulty: 'beginner',
+        tips: ['무릎을 완전히 펴지 마세요(Lock out 금지)', '발 뒤꿈치로 밀기'],
+    },
+    {
+        id: 'lunge_dumbbell',
+        name: '덤벨 런지',
+        nameEn: 'Dumbbell Lunge',
+        scope: '하체',
+        groups: ['quadriceps', 'glutes'],
+        equipment: '덤벨',
+        difficulty: 'beginner',
+        tips: ['상체를 세우세요', '무릎이 바닥에 닿기 직전까지'],
+    },
+
+    // 이두/삼두
+    {
+        id: 'bicep_curl_barbell',
+        name: '바벨 컬',
+        nameEn: 'Barbell Curl',
+        scope: '상체',
+        groups: ['bicep'],
+        equipment: '바벨',
+        difficulty: 'beginner',
+        tips: ['팔꿈치를 옆구리에 고정', '몸의 반동 금지'],
+    },
+    {
+        id: 'tricep_extension_cable',
+        name: '케이블 푸쉬 다운',
+        nameEn: 'Cable Push Down',
+        scope: '상체',
+        groups: ['tricep'],
+        equipment: '케이블',
+        difficulty: 'beginner',
+        tips: ['팔꿈치 고정', '삼두근 수축에 집중'],
+    }
+];
