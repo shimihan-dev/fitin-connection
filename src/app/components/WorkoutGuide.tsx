@@ -418,28 +418,6 @@ function BodyDiagram({
           <span className="text-[10px] text-slate-400 font-medium">미시작</span>
         </div>
       </div>
-      {/* Render Modals */}
-      <ExerciseSearchModal
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        onAddExercise={handleAddExercise}
-        targetSection={muscleGroups.upper.find(m => m.id === searchTargetSection)?.name || '운동'}
-        existingExerciseIds={addedExercises[searchTargetSection]?.map(e => e.exerciseId) || []}
-      />
-
-      <WorkoutLogModal
-        isOpen={isLogOpen}
-        onClose={() => setIsLogOpen(false)}
-        exerciseName={currentLogTarget?.exerciseName || ''}
-        initialSets={
-          // Load existing sets for this target if avail
-          currentLogTarget ? detailedLogs.find(l =>
-            l.date === new Date().toISOString().split('T')[0] &&
-            (currentLogTarget.routineExerciseId ? l.routineExerciseId === currentLogTarget.routineExerciseId : l.exerciseId === 'static' && l.id.includes(currentLogTarget.exerciseName))
-          )?.sets || [] : []
-        }
-        onSave={handleSaveLogSets}
-      />
     </div>
   );
 }
@@ -671,7 +649,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
     // We need to save this into 'workoutLogs'.
     // Current 'workoutLogs' structure involves flattened entries or we need to migrate.
     // The existing 'WorkoutLog' interface in this file is:
-    // { id, date, muscleId, exerciseName, sets(number), reps(number) }
+    // {id, date, muscleId, exerciseName, sets(number), reps(number)}
     // The new one is detailed.
     // I will STRETCH the definition of the existing state or use a new state?
     // To avoid breaking the heatmap (BodyDiagram), which uses 'workoutLogs', I should try to map it.
@@ -690,7 +668,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
     // No, local interface is strict.
 
     // Compromise: Save a simple log for the heatmap count.
-    // "3 sets" -> Create 1 entry? Or 3 entries? 
+    // "3 sets" -> Create 1 entry? Or 3 entries?
     // Usually 'count' in 'getWeeklyCount' counts SESSIONS or LOG ENTRIES.
     // If I do 3 sets, counts as 1 workout? yes.
 
@@ -1446,6 +1424,27 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
           )}
         </DialogContent>
       </Dialog >
+      <ExerciseSearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onAddExercise={handleAddExercise}
+        targetSection={muscleGroups.upper.find(m => m.id === searchTargetSection)?.name || '운동'}
+        existingExerciseIds={addedExercises[searchTargetSection]?.map(e => e.exerciseId) || []}
+      />
+
+      <WorkoutLogModal
+        isOpen={isLogOpen}
+        onClose={() => setIsLogOpen(false)}
+        exerciseName={currentLogTarget?.exerciseName || ''}
+        initialSets={
+          // Load existing sets for this target if avail
+          currentLogTarget ? detailedLogs.find(l =>
+            l.date === new Date().toISOString().split('T')[0] &&
+            (currentLogTarget.routineExerciseId ? l.routineExerciseId === currentLogTarget.routineExerciseId : l.exerciseId === 'static' && l.id.includes(currentLogTarget.exerciseName))
+          )?.sets || [] : []
+        }
+        onSave={handleSaveLogSets}
+      />
     </div >
   );
 }
