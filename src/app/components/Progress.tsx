@@ -181,7 +181,7 @@ export function Progress({ user }: ProgressProps) {
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={stat.label} className="p-4 bg-card/50 border-white/10">
+            <Card key={stat.label} className="p-4 bg-card/50 border-border">
               <div className="flex items-center gap-3">
                 <Icon className={`w-8 h-8 ${stat.color}`} />
                 <div>
@@ -196,7 +196,7 @@ export function Progress({ user }: ProgressProps) {
 
       {/* Workout Frequency Chart */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-        <Card className="p-6 bg-card/50 border-white/10">
+        <Card className="p-6 bg-card/50 border-border">
           <h3 className="mb-4 font-semibold text-foreground">이번 주 활동</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={chartData}>
@@ -219,7 +219,7 @@ export function Progress({ user }: ProgressProps) {
 
       {/* This Week's Workout Logs */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-        <Card className="p-6 bg-card/50 border-white/10">
+        <Card className="p-6 bg-card/50 border-border">
           <h3 className="mb-4 font-semibold text-foreground">이번 주 운동 기록</h3>
           {thisWeekLogs.length === 0 ? (
             <p className="text-muted-foreground text-center py-4 text-sm">
@@ -243,9 +243,9 @@ export function Progress({ user }: ProgressProps) {
                       <span className="font-medium text-foreground">{dayName}요일</span>
                       <span className="text-sm text-emerald-400">총 {dayTotal}분</span>
                     </div>
-                    <div className="space-y-2 pl-2 border-l-2 border-white/10">
+                    <div className="space-y-2 pl-2 border-l-2 border-border">
                       {dayLogs.map((log) => (
-                        <div key={log.id} className="flex items-center justify-between p-2 bg-background/50 rounded-lg ml-2 border border-white/5">
+                        <div key={log.id} className="flex items-center justify-between p-2 bg-background/50 rounded-lg ml-2 border border-border/50">
                           <div className="flex items-center gap-2">
                             <Flame className="w-4 h-4 text-orange-400" />
                             <span className="text-sm text-foreground">{log.type}</span>
@@ -276,7 +276,7 @@ export function Progress({ user }: ProgressProps) {
                 key={achievement.title}
                 className={`p-4 ${achievement.unlocked
                   ? 'border-amber-400/50 bg-gradient-to-br from-amber-500/10 to-orange-500/10'
-                  : 'opacity-50 grayscale bg-card/30 border-white/5'
+                  : 'opacity-50 grayscale bg-card/30 border-border/50'
                   }`}
               >
                 <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${achievement.color} flex items-center justify-center mb-3 mx-auto shadow-lg`}>
@@ -288,7 +288,7 @@ export function Progress({ user }: ProgressProps) {
                   {achievement.unlocked ? (
                     <Badge className="bg-amber-500 hover:bg-amber-500 text-white text-xs">달성 완료!</Badge>
                   ) : (
-                    <Badge variant="outline" className="text-muted-foreground text-xs border-white/10">미달성</Badge>
+                    <Badge variant="outline" className="text-muted-foreground text-xs border-border">미달성</Badge>
                   )}
                 </div>
               </Card>
@@ -299,7 +299,7 @@ export function Progress({ user }: ProgressProps) {
 
       {/* Add Workout Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="sm:max-w-md bg-card border-white/10">
+        <DialogContent className="sm:max-w-md bg-card border-border">
           <DialogHeader>
             <DialogTitle className="text-foreground">오늘의 운동 추가</DialogTitle>
             <DialogDescription className="text-muted-foreground">완료한 운동을 기록하세요</DialogDescription>
@@ -313,7 +313,7 @@ export function Progress({ user }: ProgressProps) {
                 placeholder="예: 러닝, 웨이트, 요가, 수영..."
                 value={newWorkoutType}
                 onChange={(e) => setNewWorkoutType(e.target.value)}
-                className="bg-background/50 border-white/10"
+                className="bg-background/50 border-border"
               />
             </div>
 
@@ -327,7 +327,7 @@ export function Progress({ user }: ProgressProps) {
                     variant={newWorkoutMinutes === min ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setNewWorkoutMinutes(min)}
-                    className={newWorkoutMinutes === min ? 'bg-primary' : 'border-white/10'}
+                    className={newWorkoutMinutes === min ? 'bg-primary' : 'border-border'}
                   >
                     {min}분
                   </Button>
@@ -343,7 +343,7 @@ export function Progress({ user }: ProgressProps) {
                   setNewWorkoutType('');
                   setNewWorkoutMinutes(30);
                 }}
-                className="flex-1 border-white/10"
+                className="flex-1 border-border"
               >
                 취소
               </Button>

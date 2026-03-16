@@ -1,6 +1,6 @@
 import { Home, Dumbbell, Calendar, TrendingUp, Utensils, Trophy, MessageSquare } from 'lucide-react';
 
-type Page = 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
+type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
 
 interface NavigationProps {
   currentPage: Page;
@@ -9,6 +9,7 @@ interface NavigationProps {
 
 export function Navigation({ currentPage, onNavigate }: NavigationProps) {
   const navItems = [
+    { id: 'home' as Page, icon: Home, label: '홈' },
     { id: 'workout' as Page, icon: Dumbbell, label: '운동' },
     { id: 'competition' as Page, icon: Trophy, label: 'SBD대회' },
     { id: 'board' as Page, icon: MessageSquare, label: '게시판' },
@@ -16,7 +17,7 @@ export function Navigation({ currentPage, onNavigate }: NavigationProps) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.3)] z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border shadow-[0_-4px_20px_rgba(0,0,0,0.08)] z-50">
       <div className="max-w-7xl mx-auto px-2">
         <div className="flex justify-around items-center h-16">
           {navItems.map((item) => {

@@ -119,7 +119,7 @@ export function Diet({ user }: DietProps) {
                 const Icon = category.icon;
                 return (
                     <motion.div key={category.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
-                        <Card className="p-4 bg-card/50 border-white/10">
+                        <Card className="p-4 bg-card/50 border-border">
                             <div className="flex items-center gap-3 mb-3">
                                 <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${category.color} flex items-center justify-center shadow-lg`}>
                                     <Icon className="w-5 h-5 text-white" />
@@ -167,22 +167,22 @@ export function Diet({ user }: DietProps) {
                     <Card className="p-4 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border-emerald-500/30">
                         <h3 className="font-semibold text-emerald-400 mb-3 text-center">📊 오늘 총 섭취량</h3>
                         <div className="grid grid-cols-4 gap-2 text-center">
-                            <div className="bg-card/50 rounded-lg p-2 border border-white/10">
+                            <div className="bg-card/50 rounded-lg p-2 border border-border">
                                 <p className="text-xs text-muted-foreground">칼로리</p>
                                 <p className="font-bold text-lg text-orange-400">{dailyTotal.calories}</p>
                                 <p className="text-xs text-muted-foreground">kcal</p>
                             </div>
-                            <div className="bg-card/50 rounded-lg p-2 border border-white/10">
+                            <div className="bg-card/50 rounded-lg p-2 border border-border">
                                 <p className="text-xs text-muted-foreground">단백질</p>
                                 <p className="font-bold text-lg text-red-400">{dailyTotal.protein}</p>
                                 <p className="text-xs text-muted-foreground">g</p>
                             </div>
-                            <div className="bg-card/50 rounded-lg p-2 border border-white/10">
+                            <div className="bg-card/50 rounded-lg p-2 border border-border">
                                 <p className="text-xs text-muted-foreground">탄수화물</p>
                                 <p className="font-bold text-lg text-primary">{dailyTotal.carbs}</p>
                                 <p className="text-xs text-muted-foreground">g</p>
                             </div>
-                            <div className="bg-card/50 rounded-lg p-2 border border-white/10">
+                            <div className="bg-card/50 rounded-lg p-2 border border-border">
                                 <p className="text-xs text-muted-foreground">지방</p>
                                 <p className="font-bold text-lg text-amber-400">{dailyTotal.fat}</p>
                                 <p className="text-xs text-muted-foreground">g</p>
@@ -196,7 +196,7 @@ export function Diet({ user }: DietProps) {
                         const Icon = section.icon;
 
                         return (
-                            <Card key={section.key} className="p-4 bg-card/50 border-white/10">
+                            <Card key={section.key} className="p-4 bg-card/50 border-border">
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-2">
                                         <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${section.color} flex items-center justify-center shadow-lg`}>
@@ -217,13 +217,13 @@ export function Diet({ user }: DietProps) {
                                 ) : (
                                     <div className="space-y-3">
                                         {meals[section.key].map((meal) => (
-                                            <div key={meal.id} className="bg-background/50 rounded-lg p-3 border border-white/10">
+                                            <div key={meal.id} className="bg-background/50 rounded-lg p-3 border border-border">
                                                 <div className="flex items-center justify-between mb-3">
                                                     <Input
                                                         placeholder="음식 이름"
                                                         value={meal.name}
                                                         onChange={(e) => updateMeal(section.key, meal.id, 'name', e.target.value)}
-                                                        className="flex-1 mr-2 font-medium bg-card/50 border-white/10"
+                                                        className="flex-1 mr-2 font-medium bg-card/50 border-border"
                                                     />
                                                     <Button variant="ghost" size="sm" onClick={() => removeMeal(section.key, meal.id)} className="text-red-400 hover:text-red-300 hover:bg-red-500/10">
                                                         <Trash2 className="w-4 h-4" />
@@ -232,24 +232,24 @@ export function Diet({ user }: DietProps) {
                                                 <div className="grid grid-cols-4 gap-2">
                                                     <div>
                                                         <Label className="text-xs text-muted-foreground">칼로리</Label>
-                                                        <Input type="number" placeholder="0" value={meal.calories || ''} onChange={(e) => updateMeal(section.key, meal.id, 'calories', Number(e.target.value))} className="text-sm bg-card/50 border-white/10" />
+                                                        <Input type="number" placeholder="0" value={meal.calories || ''} onChange={(e) => updateMeal(section.key, meal.id, 'calories', Number(e.target.value))} className="text-sm bg-card/50 border-border" />
                                                     </div>
                                                     <div>
                                                         <Label className="text-xs text-muted-foreground">단백질(g)</Label>
-                                                        <Input type="number" placeholder="0" value={meal.protein || ''} onChange={(e) => updateMeal(section.key, meal.id, 'protein', Number(e.target.value))} className="text-sm bg-card/50 border-white/10" />
+                                                        <Input type="number" placeholder="0" value={meal.protein || ''} onChange={(e) => updateMeal(section.key, meal.id, 'protein', Number(e.target.value))} className="text-sm bg-card/50 border-border" />
                                                     </div>
                                                     <div>
                                                         <Label className="text-xs text-muted-foreground">탄수화물(g)</Label>
-                                                        <Input type="number" placeholder="0" value={meal.carbs || ''} onChange={(e) => updateMeal(section.key, meal.id, 'carbs', Number(e.target.value))} className="text-sm bg-card/50 border-white/10" />
+                                                        <Input type="number" placeholder="0" value={meal.carbs || ''} onChange={(e) => updateMeal(section.key, meal.id, 'carbs', Number(e.target.value))} className="text-sm bg-card/50 border-border" />
                                                     </div>
                                                     <div>
                                                         <Label className="text-xs text-muted-foreground">지방(g)</Label>
-                                                        <Input type="number" placeholder="0" value={meal.fat || ''} onChange={(e) => updateMeal(section.key, meal.id, 'fat', Number(e.target.value))} className="text-sm bg-card/50 border-white/10" />
+                                                        <Input type="number" placeholder="0" value={meal.fat || ''} onChange={(e) => updateMeal(section.key, meal.id, 'fat', Number(e.target.value))} className="text-sm bg-card/50 border-border" />
                                                     </div>
                                                 </div>
                                             </div>
                                         ))}
-                                        <div className="flex justify-end gap-4 text-sm pt-2 border-t border-white/10">
+                                        <div className="flex justify-end gap-4 text-sm pt-2 border-t border-border">
                                             <span className="text-muted-foreground">소계: <span className="font-medium text-orange-400">{total.calories}kcal</span></span>
                                             <span className="text-muted-foreground">P: <span className="font-medium text-red-400">{total.protein}g</span></span>
                                             <span className="text-muted-foreground">C: <span className="font-medium text-primary">{total.carbs}g</span></span>
@@ -261,7 +261,7 @@ export function Diet({ user }: DietProps) {
                         );
                     })}
 
-                    <Card className="p-4 bg-card/30 border-white/5">
+                    <Card className="p-4 bg-card/30 border-border/50">
                         <p className="text-xs text-muted-foreground text-center">
                             💡 팁: 각 음식의 영양정보는 식품 포장지나 영양정보 앱에서 확인할 수 있습니다.
                         </p>

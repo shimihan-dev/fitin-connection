@@ -77,7 +77,7 @@ export function LifestyleTips({ user }: LifestyleTipsProps) {
 
       {/* Hero Images */}
       <div className="grid grid-cols-2 gap-4">
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="relative rounded-xl overflow-hidden shadow-lg border border-white/10">
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="relative rounded-xl overflow-hidden shadow-lg border border-border">
           <ImageWithFallback
             src="https://images.unsplash.com/photo-1635545999375-057ee4013deb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx5b2RhJTIwbWVkaXRhdGlvbiUyMHdlbGxuZXNzfGVufDF8fHx8MTc2NjQ1NjYwNHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
             alt="Wellness"
@@ -88,7 +88,7 @@ export function LifestyleTips({ user }: LifestyleTipsProps) {
           </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="relative rounded-xl overflow-hidden shadow-lg border border-white/10">
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="relative rounded-xl overflow-hidden shadow-lg border border-border">
           <ImageWithFallback
             src="https://images.unsplash.com/photo-1606858274001-dd10efc5ce7d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoZWFsdGh5JTIwbWVhbCUyMG51dHJpdGlvbnxlbnwxfHx8fDE3NjY1Mzg2NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
             alt="Healthy nutrition"
@@ -114,7 +114,7 @@ export function LifestyleTips({ user }: LifestyleTipsProps) {
             const Icon = category.icon;
             return (
               <motion.div key={category.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
-                <Card className="p-5 bg-card/50 border-white/10">
+                <Card className="p-5 bg-card/50 border-border">
                   <div className="flex items-center gap-3 mb-4">
                     <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${category.color} flex items-center justify-center shadow-lg`}>
                       <Icon className="w-5 h-5 text-white" />
@@ -141,7 +141,7 @@ export function LifestyleTips({ user }: LifestyleTipsProps) {
             const Icon = category.icon;
             return (
               <motion.div key={category.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
-                <Card className="p-5 bg-card/50 border-white/10">
+                <Card className="p-5 bg-card/50 border-border">
                   <div className="flex items-center gap-3 mb-4">
                     <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${category.color} flex items-center justify-center shadow-lg`}>
                       <Icon className="w-5 h-5 text-white" />
@@ -168,7 +168,7 @@ export function LifestyleTips({ user }: LifestyleTipsProps) {
             const Icon = category.icon;
             return (
               <motion.div key={category.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
-                <Card className="p-5 bg-card/50 border-white/10">
+                <Card className="p-5 bg-card/50 border-border">
                   <div className="flex items-center gap-3 mb-4">
                     <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${category.color} flex items-center justify-center shadow-lg`}>
                       <Icon className="w-5 h-5 text-white" />

@@ -43,7 +43,7 @@ export function RecordSubmission({ onSubmit, userEmail, userName }: RecordSubmis
         <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-card/50 rounded-2xl border border-white/10 p-6"
+            className="bg-card/50 rounded-2xl border border-border p-6"
         >
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-foreground">
                 <span>💪</span> 기록 측정/등록
@@ -69,7 +69,7 @@ export function RecordSubmission({ onSubmit, userEmail, userName }: RecordSubmis
                                     onClick={() => setUniversityId(uni.id)}
                                     className={`flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all ${universityId === uni.id
                                         ? 'border-primary bg-primary/10 ring-2 ring-primary/30'
-                                        : 'border-white/10 hover:border-white/20 hover:bg-white/5'
+                                        : 'border-border hover:border-border hover:bg-muted/50'
                                         }`}
                                     title={uni.name}
                                 >
@@ -89,7 +89,7 @@ export function RecordSubmission({ onSubmit, userEmail, userName }: RecordSubmis
                                 type="number"
                                 value={squat}
                                 onChange={(e) => setSquat(e.target.value)}
-                                className="w-full px-3 py-2 bg-background/50 border border-white/10 rounded-lg text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+                                className="w-full px-3 py-2 bg-background/50 border border-border rounded-lg text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
                                 placeholder="0"
                                 min="0"
                                 required
@@ -104,7 +104,7 @@ export function RecordSubmission({ onSubmit, userEmail, userName }: RecordSubmis
                                 type="number"
                                 value={bench}
                                 onChange={(e) => setBench(e.target.value)}
-                                className="w-full px-3 py-2 bg-background/50 border border-white/10 rounded-lg text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+                                className="w-full px-3 py-2 bg-background/50 border border-border rounded-lg text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
                                 placeholder="0"
                                 min="0"
                                 required
@@ -119,7 +119,7 @@ export function RecordSubmission({ onSubmit, userEmail, userName }: RecordSubmis
                                 type="number"
                                 value={deadlift}
                                 onChange={(e) => setDeadlift(e.target.value)}
-                                className="w-full px-3 py-2 bg-background/50 border border-white/10 rounded-lg text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+                                className="w-full px-3 py-2 bg-background/50 border border-border rounded-lg text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
                                 placeholder="0"
                                 min="0"
                                 required
@@ -129,7 +129,7 @@ export function RecordSubmission({ onSubmit, userEmail, userName }: RecordSubmis
                     </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/10">
+                <div className="pt-4 border-t border-border">
                     <div className="flex justify-between items-center mb-4">
                         <span className="text-muted-foreground font-medium">총점 (Total)</span>
                         <span className="text-2xl font-bold text-primary">

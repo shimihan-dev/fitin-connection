@@ -96,7 +96,7 @@ export function WelcomeSlides({
             {/* Skip button */}
             <button
                 onClick={onComplete}
-                className="absolute top-4 right-4 text-white/70 hover:text-white flex items-center gap-1 text-sm transition-colors z-10"
+                className="absolute top-4 right-4 text-foreground/70 hover:text-white flex items-center gap-1 text-sm transition-colors z-10"
             >
                 건너뛰기
                 <X className="w-5 h-5" />
@@ -108,7 +108,7 @@ export function WelcomeSlides({
                 <button
                     onClick={goToPrev}
                     disabled={currentIndex === 0}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 p-2 text-white/70 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all z-10"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 p-2 text-foreground/70 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all z-10"
                 >
                     <ChevronLeft className="w-8 h-8" />
                 </button>
@@ -116,7 +116,7 @@ export function WelcomeSlides({
                 <button
                     onClick={goToNext}
                     disabled={isLastSlide}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-white/70 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all z-10"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-foreground/70 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all z-10"
                 >
                     <ChevronRight className="w-8 h-8" />
                 </button>
@@ -140,7 +140,7 @@ export function WelcomeSlides({
                         </h2>
                     )}
                     {currentSlide.description && (
-                        <p className="text-white/80 text-sm md:text-base max-w-md">
+                        <p className="text-foreground/80 text-sm md:text-base max-w-md">
                             {currentSlide.description}
                         </p>
                     )}
@@ -154,7 +154,7 @@ export function WelcomeSlides({
                             onClick={() => goToSlide(index)}
                             className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${index === currentIndex
                                 ? 'bg-white w-8'
-                                : 'bg-white/40 hover:bg-white/60'
+                                : 'bg-muted/80 hover:bg-muted'
                                 }`}
                             aria-label={`Go to slide ${index + 1}`}
                         />
@@ -173,9 +173,9 @@ export function WelcomeSlides({
             {/* Auto-play indicator */}
             {!isPaused && !isLastSlide && (
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-                    <div className="h-1 w-32 bg-white/20 rounded-full overflow-hidden">
+                    <div className="h-1 w-32 bg-muted rounded-full overflow-hidden">
                         <div
-                            className="h-full bg-white/60 rounded-full animate-progress"
+                            className="h-full bg-muted rounded-full animate-progress"
                             style={{
                                 animation: `progress ${autoPlayInterval}ms linear`,
                             }}

@@ -95,7 +95,7 @@ export function Board({ user }: BoardProps) {
                             transition={{ delay: index * 0.1 }}
                         >
                             <Card
-                                className="p-4 bg-card/50 border-white/10 cursor-pointer hover:bg-card/70 transition-colors"
+                                className="p-4 bg-card/50 border-border cursor-pointer hover:bg-card/70 transition-colors"
                                 onClick={() => setSelectedCategory(category.id)}
                             >
                                 <div className="flex items-center justify-between">
@@ -133,7 +133,7 @@ export function Board({ user }: BoardProps) {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setSelectedCategory(null)}
-                        className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                        className="p-2 rounded-lg hover:bg-muted transition-colors"
                     >
                         <ArrowLeft className="w-5 h-5" />
                     </button>
@@ -153,7 +153,7 @@ export function Board({ user }: BoardProps) {
                 {/* 게시글 목록 */}
                 <div className="space-y-2">
                     {posts.length === 0 ? (
-                        <Card className="p-8 bg-card/50 border-white/10 text-center">
+                        <Card className="p-8 bg-card/50 border-border text-center">
                             <MessageSquare className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-30" />
                             <p className="text-muted-foreground">아직 게시글이 없습니다</p>
                             <p className="text-sm text-muted-foreground mt-1">첫 번째 글을 작성해보세요!</p>
@@ -167,7 +167,7 @@ export function Board({ user }: BoardProps) {
                                 transition={{ delay: index * 0.05 }}
                             >
                                 <Card
-                                    className="p-4 bg-card/50 border-white/10 cursor-pointer hover:bg-card/70 transition-colors"
+                                    className="p-4 bg-card/50 border-border cursor-pointer hover:bg-card/70 transition-colors"
                                     onClick={() => setSelectedPost(post.id)}
                                 >
                                     <h3 className="font-medium text-foreground mb-2">{post.title}</h3>
@@ -211,7 +211,7 @@ export function Board({ user }: BoardProps) {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setSelectedPost(null)}
-                        className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                        className="p-2 rounded-lg hover:bg-muted transition-colors"
                     >
                         <ArrowLeft className="w-5 h-5" />
                     </button>
@@ -219,9 +219,9 @@ export function Board({ user }: BoardProps) {
                 </div>
 
                 {/* 게시글 내용 */}
-                <Card className="p-6 bg-card/50 border-white/10">
+                <Card className="p-6 bg-card/50 border-border">
                     <h1 className="text-xl font-bold text-foreground mb-4">{post.title}</h1>
-                    <div className="flex items-center justify-between text-sm text-muted-foreground mb-6 pb-4 border-b border-white/10">
+                    <div className="flex items-center justify-between text-sm text-muted-foreground mb-6 pb-4 border-b border-border">
                         <span>{post.author}</span>
                         <div className="flex items-center gap-3">
                             <span>{post.date}</span>
@@ -235,7 +235,7 @@ export function Board({ user }: BoardProps) {
                         <p>이것은 더미 게시글 내용입니다.</p>
                         <p className="mt-4">실제 구현 시 이 부분에 게시글 본문이 표시됩니다.</p>
                     </div>
-                    <div className="flex items-center gap-4 mt-6 pt-4 border-t border-white/10">
+                    <div className="flex items-center gap-4 mt-6 pt-4 border-t border-border">
                         <Button variant="outline" size="sm" className="flex items-center gap-1">
                             <Heart className="w-4 h-4" />
                             좋아요 {post.likes}
@@ -244,7 +244,7 @@ export function Board({ user }: BoardProps) {
                 </Card>
 
                 {/* 댓글 영역 (더미) */}
-                <Card className="p-4 bg-card/50 border-white/10">
+                <Card className="p-4 bg-card/50 border-border">
                     <h3 className="font-semibold text-foreground mb-4">댓글</h3>
                     <p className="text-muted-foreground text-sm text-center py-4">
                         아직 댓글이 없습니다. 첫 댓글을 남겨보세요!

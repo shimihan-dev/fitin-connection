@@ -51,7 +51,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
             <Button
               size="lg"
               variant="outline"
-              className="text-base px-8 py-6 rounded-full border-white/10 hover:bg-white/5 hover:text-white transition-all"
+              className="text-base px-8 py-6 rounded-full border-border hover:bg-muted/50 hover:text-white transition-all"
             >
               기능 둘러보기
             </Button>
@@ -61,7 +61,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
         {/* Hero Image / Preview Card */}
         <div className="mt-20 relative w-full max-w-5xl mx-auto group">
           <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
-          <div className="relative rounded-2xl border border-white/10 bg-card/50 backdrop-blur-xl overflow-hidden aspect-video shadow-2xl">
+          <div className="relative rounded-2xl border border-border bg-card/50 backdrop-blur-xl overflow-hidden aspect-video shadow-2xl">
             {/* Placeholder for Dashboard UI Screenshot */}
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-card to-background">
               <div className="text-center space-y-4">
@@ -123,8 +123,8 @@ export function LandingPage({ onStart }: LandingPageProps) {
                 desc: "IGC 학생들과 함께 경쟁하고 동기부여를 얻는 소셜 피트니스."
               }
             ].map((feature, idx) => (
-              <div key={idx} className="group p-8 rounded-3xl bg-card border border-white/5 hover:border-primary/50 hover:bg-card/80 transition-all duration-300 hover:-translate-y-1">
-                <div className="mb-6 w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-[#2F80FF] group-hover:scale-110 transition-transform duration-300 border border-white/5 group-hover:border-primary/20">
+              <div key={idx} className="group p-8 rounded-3xl bg-card border border-border/50 hover:border-primary/50 hover:bg-card/80 transition-all duration-300 hover:-translate-y-1">
+                <div className="mb-6 w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center text-[#2F80FF] group-hover:scale-110 transition-transform duration-300 border border-border/50 group-hover:border-primary/20">
                   {feature.icon}
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-foreground tracking-tight">{feature.title}</h3>
@@ -136,9 +136,9 @@ export function LandingPage({ onStart }: LandingPageProps) {
       </section>
 
       {/* Social Proof / Stats */}
-      <section className="py-32 border-t border-white/5 relative bg-[#080a0f]">
+      <section className="py-32 border-t border-border/50 relative bg-[#080a0f]">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-sm text-muted-foreground mb-12">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-muted/50 text-sm text-muted-foreground mb-12">
             <CheckCircle className="w-4 h-4 text-[#2F80FF]" />
             <span>Trusted by IGC Students</span>
           </div>
@@ -159,7 +159,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
 
           <div className="mt-20 flex flex-wrap justify-center gap-4 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
             {['Utah', 'SUNY', 'FIT', 'Ghent', 'GMU'].map((uni) => (
-              <div key={uni} className="px-6 py-3 rounded-xl border border-white/10 bg-white/5 text-white/40 font-bold">
+              <div key={uni} className="px-6 py-3 rounded-xl border border-border bg-muted/50 text-muted-foreground font-bold">
                 {uni}
               </div>
             ))}
@@ -168,7 +168,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-white/5 bg-background text-center">
+      <footer className="py-12 border-t border-border/50 bg-background text-center">
         <div className="flex items-center justify-center gap-2 mb-8 opacity-50">
           <Dumbbell className="w-6 h-6" />
           <span className="font-bold tracking-tight">Fitin_Connection</span>

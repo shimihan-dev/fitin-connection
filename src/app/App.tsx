@@ -5,22 +5,23 @@ import { Progress } from './components/Progress';
 import { Diet } from './components/Diet';
 import { Board } from './components/Board';
 import { MyPage } from './components/MyPage';
-import { Navigation } from './components/Navigation';
 import { Header } from './components/Header';
 import { SignupPage } from './components/SignupPage';
 import { WelcomeSlides } from './components/WelcomeSlides';
 import { OnboardingFlow } from './components/OnboardingFlow';
 import { CompetitionPage } from './components/Competition/CompetitionPage';
+import { HomePage } from './components/HomePage';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './components/ui/dialog';
 import { Button as UIButton } from './components/ui/button';
 import { Input } from './components/ui/input';
 import { Label } from './components/ui/label';
 import { getCurrentUser, signOut, signIn, User } from '../../utils/auth';
 
-type Page = 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
+type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('workout');
+  const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [showDictionary, setShowDictionary] = useState(false);
   const [isSignupPage, setIsSignupPage] = useState(false);
   const [showMyPage, setShowMyPage] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
@@ -215,6 +216,8 @@ export default function App() {
 
   const renderPage = () => {
     switch (currentPage) {
+      case 'home':
+        return <HomePage user={user} onNavigate={setCurrentPage} onMyPageClick={() => setShowMyPage(true)} onDictionaryClick={() => setShowDictionary(true)} />;
       case 'workout':
         return <WorkoutGuide user={user} />;
       case 'competition':
@@ -228,7 +231,7 @@ export default function App() {
       case 'board':
         return <Board user={user} />;
       default:
-        return <WorkoutGuide user={user} />;
+        return <HomePage user={user} onNavigate={setCurrentPage} onMyPageClick={() => setShowMyPage(true)} onDictionaryClick={() => setShowDictionary(true)} />;
     }
   };
 
@@ -242,7 +245,7 @@ export default function App() {
       <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} onMyPageClick={() => setShowMyPage(true)} />
 
       <main className="flex-1 overflow-y-auto pt-16 scroll-smooth">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-48">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
           {showMyPage ? (
             <MyPage user={user} onBack={() => setShowMyPage(false)} />
           ) : (
@@ -250,8 +253,6 @@ export default function App() {
           )}
         </div>
       </main>
-
-      {!showMyPage && <Navigation currentPage={currentPage} onNavigate={setCurrentPage} />}
     </div>
   );
 }

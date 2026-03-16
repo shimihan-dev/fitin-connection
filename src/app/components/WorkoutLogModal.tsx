@@ -66,7 +66,7 @@ export function WorkoutLogModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-[500px] bg-[#0f172a] border-white/10 text-slate-200">
+            <DialogContent className="sm:max-w-[500px] bg-[#0f172a] border-border text-slate-200">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-bold text-slate-100">{exerciseName} 기록</DialogTitle>
                 </DialogHeader>

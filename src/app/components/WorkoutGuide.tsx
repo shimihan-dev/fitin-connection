@@ -830,7 +830,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
         <TabsContent value="overview" className="space-y-6 pt-2">
           <div className="grid lg:grid-cols-[1.2fr,1fr] gap-6">
             {/* Body Diagram Card */}
-            <Card className="p-6 bg-[#1e293b]/50 border-white/5 backdrop-blur-sm shadow-2xl flex flex-col items-center">
+            <Card className="p-6 bg-[#1e293b]/50 border-border/50 backdrop-blur-sm shadow-2xl flex flex-col items-center">
               <h3 className="text-sm font-semibold mb-8 text-slate-300 uppercase tracking-widest">이번 주 운동 현황</h3>
               <BodyDiagram
                 muscleData={allMuscles}
@@ -841,7 +841,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
 
             {/* Weekly Stats List Card */}
             <div className="space-y-4">
-              <Card className="p-6 bg-[#1e293b]/50 border-white/5 backdrop-blur-sm shadow-2xl h-full">
+              <Card className="p-6 bg-[#1e293b]/50 border-border/50 backdrop-blur-sm shadow-2xl h-full">
                 <h3 className="text-base font-semibold mb-6 flex items-center gap-2 text-slate-200">
                   <Calendar className="w-4 h-4 text-blue-400" />
                   이번 주 부위별 운동 횟수
@@ -854,7 +854,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                     return (
                       <div
                         key={muscle.id}
-                        className="group flex items-center justify-between py-3 px-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-white/5 border border-transparent"
+                        className="group flex items-center justify-between py-3 px-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-muted/50 border border-transparent"
                         onClick={() => handleMuscleNavigation(muscle.id)}
                       >
                         <div className="flex items-center gap-3">
@@ -881,7 +881,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
         {/* Routine Tab */}
         <TabsContent value="routine" className="space-y-6">
           {/* Routine Sub-tabs */}
-          <div className="flex bg-muted/50 p-1 rounded-xl border border-white/5 w-fit mx-auto sm:mx-0">
+          <div className="flex bg-muted/50 p-1 rounded-xl border border-border/50 w-fit mx-auto sm:mx-0">
             <button
               onClick={() => setRoutineSubTab('planner')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${routineSubTab === 'planner' ? 'bg-primary text-white shadow-lg shadow-primary/25' : 'text-muted-foreground hover:text-foreground'}`}
@@ -917,7 +917,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                   <h3 className="font-semibold text-lg">상체 운동 가이드</h3>
                 </div>
                 {muscleGroups.upper.map(muscle => (
-                  <Card key={muscle.id} className="overflow-hidden bg-card/50 border-white/10 hover:border-primary/30 transition-colors shadow-sm">
+                  <Card key={muscle.id} className="overflow-hidden bg-card/50 border-border hover:border-primary/30 transition-colors shadow-sm">
                     <div
                       className="p-4 cursor-pointer hover:bg-muted/30 transition-colors"
                       onClick={() => setExpandedExercise(expandedExercise === muscle.id ? null : muscle.id)}
@@ -946,20 +946,20 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                           >
                             <Plus className="w-4 h-4 mr-1" /> 운동 추가
                           </Button>
-                          <Badge variant="outline" className="border-white/10 bg-white/5">{getWeeklyCount(muscle.id)}회 / 주</Badge>
+                          <Badge variant="outline" className="border-border bg-muted/50">{getWeeklyCount(muscle.id)}회 / 주</Badge>
                           <ChevronRight className={`w-5 h-5 transition-transform text-muted-foreground ${expandedExercise === muscle.id ? 'rotate-90' : ''}`} />
                         </div>
                       </div>
                     </div>
 
                     {expandedExercise === muscle.id && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-white/5 bg-background/30">
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-border/50 bg-background/30">
                         <div className="p-4 space-y-3">
                           {/* Static Exercises */}
                           {muscle.exercises.map((exercise, idx) => {
                             const summary = getLogSummary(muscle.id, exercise.name);
                             return (
-                              <div key={`static-${idx}`} className="p-4 bg-background/50 rounded-xl border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                              <div key={`static-${idx}`} className="p-4 bg-background/50 rounded-xl border border-border/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div className="space-y-1">
                                   <div className="flex items-center gap-2">
                                     <span className="font-medium text-foreground">{exercise.name}</span>
@@ -1043,7 +1043,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                     <h3 className="font-semibold text-lg">하체 운동 가이드</h3>
                   </div>
                   {muscleGroups.lower.map(muscle => (
-                    <Card key={muscle.id} className="overflow-hidden bg-card/50 border-white/10 hover:border-primary/30 transition-colors shadow-sm">
+                    <Card key={muscle.id} className="overflow-hidden bg-card/50 border-border hover:border-primary/30 transition-colors shadow-sm">
                       <div
                         className="p-4 cursor-pointer hover:bg-muted/30 transition-colors"
                         onClick={() => setExpandedExercise(expandedExercise === muscle.id ? null : muscle.id)}
@@ -1059,17 +1059,17 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <Badge variant="outline" className="border-white/10 bg-white/5">{getWeeklyCount(muscle.id)}회 / 주</Badge>
+                            <Badge variant="outline" className="border-border bg-muted/50">{getWeeklyCount(muscle.id)}회 / 주</Badge>
                             <ChevronRight className={`w-5 h-5 transition-transform text-muted-foreground ${expandedExercise === muscle.id ? 'rotate-90' : ''}`} />
                           </div>
                         </div>
                       </div>
 
                       {expandedExercise === muscle.id && (
-                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-white/5 bg-background/30">
+                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-border/50 bg-background/30">
                           <div className="p-4 space-y-3">
                             {muscle.exercises.map((exercise, idx) => (
-                              <div key={idx} className="p-4 bg-background/50 rounded-xl border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                              <div key={idx} className="p-4 bg-background/50 rounded-xl border border-border/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div className="space-y-1">
                                   <div className="flex items-center gap-2">
                                     <span className="font-medium text-foreground">{exercise.name}</span>
@@ -1107,7 +1107,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                     <h3 className="font-semibold text-lg">코어 운동 가이드</h3>
                   </div>
                   {muscleGroups.core.map(muscle => (
-                    <Card key={muscle.id} className="overflow-hidden bg-card/50 border-white/10 hover:border-primary/30 transition-colors shadow-sm">
+                    <Card key={muscle.id} className="overflow-hidden bg-card/50 border-border hover:border-primary/30 transition-colors shadow-sm">
                       <div
                         className="p-4 cursor-pointer hover:bg-muted/30 transition-colors"
                         onClick={() => setExpandedExercise(expandedExercise === muscle.id ? null : muscle.id)}
@@ -1123,17 +1123,17 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <Badge variant="outline" className="border-white/10 bg-white/5">{getWeeklyCount(muscle.id)}회 / 주</Badge>
+                            <Badge variant="outline" className="border-border bg-muted/50">{getWeeklyCount(muscle.id)}회 / 주</Badge>
                             <ChevronRight className={`w-5 h-5 transition-transform text-muted-foreground ${expandedExercise === muscle.id ? 'rotate-90' : ''}`} />
                           </div>
                         </div>
                       </div>
 
                       {expandedExercise === muscle.id && (
-                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-white/5 bg-background/30">
+                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-border/50 bg-background/30">
                           <div className="p-4 space-y-3">
                             {muscle.exercises.map((exercise, idx) => (
-                              <div key={idx} className="p-4 bg-background/50 rounded-xl border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                              <div key={idx} className="p-4 bg-background/50 rounded-xl border border-border/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div className="space-y-1">
                                   <div className="flex items-center gap-2">
                                     <span className="font-medium text-foreground">{exercise.name}</span>
@@ -1177,7 +1177,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
         {/* Running Tab */}
         < TabsContent value="running" className="space-y-4" >
           {/* 헤더 및 업로드 버튼 */}
-          < Card className="p-4 bg-card/50 border-white/10" >
+          < Card className="p-4 bg-card/50 border-border" >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
@@ -1232,7 +1232,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
           {/* 러닝 기록 리스트 */}
           {
             runningRecords.length === 0 ? (
-              <Card className="p-8 bg-card/50 border-white/10 text-center">
+              <Card className="p-8 bg-card/50 border-border text-center">
                 <Footprints className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-30" />
                 <p className="text-muted-foreground mb-2">아직 러닝 기록이 없습니다</p>
                 <p className="text-sm text-muted-foreground">위의 "기록 추가" 버튼을 눌러 시작하세요</p>
@@ -1240,14 +1240,14 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
             ) : (
               <div className="space-y-3">
                 {runningRecords.map((record) => (
-                  <Card key={record.id} className="p-4 bg-card/50 border-white/10">
+                  <Card key={record.id} className="p-4 bg-card/50 border-border">
                     <div className="flex gap-4">
                       {/* 썸네일 이미지 */}
                       <img
                         src={record.imageUrl}
                         alt="러닝 기록"
                         onClick={() => setViewingImage(record.imageUrl)}
-                        className="w-20 h-20 object-cover rounded-lg border border-white/10 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                        className="w-20 h-20 object-cover rounded-lg border border-border flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
                       />
                       {/* 기록 정보 */}
                       <div className="flex-1 min-w-0">
@@ -1344,7 +1344,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
               <img
                 src={pendingRunningImage}
                 alt="미리보기"
-                className="w-full max-h-64 object-contain rounded-lg border border-white/10"
+                className="w-full max-h-64 object-contain rounded-lg border border-border"
               />
             )}
             <div>
@@ -1353,7 +1353,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                 type="date"
                 value={runningDate}
                 onChange={(e) => setRunningDate(e.target.value)}
-                className="w-full p-2 border rounded-md mt-1 bg-card border-white/20 text-foreground"
+                className="w-full p-2 border rounded-md mt-1 bg-card border-border text-foreground"
               />
             </div>
             <div className="grid grid-cols-3 gap-3">
@@ -1365,7 +1365,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                   placeholder="0.00"
                   value={runningDistance}
                   onChange={(e) => setRunningDistance(e.target.value)}
-                  className="w-full p-2 border rounded-md mt-1 bg-card border-white/20 text-foreground"
+                  className="w-full p-2 border rounded-md mt-1 bg-card border-border text-foreground"
                 />
               </div>
               <div>
@@ -1375,7 +1375,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                   placeholder="mm:ss"
                   value={runningDuration}
                   onChange={(e) => setRunningDuration(e.target.value)}
-                  className="w-full p-2 border rounded-md mt-1 bg-card border-white/20 text-foreground"
+                  className="w-full p-2 border rounded-md mt-1 bg-card border-border text-foreground"
                 />
               </div>
               <div>
@@ -1385,7 +1385,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                   placeholder={"m'ss\""}
                   value={runningPace}
                   onChange={(e) => setRunningPace(e.target.value)}
-                  className="w-full p-2 border rounded-md mt-1 bg-card border-white/20 text-foreground"
+                  className="w-full p-2 border rounded-md mt-1 bg-card border-border text-foreground"
                 />
               </div>
             </div>

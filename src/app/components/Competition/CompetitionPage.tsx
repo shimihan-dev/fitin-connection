@@ -48,7 +48,7 @@ export function CompetitionPage({ user }: CompetitionPageProps) {
                                 userName={user.name}
                             />
                         ) : (
-                            <div className="bg-card/50 rounded-2xl border border-white/10 p-8 text-center">
+                            <div className="bg-card/50 rounded-2xl border border-border p-8 text-center">
                                 <p className="text-muted-foreground mb-4">기록을 제출하려면 로그인이 필요합니다.</p>
                             </div>
                         )}

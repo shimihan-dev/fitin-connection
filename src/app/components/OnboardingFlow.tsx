@@ -165,7 +165,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                         transition={{ duration: 0.3 }}
                         className="w-full max-w-md"
                     >
-                        <Card className="p-8 text-center bg-card/50 backdrop-blur-xl border-white/10">
+                        <Card className="p-8 text-center bg-card/50 backdrop-blur-xl border-border">
                             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center mx-auto mb-6">
                                 <Dumbbell className="w-10 h-10 text-white" />
                             </div>
@@ -186,7 +186,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                 <Button
                                     variant="outline"
                                     onClick={onLoginClick}
-                                    className="w-full py-6 text-lg border-white/20 hover:bg-white/5"
+                                    className="w-full py-6 text-lg border-border hover:bg-muted/50"
                                 >
                                     이미 계정이 있어요 (로그인)
                                 </Button>
@@ -206,7 +206,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                         transition={{ duration: 0.3 }}
                         className="w-full max-w-lg"
                     >
-                        <Card className="p-8 bg-card/50 backdrop-blur-xl border-white/10">
+                        <Card className="p-8 bg-card/50 backdrop-blur-xl border-border">
                             <button onClick={goBack} className="flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors">
                                 <ArrowLeft className="w-4 h-4 mr-2" />
                                 뒤로
@@ -227,7 +227,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                         }}
                                         className={`p-8 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center gap-3 hover:scale-105 ${data.gender === option.value
                                             ? `border-primary bg-gradient-to-br ${option.color} text-white`
-                                            : 'border-white/10 hover:border-white/30 bg-card/50'
+                                            : 'border-border hover:border-white/30 bg-card/50'
                                             }`}
                                     >
                                         <span className="text-5xl">{option.icon}</span>
@@ -250,7 +250,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                         transition={{ duration: 0.3 }}
                         className="w-full max-w-lg"
                     >
-                        <Card className="p-8 bg-card/50 backdrop-blur-xl border-white/10">
+                        <Card className="p-8 bg-card/50 backdrop-blur-xl border-border">
                             <button onClick={goBack} className="flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors">
                                 <ArrowLeft className="w-4 h-4 mr-2" />
                                 뒤로
@@ -271,7 +271,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                         }}
                                         className={`p-6 rounded-xl border-2 transition-all duration-300 flex flex-col items-center gap-2 hover:scale-105 ${data.bodyFatGoal === fat
                                             ? 'border-primary bg-primary/20 text-primary'
-                                            : 'border-white/10 hover:border-white/30 bg-card/50'
+                                            : 'border-border hover:border-white/30 bg-card/50'
                                             }`}
                                     >
                                         <Target className="w-8 h-8" />
@@ -300,7 +300,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                         transition={{ duration: 0.3 }}
                         className="w-full max-w-md"
                     >
-                        <Card className="p-8 text-center bg-card/50 backdrop-blur-xl border-white/10">
+                        <Card className="p-8 text-center bg-card/50 backdrop-blur-xl border-border">
                             <button onClick={goBack} className="flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors">
                                 <ArrowLeft className="w-4 h-4 mr-2" />
                                 뒤로
@@ -318,7 +318,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                 BMR(기초대사량) 공식으로 계산해 드립니다!
                             </p>
 
-                            <div className="bg-white/5 rounded-xl p-4 mb-6 text-sm text-muted-foreground">
+                            <div className="bg-muted/50 rounded-xl p-4 mb-6 text-sm text-muted-foreground">
                                 <p className="font-medium text-foreground mb-2">BMR 계산에 다음 정보가 필요해요:</p>
                                 <ul className="space-y-1 text-left">
                                     <li>• 키 (cm)</li>
@@ -349,7 +349,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                         transition={{ duration: 0.3 }}
                         className="w-full max-w-lg"
                     >
-                        <Card className="p-8 bg-card/50 backdrop-blur-xl border-white/10 max-h-[85vh] overflow-y-auto">
+                        <Card className="p-8 bg-card/50 backdrop-blur-xl border-border max-h-[85vh] overflow-y-auto">
                             <button onClick={goBack} className="flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors">
                                 <ArrowLeft className="w-4 h-4 mr-2" />
                                 뒤로
@@ -365,7 +365,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                         placeholder="홍길동"
                                         value={data.name}
                                         onChange={(e) => updateData('name', e.target.value)}
-                                        className="bg-white/5 border-white/10"
+                                        className="bg-muted/50 border-border"
                                         required
                                     />
                                 </div>
@@ -377,7 +377,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                         placeholder="your@email.com"
                                         value={data.email}
                                         onChange={(e) => updateData('email', e.target.value)}
-                                        className="bg-white/5 border-white/10"
+                                        className="bg-muted/50 border-border"
                                         required
                                     />
                                 </div>
@@ -387,7 +387,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                     <select
                                         value={data.university}
                                         onChange={(e) => updateData('university', e.target.value)}
-                                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
+                                        className="w-full px-3 py-2 bg-muted/50 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
                                         required
                                     >
                                         <option value="" className="bg-background">선택하세요</option>
@@ -407,7 +407,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                             placeholder="8자 이상"
                                             value={data.password}
                                             onChange={(e) => updateData('password', e.target.value)}
-                                            className="bg-white/5 border-white/10"
+                                            className="bg-muted/50 border-border"
                                             required
                                             minLength={8}
                                         />
@@ -419,14 +419,14 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                             placeholder="비밀번호 확인"
                                             value={data.passwordConfirm}
                                             onChange={(e) => updateData('passwordConfirm', e.target.value)}
-                                            className="bg-white/5 border-white/10"
+                                            className="bg-muted/50 border-border"
                                             required
                                         />
                                     </div>
                                 </div>
 
                                 {/* 신체 정보 */}
-                                <div className="pt-4 border-t border-white/10">
+                                <div className="pt-4 border-t border-border">
                                     <h3 className="font-semibold mb-4 flex items-center gap-2">
                                         <User className="w-4 h-4" />
                                         신체 정보 (BMR 계산용)
@@ -439,7 +439,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                                 placeholder="170"
                                                 value={data.height || ''}
                                                 onChange={(e) => updateData('height', e.target.value ? Number(e.target.value) : null)}
-                                                className="bg-white/5 border-white/10"
+                                                className="bg-muted/50 border-border"
                                                 required
                                             />
                                         </div>
@@ -450,7 +450,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                                 placeholder="70"
                                                 value={data.weight || ''}
                                                 onChange={(e) => updateData('weight', e.target.value ? Number(e.target.value) : null)}
-                                                className="bg-white/5 border-white/10"
+                                                className="bg-muted/50 border-border"
                                                 required
                                             />
                                         </div>
@@ -461,7 +461,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                                 placeholder="22"
                                                 value={data.age || ''}
                                                 onChange={(e) => updateData('age', e.target.value ? Number(e.target.value) : null)}
-                                                className="bg-white/5 border-white/10"
+                                                className="bg-muted/50 border-border"
                                                 required
                                             />
                                         </div>
@@ -469,7 +469,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                 </div>
 
                                 {/* 약관 동의 */}
-                                <div className="pt-4 border-t border-white/10">
+                                <div className="pt-4 border-t border-border">
                                     <label className="flex items-start gap-2 text-sm text-muted-foreground">
                                         <input type="checkbox" required className="mt-1" />
                                         <span><span className="text-red-500">*</span> 이용약관 및 개인정보처리방침에 동의합니다.</span>
@@ -500,7 +500,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                         transition={{ duration: 0.3 }}
                         className="w-full max-w-lg"
                     >
-                        <Card className="p-8 bg-card/50 backdrop-blur-xl border-white/10">
+                        <Card className="p-8 bg-card/50 backdrop-blur-xl border-border">
                             {/* 칼로리 결과 표시 */}
                             {calorieResult && (
                                 <div className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-xl p-4 mb-6 border border-primary/30">
@@ -535,13 +535,13 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                         }}
                                         className={`w-full p-5 rounded-xl border-2 transition-all duration-300 flex items-center gap-4 hover:scale-[1.02] ${data.preferredExercise === option.value
                                             ? `border-primary bg-gradient-to-r ${option.color} text-white`
-                                            : 'border-white/10 hover:border-white/30 bg-card/50'
+                                            : 'border-border hover:border-white/30 bg-card/50'
                                             }`}
                                     >
                                         {option.icon}
                                         <div className="text-left">
                                             <p className="font-bold text-lg">{option.label}</p>
-                                            <p className={`text-sm ${data.preferredExercise === option.value ? 'text-white/80' : 'text-muted-foreground'}`}>
+                                            <p className={`text-sm ${data.preferredExercise === option.value ? 'text-foreground/80' : 'text-muted-foreground'}`}>
                                                 {option.desc}
                                             </p>
                                         </div>

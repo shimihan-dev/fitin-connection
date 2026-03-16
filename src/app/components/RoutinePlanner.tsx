@@ -119,11 +119,11 @@ export function RoutinePlanner({ user }: RoutinePlannerProps) {
 
       {/* View Toggle Buttons */}
       <div className="flex gap-3">
-        <Button onClick={() => setShowCalendarView(!showCalendarView)} variant={showCalendarView ? 'default' : 'outline'} className="flex-1 border-white/10">
+        <Button onClick={() => setShowCalendarView(!showCalendarView)} variant={showCalendarView ? 'default' : 'outline'} className="flex-1 border-border">
           <CalendarIcon className="w-4 h-4 mr-2" />
           {showCalendarView ? '루틴 보기' : '달력 보기'}
         </Button>
-        <Button onClick={() => setShowTemplates(!showTemplates)} variant="outline" className="flex-1 border-white/10">
+        <Button onClick={() => setShowTemplates(!showTemplates)} variant="outline" className="flex-1 border-border">
           <Plus className="w-4 h-4 mr-2" />
           {showTemplates ? '템플릿 닫기' : '추천 루틴'}
         </Button>
@@ -132,7 +132,7 @@ export function RoutinePlanner({ user }: RoutinePlannerProps) {
       {/* Calendar View */}
       {showCalendarView && (
         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-4">
-          <Card className="p-4 bg-card/50 border-white/10">
+          <Card className="p-4 bg-card/50 border-border">
             <Calendar
               mode="single"
               selected={selectedDate}
@@ -145,7 +145,7 @@ export function RoutinePlanner({ user }: RoutinePlannerProps) {
           </Card>
 
           {selectedDate && (
-            <Card className="p-5 bg-card/50 border-white/10">
+            <Card className="p-5 bg-card/50 border-border">
               <h3 className="mb-3 font-semibold text-foreground">{format(selectedDate, 'yyyy년 M월 d일 (EEE)', { locale: ko })}</h3>
               {selectedDateWorkout ? (
                 <div className="space-y-2">
@@ -183,7 +183,7 @@ export function RoutinePlanner({ user }: RoutinePlannerProps) {
       {showTemplates && !showCalendarView && (
         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-3">
           {templates.map((template, index) => (
-            <Card key={template.name} className="p-4 bg-card/50 border-white/10">
+            <Card key={template.name} className="p-4 bg-card/50 border-border">
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">{template.name}</h3>
@@ -194,7 +194,7 @@ export function RoutinePlanner({ user }: RoutinePlannerProps) {
               <div className="space-y-1">
                 {template.routines.map((routine, idx) => (
                   <div key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs border-white/10">{routine.day}</Badge>
+                    <Badge variant="outline" className="text-xs border-border">{routine.day}</Badge>
                     <span className="text-xs">{routine.workouts.join(', ')}</span>
                   </div>
                 ))}
@@ -209,7 +209,7 @@ export function RoutinePlanner({ user }: RoutinePlannerProps) {
         <div className="space-y-3">
           <h2 className="text-lg font-semibold text-foreground">내 루틴</h2>
           {routines.length === 0 ? (
-            <Card className="p-8 text-center bg-card/50 border-white/10">
+            <Card className="p-8 text-center bg-card/50 border-border">
               <CalendarIcon className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
               <p className="text-muted-foreground mb-2">아직 등록된 루틴이 없어요</p>
               <p className="text-sm text-muted-foreground/70">위에서 추천 루틴을 선택해보세요!</p>
@@ -217,7 +217,7 @@ export function RoutinePlanner({ user }: RoutinePlannerProps) {
           ) : (
             routines.map((routine, index) => (
               <motion.div key={routine.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.1 }}>
-                <Card className={`p-4 transition-all ${routine.completed ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-card/50 border-white/10 hover:border-white/20'}`}>
+                <Card className={`p-4 transition-all ${routine.completed ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-card/50 border-border hover:border-border'}`}>
                   <div className="flex items-start gap-3">
                     <button onClick={() => toggleComplete(routine.id)} className="flex-shrink-0 mt-1">
                       {routine.completed ? <CheckCircle className="w-6 h-6 text-emerald-400" /> : <Circle className="w-6 h-6 text-muted-foreground" />}

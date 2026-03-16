@@ -22,7 +22,7 @@ export function Leaderboard({ records }: LeaderboardProps) {
     return (
         <div className="space-y-8">
             {/* Top 3 Podium */}
-            <div className="bg-card/50 rounded-2xl border border-white/10 p-6">
+            <div className="bg-card/50 rounded-2xl border border-border p-6">
                 <h2 className="text-2xl font-bold text-center mb-8 flex items-center justify-center gap-2 text-foreground">
                     <span>🏆</span> 명예의 전당
                 </h2>
@@ -83,13 +83,13 @@ export function Leaderboard({ records }: LeaderboardProps) {
             </div>
 
             {/* University Ranking */}
-            <div className="bg-card/50 rounded-2xl border border-white/10 p-6">
+            <div className="bg-card/50 rounded-2xl border border-border p-6">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-foreground">
                     <span>🏛️</span> 대학교 대항전 (평균 기록)
                 </h2>
                 <div className="space-y-4">
                     {universityStats.map((uni, index) => (
-                        <div key={uni.id} className="flex items-center gap-4 p-3 rounded-xl bg-background/50 hover:bg-background/70 transition-colors border border-white/5">
+                        <div key={uni.id} className="flex items-center gap-4 p-3 rounded-xl bg-background/50 hover:bg-background/70 transition-colors border border-border/50">
                             <div className="font-bold text-muted-foreground w-6 text-center">{index + 1}</div>
                             <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${uni.color} flex items-center justify-center text-xl shadow-sm text-white`}>
                                 {uni.logo}

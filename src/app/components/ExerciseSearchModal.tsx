@@ -49,8 +49,8 @@ export function ExerciseSearchModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-[480px] h-[80vh] flex flex-col p-0 gap-0 bg-[#0f172a] border-white/10 text-slate-200">
-                <DialogHeader className="p-4 border-b border-white/5">
+            <DialogContent className="sm:max-w-[480px] h-[80vh] flex flex-col p-0 gap-0 bg-[#0f172a] border-border text-slate-200">
+                <DialogHeader className="p-4 border-b border-border/50">
                     <DialogTitle className="text-lg font-bold flex items-center gap-2">
                         <Plus className="w-5 h-5 text-blue-500" />
                         운동 추가
@@ -114,7 +114,7 @@ export function ExerciseSearchModal({
                                 return (
                                     <div
                                         key={exercise.id}
-                                        className="flex items-center justify-between p-3 rounded-xl bg-slate-800/50 border border-white/5 hover:bg-slate-800 transition-colors"
+                                        className="flex items-center justify-between p-3 rounded-xl bg-slate-800/50 border border-border/50 hover:bg-slate-800 transition-colors"
                                     >
                                         <div>
                                             <h4 className="font-semibold text-sm text-slate-200">{exercise.name}</h4>

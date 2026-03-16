@@ -153,7 +153,7 @@ export function MyPage({ user, onBack }: MyPageProps) {
         <div className="p-6 space-y-6">
             {/* 뒤로가기 버튼 */}
             <div className="flex justify-end">
-                <Button variant="outline" onClick={onBack} className="border-white/10">
+                <Button variant="outline" onClick={onBack} className="border-border">
                     뒤로가기
                 </Button>
             </div>
@@ -232,7 +232,7 @@ export function MyPage({ user, onBack }: MyPageProps) {
             </Card>
 
             {/* 프로필 수정 폼 */}
-            <Card className="p-5 bg-card/50 border-white/10">
+            <Card className="p-5 bg-card/50 border-border">
                 <h3 className="font-semibold text-foreground mb-4">프로필 수정</h3>
 
                 <div className="space-y-4">
@@ -248,7 +248,7 @@ export function MyPage({ user, onBack }: MyPageProps) {
                             onChange={handleChange}
                             placeholder="이름을 입력하세요"
                             disabled={saving}
-                            className="bg-background/50 border-white/10"
+                            className="bg-background/50 border-border"
                         />
                     </div>
 
@@ -266,7 +266,7 @@ export function MyPage({ user, onBack }: MyPageProps) {
                                 onChange={handleChange}
                                 placeholder="170"
                                 disabled={saving}
-                                className="bg-background/50 border-white/10"
+                                className="bg-background/50 border-border"
                             />
                         </div>
                         <div className="space-y-2">
@@ -282,7 +282,7 @@ export function MyPage({ user, onBack }: MyPageProps) {
                                 onChange={handleChange}
                                 placeholder="70"
                                 disabled={saving}
-                                className="bg-background/50 border-white/10"
+                                className="bg-background/50 border-border"
                             />
                         </div>
                     </div>
@@ -302,7 +302,7 @@ export function MyPage({ user, onBack }: MyPageProps) {
                                 onChange={handleChange}
                                 placeholder="22"
                                 disabled={saving}
-                                className="bg-background/50 border-white/10"
+                                className="bg-background/50 border-border"
                             />
                         </div>
                         <div className="space-y-2">
@@ -318,7 +318,7 @@ export function MyPage({ user, onBack }: MyPageProps) {
                                 onChange={handleChange}
                                 placeholder="15"
                                 disabled={saving}
-                                className="bg-background/50 border-white/10"
+                                className="bg-background/50 border-border"
                             />
                         </div>
                     </div>
@@ -335,7 +335,7 @@ export function MyPage({ user, onBack }: MyPageProps) {
                             value={formData.preferred_exercise}
                             onChange={(e) => setFormData({ ...formData, preferred_exercise: e.target.value })}
                             disabled={saving}
-                            className="w-full px-3 py-2 bg-background/50 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
+                            className="w-full px-3 py-2 bg-background/50 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
                         >
                             <option value="" className="bg-background">선택하세요</option>
                             <option value="running" className="bg-background">러닝</option>
@@ -356,7 +356,7 @@ export function MyPage({ user, onBack }: MyPageProps) {
                             onChange={handleChange}
                             placeholder="예: 체중 10kg 감량, 근육량 증가, 마라톤 완주..."
                             disabled={saving}
-                            className="bg-background/50 border-white/10"
+                            className="bg-background/50 border-border"
                         />
                     </div>
 
@@ -372,7 +372,7 @@ export function MyPage({ user, onBack }: MyPageProps) {
                             onChange={handleChange}
                             placeholder="https://instagram.com/username"
                             disabled={saving}
-                            className="bg-background/50 border-white/10"
+                            className="bg-background/50 border-border"
                         />
                     </div>
 

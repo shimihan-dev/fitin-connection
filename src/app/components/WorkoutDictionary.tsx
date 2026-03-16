@@ -154,7 +154,7 @@ export function WorkoutDictionary({ open, onOpenChange }: WorkoutDictionaryProps
                             {filtered.map((ex, exIdx) => (
                                 <div
                                     key={exIdx}
-                                    className="px-4 py-3 bg-muted/30 hover:bg-muted/50 rounded-xl text-sm transition-colors border border-white/5"
+                                    className="px-4 py-3 bg-muted/30 hover:bg-muted/50 rounded-xl text-sm transition-colors border border-border/50"
                                 >
                                     {ex}
                                 </div>
