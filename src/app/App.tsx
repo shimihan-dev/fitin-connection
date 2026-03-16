@@ -217,7 +217,7 @@ export default function App() {
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
-        return <HomePage user={user} onNavigate={setCurrentPage} onMyPageClick={() => setShowMyPage(true)} onDictionaryClick={() => setShowDictionary(true)} />;
+        return <HomePage user={user} onNavigate={setCurrentPage} />;
       case 'workout':
         return <WorkoutGuide user={user} />;
       case 'competition':
@@ -231,7 +231,7 @@ export default function App() {
       case 'board':
         return <Board user={user} />;
       default:
-        return <HomePage user={user} onNavigate={setCurrentPage} onMyPageClick={() => setShowMyPage(true)} onDictionaryClick={() => setShowDictionary(true)} />;
+        return <HomePage user={user} onNavigate={setCurrentPage} />;
     }
   };
 
@@ -242,7 +242,7 @@ export default function App() {
         <WelcomeSlides onComplete={handleWelcomeSlidesComplete} />
       )}
 
-      <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} onMyPageClick={() => setShowMyPage(true)} />
+      <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} onMyPageClick={() => setShowMyPage(true)} showBackButton={currentPage !== 'home' || showMyPage} onBack={() => { setCurrentPage('home'); setShowMyPage(false); }} />
 
       <main className="flex-1 overflow-y-auto pt-16 scroll-smooth">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">

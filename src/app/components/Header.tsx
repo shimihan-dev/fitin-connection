@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dumbbell, LogIn, UserPlus, Download, Menu, X, User, LogOut, UserMinus, Bell, BookOpen } from 'lucide-react';
+import { Dumbbell, LogIn, UserPlus, Download, Menu, X, User, LogOut, UserMinus, Bell, BookOpen, ArrowLeft } from 'lucide-react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Input } from './ui/input';
@@ -14,9 +14,11 @@ interface HeaderProps {
   onSignupClick?: () => void;
   onMyPageClick?: () => void;
   defaultShowLogin?: boolean;
+  showBackButton?: boolean;
+  onBack?: () => void;
 }
 
-export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPageClick, defaultShowLogin = false }: HeaderProps) {
+export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPageClick, defaultShowLogin = false, showBackButton = false, onBack }: HeaderProps) {
   const [showLoginDialog, setShowLoginDialog] = useState(defaultShowLogin);
   const [showSignupDialog, setShowSignupDialog] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -243,8 +245,17 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
       <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-md border-b border-border z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
+            {/* Back Button + Logo */}
             <div className="flex items-center gap-2">
+              {showBackButton && (
+                <button
+                  onClick={onBack}
+                  className="p-2 -ml-2 mr-1 rounded-lg hover:bg-muted transition-colors"
+                  aria-label="홈으로 돌아가기"
+                >
+                  <ArrowLeft className="w-5 h-5 text-foreground" />
+                </button>
+              )}
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
                 <Dumbbell className="w-5 h-5 text-[#2F80FF]" />
               </div>
