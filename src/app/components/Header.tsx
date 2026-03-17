@@ -13,12 +13,13 @@ interface HeaderProps {
   onLoginSuccess?: (user: AuthUser) => void;
   onSignupClick?: () => void;
   onMyPageClick?: () => void;
+  onNotificationsClick?: () => void;
   defaultShowLogin?: boolean;
   showBackButton?: boolean;
   onBack?: () => void;
 }
 
-export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPageClick, defaultShowLogin = false, showBackButton = false, onBack }: HeaderProps) {
+export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPageClick, onNotificationsClick, defaultShowLogin = false, showBackButton = false, onBack }: HeaderProps) {
   const [showLoginDialog, setShowLoginDialog] = useState(defaultShowLogin);
   const [showSignupDialog, setShowSignupDialog] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -277,11 +278,11 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#2F80FF] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>
                 <button
+                  onClick={() => onNotificationsClick?.()}
                   className="p-2 hover:bg-muted rounded-lg transition-colors relative group"
                   aria-label="알림"
                 >
                   <Bell className="w-5 h-5 text-foreground/70 group-hover:text-[#2F80FF]" />
-                  <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-background" />
                 </button>
               </div>
               {user ? (
@@ -339,10 +340,10 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                 <BookOpen className="w-5 h-5 text-foreground" />
               </button>
               <button
+                onClick={() => onNotificationsClick?.()}
                 className="p-2 hover:bg-muted rounded-lg transition-colors relative"
               >
                 <Bell className="w-5 h-5 text-foreground" />
-                <span className="absolute top-2 right-2.5 w-1.5 h-1.5 bg-red-500 rounded-full" />
               </button>
               <button
                 className="p-2 hover:bg-muted rounded-lg transition-colors"

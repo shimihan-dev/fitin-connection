@@ -11,6 +11,7 @@ import { WelcomeSlides } from './components/WelcomeSlides';
 import { OnboardingFlow } from './components/OnboardingFlow';
 import { CompetitionPage } from './components/Competition/CompetitionPage';
 import { HomePage } from './components/HomePage';
+import { NotificationsPage } from './components/NotificationsPage';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './components/ui/dialog';
 import { Button as UIButton } from './components/ui/button';
 import { Input } from './components/ui/input';
@@ -24,6 +25,7 @@ export default function App() {
   const [showDictionary, setShowDictionary] = useState(false);
   const [isSignupPage, setIsSignupPage] = useState(false);
   const [showMyPage, setShowMyPage] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [user, setUser] = useState<{ name: string; email: string; id?: string; profile_picture?: string } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -424,11 +426,13 @@ export default function App() {
         <WelcomeSlides onComplete={handleWelcomeSlidesComplete} />
       )}
 
-      <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} onMyPageClick={() => setShowMyPage(true)} showBackButton={currentPage !== 'home' || showMyPage} onBack={() => { setCurrentPage('home'); setShowMyPage(false); }} />
+      <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} onMyPageClick={() => setShowMyPage(true)} onNotificationsClick={() => { setShowNotifications(true); setShowMyPage(false); }} showBackButton={currentPage !== 'home' || showMyPage || showNotifications} onBack={() => { setCurrentPage('home'); setShowMyPage(false); setShowNotifications(false); }} />
 
       <main className="flex-1 overflow-y-auto pt-16 scroll-smooth">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-          {showMyPage ? (
+          {showNotifications ? (
+            <NotificationsPage />
+          ) : showMyPage ? (
             <MyPage user={user} onBack={() => setShowMyPage(false)} />
           ) : (
             renderPage()
