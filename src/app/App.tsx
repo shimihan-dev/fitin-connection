@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button as UIButton } from './components/ui/button';
 import { Input } from './components/ui/input';
 import { Label } from './components/ui/label';
-import { getCurrentUser, signOut, signIn, User } from '../../utils/auth';
+import { getCurrentUser, signOut, signIn, requestPasswordReset, verifyResetCode, resetPassword, User } from '../../utils/auth';
 
 type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
 
@@ -33,6 +33,16 @@ export default function App() {
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [rememberMe, setRememberMe] = useState(true);
+
+  // 비밀번호 찾기 상태
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showVerifyCode, setShowVerifyCode] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetCode, setResetCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
 
   // 로그인 폼 핸들러
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,18 +187,31 @@ export default function App() {
                   disabled={loginLoading}
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="login-rememberMe"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded"
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="login-rememberMe"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-4 h-4 text-blue-600 rounded"
+                    disabled={loginLoading}
+                  />
+                  <label htmlFor="login-rememberMe" className="text-sm text-muted-foreground">
+                    로그인 상태 유지하기
+                  </label>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowLoginDialog(false);
+                    setShowForgotPassword(true);
+                  }}
+                  className="text-sm text-blue-500 hover:text-blue-700 underline transition-colors"
                   disabled={loginLoading}
-                />
-                <label htmlFor="login-rememberMe" className="text-sm text-muted-foreground">
-                  로그인 상태 유지하기
-                </label>
+                >
+                  비밀번호 찾기
+                </button>
               </div>
               <div className="flex flex-col gap-2">
                 <UIButton
@@ -207,6 +230,165 @@ export default function App() {
                   취소
                 </button>
               </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* 비밀번호 찾기 - 1단계: 이메일 입력 */}
+        <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>비밀번호 찾기</DialogTitle>
+              <DialogDescription>
+                가입하신 이메일을 입력하면 인증 코드를 보내드립니다.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              setResetLoading(true);
+              try {
+                const { success, error } = await requestPasswordReset(resetEmail);
+                if (success) {
+                  alert('인증 코드가 발송되었습니다. 이메일을 확인해주세요.');
+                  setShowForgotPassword(false);
+                  setShowVerifyCode(true);
+                } else {
+                  alert(error || '인증 코드 발송에 실패했습니다.');
+                }
+              } catch {
+                alert('오류가 발생했습니다.');
+              } finally {
+                setResetLoading(false);
+              }
+            }} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="reset-email">이메일</Label>
+                <Input
+                  id="reset-email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  required
+                  disabled={resetLoading}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <UIButton type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={resetLoading}>
+                  {resetLoading ? '발송 중...' : '인증 코드 발송'}
+                </UIButton>
+                <button type="button" onClick={() => { setShowForgotPassword(false); setShowLoginDialog(true); }} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  로그인으로 돌아가기
+                </button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* 비밀번호 찾기 - 2단계: 인증 코드 확인 */}
+        <Dialog open={showVerifyCode} onOpenChange={setShowVerifyCode}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>인증 코드 확인</DialogTitle>
+              <DialogDescription>
+                {resetEmail}로 발송된 인증 코드를 입력해주세요.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              setResetLoading(true);
+              try {
+                const { valid, error } = await verifyResetCode(resetEmail, resetCode);
+                if (valid) {
+                  setShowVerifyCode(false);
+                  setShowNewPassword(true);
+                } else {
+                  alert(error || '인증 코드가 올바르지 않습니다.');
+                }
+              } catch {
+                alert('오류가 발생했습니다.');
+              } finally {
+                setResetLoading(false);
+              }
+            }} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="reset-code">인증 코드</Label>
+                <Input
+                  id="reset-code"
+                  type="text"
+                  placeholder="인증 코드 6자리"
+                  value={resetCode}
+                  onChange={(e) => setResetCode(e.target.value)}
+                  required
+                  disabled={resetLoading}
+                />
+              </div>
+              <UIButton type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={resetLoading}>
+                {resetLoading ? '확인 중...' : '인증 코드 확인'}
+              </UIButton>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* 비밀번호 찾기 - 3단계: 새 비밀번호 설정 */}
+        <Dialog open={showNewPassword} onOpenChange={setShowNewPassword}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>새 비밀번호 설정</DialogTitle>
+              <DialogDescription>
+                새로운 비밀번호를 입력해주세요. (최소 8자)
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (newPassword !== newPasswordConfirm) {
+                alert('비밀번호가 일치하지 않습니다.');
+                return;
+              }
+              setResetLoading(true);
+              try {
+                const { success, error } = await resetPassword(resetEmail, resetCode, newPassword);
+                if (success) {
+                  alert('비밀번호가 성공적으로 변경되었습니다! 새 비밀번호로 로그인해주세요.');
+                  setShowNewPassword(false);
+                  setResetEmail(''); setResetCode(''); setNewPassword(''); setNewPasswordConfirm('');
+                  setShowLoginDialog(true);
+                } else {
+                  alert(error || '비밀번호 변경에 실패했습니다.');
+                }
+              } catch {
+                alert('오류가 발생했습니다.');
+              } finally {
+                setResetLoading(false);
+              }
+            }} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">새 비밀번호</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  placeholder="최소 8자 이상"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  disabled={resetLoading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="new-password-confirm">새 비밀번호 확인</Label>
+                <Input
+                  id="new-password-confirm"
+                  type="password"
+                  placeholder="비밀번호 확인"
+                  value={newPasswordConfirm}
+                  onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                  required
+                  disabled={resetLoading}
+                />
+              </div>
+              <UIButton type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={resetLoading}>
+                {resetLoading ? '변경 중...' : '비밀번호 변경'}
+              </UIButton>
             </form>
           </DialogContent>
         </Dialog>

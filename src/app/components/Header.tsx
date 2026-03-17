@@ -440,7 +440,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
 
       {/* Login Dialog */}
       <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>로그인</DialogTitle>
             <DialogDescription>
@@ -476,18 +476,32 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                 disabled={loading}
               />
             </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="rememberMe"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 text-blue-600 rounded"
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 rounded"
+                  disabled={loading}
+                />
+                <label htmlFor="rememberMe" className="text-sm text-gray-600">
+                  로그인 상태 유지하기
+                </label>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLoginDialog(false);
+                  setShowForgotPasswordDialog(true);
+                  setResetEmail(loginData.email);
+                }}
+                className="text-sm text-blue-500 hover:text-blue-700 underline transition-colors"
                 disabled={loading}
-              />
-              <label htmlFor="rememberMe" className="text-sm text-gray-600">
-                로그인 상태 유지하기
-              </label>
+              >
+                비밀번호 찾기
+              </button>
             </div>
             <div className="flex flex-col gap-2">
               <Button
@@ -507,18 +521,6 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                 disabled={loading}
               >
                 계정이 없으신가요? 회원가입
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowLoginDialog(false);
-                  setShowForgotPasswordDialog(true);
-                  setResetEmail(loginData.email); // 이미 입력한 이메일 전달
-                }}
-                className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
-                disabled={loading}
-              >
-                비밀번호를 잊으셨나요?
               </button>
             </div>
           </form>
