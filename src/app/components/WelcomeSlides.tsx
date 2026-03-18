@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface Slide {
     imageUrl: string;
@@ -14,32 +15,34 @@ interface WelcomeSlidesProps {
     autoPlayInterval?: number; // milliseconds
 }
 
-const defaultSlides: Slide[] = [
-    {
-        imageUrl: '/slides/slide-1.png',
-        title: '환영합니다!',
-        description: 'Fitin_Connection과 함께 건강한 대학생활을 시작하세요',
-    },
-    {
-        imageUrl: '/slides/slide-2.png',
-        title: '맞춤형 운동 가이드',
-        description: '개인에게 맞는 운동 루틴과 상세한 가이드를 제공합니다',
-    },
-    {
-        imageUrl: '/slides/slide-3.png',
-        title: '함께 성장하세요!',
-        description: '대학 친구들과 함께 운동하고 목표를 달성하세요',
-    },
-];
-
 export function WelcomeSlides({
-    slides = defaultSlides,
+    slides: passedSlides,
     onComplete,
     autoPlayInterval = 5000,
 }: WelcomeSlidesProps) {
+    const { t } = useLanguage();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
 
+    const defaultSlides: Slide[] = useMemo(() => [
+        {
+            imageUrl: '/slides/slide-1.png',
+            title: t('welcome_slides.slide1_title'),
+            description: t('welcome_slides.slide1_desc'),
+        },
+        {
+            imageUrl: '/slides/slide-2.png',
+            title: t('welcome_slides.slide2_title'),
+            description: t('welcome_slides.slide2_desc'),
+        },
+        {
+            imageUrl: '/slides/slide-3.png',
+            title: t('welcome_slides.slide3_title'),
+            description: t('welcome_slides.slide3_desc'),
+        },
+    ], [t]);
+
+    const slides = passedSlides || defaultSlides;
     const isLastSlide = currentIndex === slides.length - 1;
 
     const goToNext = useCallback(() => {
@@ -98,7 +101,7 @@ export function WelcomeSlides({
                 onClick={onComplete}
                 className="absolute top-4 right-4 text-foreground/70 hover:text-white flex items-center gap-1 text-sm transition-colors z-10"
             >
-                건너뛰기
+                {t('welcome_slides.skip')}
                 <X className="w-5 h-5" />
             </button>
 
@@ -166,7 +169,7 @@ export function WelcomeSlides({
                     onClick={isLastSlide ? onComplete : goToNext}
                     className="mt-8 px-8 py-3 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white font-semibold rounded-full shadow-lg transition-all hover:scale-105"
                 >
-                    {isLastSlide ? '시작하기' : '다음'}
+                    {isLastSlide ? t('welcome_slides.start') : t('welcome_slides.next')}
                 </Button>
             </div>
 

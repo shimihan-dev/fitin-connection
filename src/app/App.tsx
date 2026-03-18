@@ -23,7 +23,7 @@ import { getCurrentUser, signOut, signIn, requestPasswordReset, verifyResetCode,
 type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
 
 export default function App() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [showDictionary, setShowDictionary] = useState(false);
   const [isSignupPage, setIsSignupPage] = useState(false);
@@ -78,11 +78,16 @@ export default function App() {
   const handleLoginSuccess = (loggedInUser: User) => {
     setUser({
       id: loggedInUser.id,
-      name: loggedInUser.name || loggedInUser.email.split('@')[0] || '사용자',
+      name: loggedInUser.name || loggedInUser.email.split('@')[0] || t('common.user'),
       email: loggedInUser.email,
       profile_picture: loggedInUser.profile_picture,
     });
-    setShowWelcomeSlides(true);
+    
+    // Check if welcome slides should be shown (default to true)
+    const showSlidesSetting = localStorage.getItem(`igc_show_welcome_slides_${loggedInUser.id}`);
+    if (showSlidesSetting !== 'false') {
+      setShowWelcomeSlides(true);
+    }
   };
 
   // 슬라이드 완료 시 닫기
@@ -107,7 +112,7 @@ export default function App() {
       if (currentUser) {
         setUser({
           id: currentUser.id,
-          name: currentUser.name || currentUser.email.split('@')[0] || '사용자',
+          name: currentUser.name || currentUser.email.split('@')[0] || t('common.user'),
           email: currentUser.email,
           profile_picture: currentUser.profile_picture,
         });
@@ -149,7 +154,7 @@ export default function App() {
           onComplete={(completedUser) => {
             setUser({
               id: completedUser.id,
-              name: completedUser.name || completedUser.email.split('@')[0] || '사용자',
+              name: completedUser.name || completedUser.email.split('@')[0] || t('common.user'),
               email: completedUser.email,
               profile_picture: completedUser.profile_picture,
             });
@@ -322,7 +327,7 @@ export default function App() {
                 <Input
                   id="reset-code"
                   type="text"
-                  placeholder="인증 코드 6자리"
+                  placeholder={language === 'ko' ? '인증 코드 6자리' : '6-digit code'}
                   value={resetCode}
                   onChange={(e) => setResetCode(e.target.value)}
                   required
@@ -340,40 +345,40 @@ export default function App() {
         <Dialog open={showNewPassword} onOpenChange={setShowNewPassword}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>새 비밀번호 설정</DialogTitle>
+              <DialogTitle>{t('auth.new_password')}</DialogTitle>
               <DialogDescription>
-                새로운 비밀번호를 입력해주세요. (최소 8자)
+                {t('auth.enter_new_password')}
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={async (e) => {
               e.preventDefault();
-              if (newPassword !== newPasswordConfirm) {
-                alert('비밀번호가 일치하지 않습니다.');
-                return;
-              }
-              setResetLoading(true);
-              try {
-                const { success, error } = await resetPassword(resetEmail, resetCode, newPassword);
-                if (success) {
-                  alert('비밀번호가 성공적으로 변경되었습니다! 새 비밀번호로 로그인해주세요.');
-                  setShowNewPassword(false);
-                  setResetEmail(''); setResetCode(''); setNewPassword(''); setNewPasswordConfirm('');
-                  setShowLoginDialog(true);
-                } else {
-                  alert(error || '비밀번호 변경에 실패했습니다.');
+                if (newPassword !== newPasswordConfirm) {
+                  alert(t('auth.passwords_dont_match'));
+                  return;
                 }
-              } catch {
-                alert('오류가 발생했습니다.');
-              } finally {
-                setResetLoading(false);
-              }
-            }} className="space-y-4">
+                setResetLoading(true);
+                try {
+                  const { success, error } = await resetPassword(resetEmail, resetCode, newPassword);
+                  if (success) {
+                    alert(t('auth.password_changed_success'));
+                    setShowNewPassword(false);
+                    setResetEmail(''); setResetCode(''); setNewPassword(''); setNewPasswordConfirm('');
+                    setShowLoginDialog(true);
+                  } else {
+                    alert(error || t('auth.failed_to_change_password'));
+                  }
+                } catch {
+                  alert(t('common.error_occurred'));
+                } finally {
+                  setResetLoading(false);
+                }
+              }} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="new-password">새 비밀번호</Label>
+                <Label htmlFor="new-password">{t('auth.new_password')}</Label>
                 <Input
                   id="new-password"
                   type="password"
-                  placeholder="최소 8자 이상"
+                  placeholder={language === 'ko' ? '최소 8자 이상' : 'Min. 8 characters'}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
@@ -381,11 +386,11 @@ export default function App() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="new-password-confirm">새 비밀번호 확인</Label>
+                <Label htmlFor="new-password-confirm">{t('auth.password_confirm')}</Label>
                 <Input
                   id="new-password-confirm"
                   type="password"
-                  placeholder="비밀번호 확인"
+                  placeholder={t('auth.password_confirm')}
                   value={newPasswordConfirm}
                   onChange={(e) => setNewPasswordConfirm(e.target.value)}
                   required
@@ -393,7 +398,7 @@ export default function App() {
                 />
               </div>
               <UIButton type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={resetLoading}>
-                {resetLoading ? '변경 중...' : '비밀번호 변경'}
+                {resetLoading ? t('common.changing') : t('auth.reset_password')}
               </UIButton>
             </form>
           </DialogContent>

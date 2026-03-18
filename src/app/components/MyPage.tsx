@@ -5,6 +5,9 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { getUserProfile, updateUserProfile, uploadProfilePicture, User, ProfileUpdateData } from '../../../utils/auth';
+import { useLanguage } from '../contexts/LanguageContext';
+import { Switch } from './ui/switch'; // Assuming Switch exists or I'll use a checkbox/button if not
+import { Settings } from 'lucide-react';
 
 interface MyPageProps {
     user: { name: string; email: string; id?: string };
@@ -27,10 +30,22 @@ export function MyPage({ user, onBack }: MyPageProps) {
         preferred_exercise: '',
         sns_link: '',
     });
+    const { t } = useLanguage();
+    const [showWelcomeSlides, setShowWelcomeSlides] = useState(true);
 
     useEffect(() => {
         loadProfile();
-    }, []);
+        // Load slide setting from localStorage
+        const savedSetting = localStorage.getItem(`igc_show_welcome_slides_${user.id}`);
+        if (savedSetting !== null) {
+            setShowWelcomeSlides(savedSetting === 'true');
+        }
+    }, [user.id]);
+
+    const handleToggleWelcomeSlides = (checked: boolean) => {
+        setShowWelcomeSlides(checked);
+        localStorage.setItem(`igc_show_welcome_slides_${user.id}`, checked.toString());
+    };
 
     const loadProfile = async () => {
         if (!user.id) {
@@ -227,6 +242,34 @@ export function MyPage({ user, onBack }: MyPageProps) {
                         <p className="font-medium text-foreground">
                             {profile?.gender === 'male' ? '남성' : profile?.gender === 'female' ? '여성' : profile?.gender || '-'}
                         </p>
+                    </div>
+                </div>
+            </Card>
+
+            {/* 시스템 설정 섹션 */}
+            <Card className="p-5 bg-card/50 border-border">
+                <div className="flex items-center gap-3 mb-4 text-foreground">
+                    <Settings className="w-5 h-5 text-primary" />
+                    <h3 className="font-semibold">{t('common.system_settings')}</h3>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border">
+                    <div className="space-y-0.5">
+                        <Label htmlFor="welcome-slides-toggle" className="text-foreground font-medium">
+                            {t('common.show_welcome_slides')}
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                            {t('welcome_slides.slide1_desc')}
+                        </p>
+                    </div>
+                    <div className="flex items-center h-6">
+                        <input
+                            type="checkbox"
+                            id="welcome-slides-toggle"
+                            checked={showWelcomeSlides}
+                            onChange={(e) => handleToggleWelcomeSlides(e.target.checked)}
+                            className="w-10 h-5 appearance-none bg-muted rounded-full relative cursor-pointer outline-none transition-colors checked:bg-primary before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-0.5 before:left-0.5 before:transition-transform checked:before:translate-x-5"
+                        />
                     </div>
                 </div>
             </Card>

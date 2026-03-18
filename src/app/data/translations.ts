@@ -6,14 +6,14 @@ export const translations = {
             logout: '로그아웃',
             mypage: '마이페이지',
             cancel: '취소',
-            confirm: '확인',
-            back: '뒤로',
-            save: '저장',
-            delete: '삭제',
-            loading: '로딩 중...',
+            saving: '저장 중...',
             error_occurred: '오류가 발생했습니다.',
             sending: '발송 중...',
             verifying: '확인 중...',
+            changing: '변경 중...',
+            user: '사용자',
+            system_settings: '시스템 설정',
+            show_welcome_slides: '로그인 후 소개 슬라이드 표시',
         },
         header: {
             dictionary: '운동 사전',
@@ -66,6 +66,9 @@ export const translations = {
             back_to_login: '로그인으로 돌아가기',
             invalid_code: '인증 코드가 올바르지 않습니다.',
             verification_code: '인증 코드',
+            passwords_dont_match: '비밀번호가 일치하지 않습니다.',
+            password_changed_success: '비밀번호가 성공적으로 변경되었습니다! 새 비밀번호로 로그인해주세요.',
+            failed_to_change_password: '비밀번호 변경에 실패했습니다.',
         },
         onboarding: {
             welcome_title: 'Fitin_Connection에\n오신 것을 환영합니다!',
@@ -93,6 +96,17 @@ export const translations = {
             exercise_gym_desc: '웨이트 트레이닝 중심',
             exercise_crossfit: '크로스핏',
             exercise_crossfit_desc: '고강도 복합 운동',
+        },
+        welcome_slides: {
+            slide1_title: '환영합니다!',
+            slide1_desc: 'Fitin_Connection과 함께 건강한 대학생활을 시작하세요',
+            slide2_title: '맞춤형 운동 가이드',
+            slide2_desc: '개인에게 맞는 운동 루틴과 상세한 가이드를 제공합니다',
+            slide3_title: '함께 성장하세요!',
+            slide3_desc: '대학 친구들과 함께 운동하고 목표를 달성하세요',
+            skip: '건너뛰기',
+            next: '다음',
+            start: '시작하기',
         }
     },
     en: {
@@ -107,9 +121,14 @@ export const translations = {
             save: 'Save',
             delete: 'Delete',
             loading: 'Loading...',
+            saving: 'Saving...',
             error_occurred: 'An error occurred.',
             sending: 'Sending...',
             verifying: 'Verifying...',
+            changing: 'Changing...',
+            user: 'User',
+            system_settings: 'System Settings',
+            show_welcome_slides: 'Show welcome slides after login',
         },
         header: {
             dictionary: 'Dictionary',
@@ -162,6 +181,9 @@ export const translations = {
             back_to_login: 'Back to Login',
             invalid_code: 'Invalid verification code.',
             verification_code: 'Verification Code',
+            passwords_dont_match: 'Passwords do not match.',
+            password_changed_success: 'Password changed successfully! Please login with your new password.',
+            failed_to_change_password: 'Failed to change password.',
         },
         onboarding: {
             welcome_title: 'Welcome to\nFitin_Connection!',
@@ -189,15 +211,27 @@ export const translations = {
             exercise_gym_desc: 'Weight training focused',
             exercise_crossfit: 'Crossfit',
             exercise_crossfit_desc: 'High-intensity compound workouts',
+        },
+        welcome_slides: {
+            slide1_title: 'Welcome!',
+            slide1_desc: 'Start your healthy campus life with Fitin_Connection',
+            slide2_title: 'Custom Workout Guide',
+            slide2_desc: 'We provide personalized workout routines and detailed guides',
+            slide3_title: 'Grow Together!',
+            slide3_desc: 'Workout with your college friends and achieve your goals together',
+            skip: 'Skip',
+            next: 'Next',
+            start: 'Start',
         }
     }
 };
 
 export type TranslationKey = 
-    | 'common.login' | 'common.signup' | 'common.logout' | 'common.mypage' | 'common.cancel' | 'common.confirm' | 'common.back' | 'common.save' | 'common.delete' | 'common.loading' | 'common.error_occurred' | 'common.sending' | 'common.verifying'
+    | 'common.login' | 'common.signup' | 'common.logout' | 'common.mypage' | 'common.cancel' | 'common.confirm' | 'common.back' | 'common.save' | 'common.delete' | 'common.loading' | 'common.saving' | 'common.error_occurred' | 'common.sending' | 'common.verifying' | 'common.changing' | 'common.user' | 'common.system_settings' | 'common.show_welcome_slides'
     | 'header.dictionary' | 'header.notifications' | 'header.welcome' | 'header.performance_guide'
     | 'home.greeting' | 'home.user_greeting' | 'home.sub_greeting' 
     | 'home.menu.workout' | 'home.menu.routine' | 'home.menu.progress' | 'home.menu.diet' | 'home.menu.competition' | 'home.menu.board'
     | 'home.goal.title' | 'home.goal.fighting'
-    | 'auth.email' | 'auth.password' | 'auth.password_confirm' | 'auth.name' | 'auth.gender' | 'auth.university' | 'auth.referral' | 'auth.remember_me' | 'auth.forgot_password' | 'auth.no_account' | 'auth.already_have_account' | 'auth.welcome_back' | 'auth.start_healthy' | 'auth.verify_code' | 'auth.new_password' | 'auth.reset_password' | 'auth.send_code' | 'auth.enter_email_reset' | 'auth.enter_code_sent' | 'auth.enter_new_password' | 'auth.login_error_occurred' | 'auth.logged_out' | 'auth.code_sent_check_email' | 'auth.failed_to_send_code' | 'auth.back_to_login' | 'auth.invalid_code' | 'auth.verification_code'
-    | 'onboarding.welcome_title' | 'onboarding.welcome_sub' | 'onboarding.get_started' | 'onboarding.select_gender' | 'onboarding.select_gender_sub' | 'onboarding.gender_male' | 'onboarding.gender_female' | 'onboarding.select_goal' | 'onboarding.select_goal_sub' | 'onboarding.calorie_guide' | 'onboarding.calorie_guide_sub' | 'onboarding.body_info' | 'onboarding.height' | 'onboarding.weight' | 'onboarding.age' | 'onboarding.terms_agree' | 'onboarding.start_now' | 'onboarding.select_exercise' | 'onboarding.select_exercise_sub' | 'onboarding.exercise_running' | 'onboarding.exercise_running_desc' | 'onboarding.exercise_gym' | 'onboarding.exercise_gym_desc' | 'onboarding.exercise_crossfit' | 'onboarding.exercise_crossfit_desc';
+    | 'auth.email' | 'auth.password' | 'auth.password_confirm' | 'auth.name' | 'auth.gender' | 'auth.university' | 'auth.referral' | 'auth.remember_me' | 'auth.forgot_password' | 'auth.no_account' | 'auth.already_have_account' | 'auth.welcome_back' | 'auth.start_healthy' | 'auth.verify_code' | 'auth.new_password' | 'auth.reset_password' | 'auth.send_code' | 'auth.enter_email_reset' | 'auth.enter_code_sent' | 'auth.enter_new_password' | 'auth.login_error_occurred' | 'auth.logged_out' | 'auth.code_sent_check_email' | 'auth.failed_to_send_code' | 'auth.back_to_login' | 'auth.invalid_code' | 'auth.verification_code' | 'auth.passwords_dont_match' | 'auth.password_changed_success' | 'auth.failed_to_change_password'
+    | 'onboarding.welcome_title' | 'onboarding.welcome_sub' | 'onboarding.get_started' | 'onboarding.select_gender' | 'onboarding.select_gender_sub' | 'onboarding.gender_male' | 'onboarding.gender_female' | 'onboarding.select_goal' | 'onboarding.select_goal_sub' | 'onboarding.calorie_guide' | 'onboarding.calorie_guide_sub' | 'onboarding.body_info' | 'onboarding.height' | 'onboarding.weight' | 'onboarding.age' | 'onboarding.terms_agree' | 'onboarding.start_now' | 'onboarding.select_exercise' | 'onboarding.select_exercise_sub' | 'onboarding.exercise_running' | 'onboarding.exercise_running_desc' | 'onboarding.exercise_gym' | 'onboarding.exercise_gym_desc' | 'onboarding.exercise_crossfit' | 'onboarding.exercise_crossfit_desc'
+    | 'welcome_slides.slide1_title' | 'welcome_slides.slide1_desc' | 'welcome_slides.slide2_title' | 'welcome_slides.slide2_desc' | 'welcome_slides.slide3_title' | 'welcome_slides.slide3_desc' | 'welcome_slides.skip' | 'welcome_slides.next' | 'welcome_slides.start';
