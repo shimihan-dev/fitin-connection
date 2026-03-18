@@ -12,6 +12,7 @@ import { OnboardingFlow } from './components/OnboardingFlow';
 import { CompetitionPage } from './components/Competition/CompetitionPage';
 import { HomePage } from './components/HomePage';
 import { NotificationsPage } from './components/NotificationsPage';
+import { Navigation } from './components/Navigation';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './components/ui/dialog';
 import { Button as UIButton } from './components/ui/button';
 import { Input } from './components/ui/input';
@@ -419,6 +420,8 @@ export default function App() {
     }
   };
 
+  const showBottomNav = currentPage !== 'home' && !showMyPage && !showNotifications;
+
   return (
     <div className="flex flex-col h-[100dvh] bg-background text-foreground overflow-hidden">
       {/* Welcome Slides - 로그인 성공 시 표시 */}
@@ -428,7 +431,7 @@ export default function App() {
 
       <Header user={user} onLogout={handleLogout} onLoginSuccess={handleLoginSuccess} onMyPageClick={() => setShowMyPage(true)} onNotificationsClick={() => { setShowNotifications(true); setShowMyPage(false); }} showBackButton={currentPage !== 'home' || showMyPage || showNotifications} onBack={() => { setCurrentPage('home'); setShowMyPage(false); setShowNotifications(false); }} />
 
-      <main className="flex-1 overflow-y-auto pt-16 scroll-smooth">
+      <main className={`flex-1 overflow-y-auto pt-16 scroll-smooth ${showBottomNav ? 'pb-16 md:pb-0' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
           {showNotifications ? (
             <NotificationsPage />
@@ -439,6 +442,13 @@ export default function App() {
           )}
         </div>
       </main>
+
+      {/* 하단 네비게이션 - 서브 페이지에서만 표시 (모바일) */}
+      {showBottomNav && (
+        <div className="md:hidden">
+          <Navigation currentPage={currentPage} onNavigate={(page) => { setCurrentPage(page); setShowMyPage(false); setShowNotifications(false); }} />
+        </div>
+      )}
     </div>
   );
 }
