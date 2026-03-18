@@ -49,8 +49,8 @@ export function ExerciseSearchModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-[480px] h-[80vh] flex flex-col p-0 gap-0 bg-[#0f172a] border-border text-slate-200">
-                <DialogHeader className="p-4 border-b border-border/50">
+            <DialogContent className="sm:max-w-[480px] h-[80vh] flex flex-col p-0 gap-0 bg-[#0f172a] border-border text-slate-200 overflow-hidden">
+                <DialogHeader className="p-4 border-b border-border/50 flex-shrink-0">
                     <DialogTitle className="text-lg font-bold flex items-center gap-2">
                         <Plus className="w-5 h-5 text-blue-500" />
                         운동 추가
@@ -61,7 +61,7 @@ export function ExerciseSearchModal({
                 </DialogHeader>
 
                 {/* Search & Filters */}
-                <div className="p-4 space-y-3 bg-slate-900/50">
+                <div className="p-4 space-y-3 bg-slate-900/50 flex-shrink-0">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <Input
@@ -102,7 +102,7 @@ export function ExerciseSearchModal({
                 </div>
 
                 {/* List */}
-                <ScrollArea className="flex-1 p-4">
+                <ScrollArea className="flex-1 min-h-0 p-4">
                     <div className="space-y-2">
                         {filteredExercises.length === 0 ? (
                             <div className="text-center py-10 text-muted-foreground text-sm">
@@ -114,35 +114,47 @@ export function ExerciseSearchModal({
                                 return (
                                     <div
                                         key={exercise.id}
-                                        className="flex items-center justify-between p-3 rounded-xl bg-slate-800/50 border border-border/50 hover:bg-slate-800 transition-colors"
+                                        className="flex flex-col p-3 rounded-xl bg-slate-800/50 border border-border/50 hover:bg-slate-800 transition-colors"
                                     >
-                                        <div>
-                                            <h4 className="font-semibold text-sm text-slate-200">{exercise.name}</h4>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <Badge variant="outline" className="text-[10px] py-0 px-1.5 border-slate-600 text-slate-400">
-                                                    {exercise.groups[0]}
-                                                </Badge>
-                                                <span className="text-[10px] text-slate-500">{exercise.equipment}</span>
+                                        <div className="flex items-start justify-between">
+                                            <div>
+                                                <h4 className="font-semibold text-sm text-slate-200">{exercise.name}</h4>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <Badge variant="outline" className="text-[10px] py-0 px-1.5 border-slate-600 text-slate-400">
+                                                        {exercise.groups[0]}
+                                                    </Badge>
+                                                    <span className="text-[10px] text-slate-500">{exercise.equipment}</span>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <Button
-                                            size="sm"
-                                            disabled={isAdded}
-                                            onClick={() => onAddExercise(exercise)}
-                                            className={`h-8 px-3 text-xs ${isAdded
-                                                    ? 'bg-slate-700 text-slate-400'
-                                                    : 'bg-blue-600 hover:bg-blue-700 text-white'
-                                                }`}
-                                        >
-                                            {isAdded ? (
-                                                <>
-                                                    <Check className="w-3 h-3 mr-1" /> 추가됨
-                                                </>
-                                            ) : (
-                                                '추가'
-                                            )}
-                                        </Button>
+                                            <Button
+                                                size="sm"
+                                                disabled={isAdded}
+                                                onClick={() => onAddExercise(exercise)}
+                                                className={`h-8 px-3 text-xs ${isAdded
+                                                        ? 'bg-slate-700 text-slate-400'
+                                                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                                    }`}
+                                            >
+                                                {isAdded ? (
+                                                    <>
+                                                        <Check className="w-3 h-3 mr-1" /> 추가됨
+                                                    </>
+                                                ) : (
+                                                    '추가'
+                                                )}
+                                            </Button>
+                                        </div>
+                                        {exercise.tips && exercise.tips.length > 0 && (
+                                            <div className="mt-3 pt-3 border-t border-slate-700/50">
+                                                <p className="text-[10px] text-blue-400 font-semibold mb-1">💡 운동 팁</p>
+                                                <ul className="text-[11px] text-slate-400 space-y-0.5 list-disc pl-3">
+                                                    {exercise.tips.map((tip, idx) => (
+                                                        <li key={idx}>{tip}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             })

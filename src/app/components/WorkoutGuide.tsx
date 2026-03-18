@@ -638,6 +638,12 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
     // Let's just add and maybe show toast/visual feedback. Modal stays open.
   };
 
+  const handleRemoveExercise = (muscleId: string, routineExerciseId: string) => {
+    const existing = addedExercises[muscleId] || [];
+    const newMap = { ...addedExercises, [muscleId]: existing.filter(e => e.id !== routineExerciseId) };
+    saveAddedExercises(newMap);
+  };
+
   const openLogModal = (muscleId: string, name: string, exerciseId?: string, routineExerciseId?: string) => {
     setCurrentLogTarget({ muscleId, exerciseName: name, exerciseId, routineExerciseId });
     setIsLogOpen(true);
@@ -914,10 +920,10 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
               <div className="space-y-4">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-1 h-6 bg-blue-500 rounded-full" />
-                  <h3 className="font-semibold text-lg">상체 운동 가이드</h3>
+                  <h3 className="font-semibold text-lg">상체 운동</h3>
                 </div>
                 {muscleGroups.upper.map(muscle => (
-                  <Card key={muscle.id} className="overflow-hidden bg-card/50 border-border hover:border-primary/30 transition-colors shadow-sm">
+                  <Card key={muscle.id} id={`exercise-${muscle.id}`} className="overflow-hidden bg-card/50 border-border hover:border-primary/30 transition-colors shadow-sm">
                     <div
                       className="p-4 cursor-pointer hover:bg-muted/30 transition-colors"
                       onClick={() => setExpandedExercise(expandedExercise === muscle.id ? null : muscle.id)}
@@ -930,7 +936,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                           <div>
                             <h3 className="font-semibold text-foreground">{muscle.name}</h3>
                             <p className="text-sm text-muted-foreground">
-                              {muscle.exercises.length + (addedExercises[muscle.id]?.length || 0)}개 운동
+                              {addedExercises[muscle.id]?.length || 0}개 운동
                             </p>
                           </div>
                         </div>
@@ -955,44 +961,14 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                     {expandedExercise === muscle.id && (
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-border/50 bg-background/30">
                         <div className="p-4 space-y-3">
-                          {/* Static Exercises */}
-                          {muscle.exercises.map((exercise, idx) => {
-                            const summary = getLogSummary(muscle.id, exercise.name);
-                            return (
-                              <div key={`static-${idx}`} className="p-4 bg-background/50 rounded-xl border border-border/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                <div className="space-y-1">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-medium text-foreground">{exercise.name}</span>
-                                    <Badge className={`${getDifficultyColor(exercise.difficulty)} border-none text-[10px]`}>
-                                      {getDifficultyLabel(exercise.difficulty)}
-                                    </Badge>
-                                  </div>
-                                  <div className="flex gap-4 text-xs text-muted-foreground">
-                                    {summary ? (
-                                      <span className="text-emerald-400 font-bold">{summary}</span>
-                                    ) : (
-                                      <>
-                                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {exercise.duration}</span>
-                                        <span>{exercise.sets}</span>
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
-                                <Button
-                                  size="sm"
-                                  variant={summary ? "outline" : "default"}
-                                  className={summary ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500/10" : "bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20"}
-                                  onClick={() => {
-                                    openLogModal(muscle.id, exercise.name);
-                                  }}
-                                >
-                                  {summary ? '기록 수정' : <><Plus className="w-4 h-4 mr-1" /> 기록</>}
-                                </Button>
-                              </div>
-                            );
-                          })}
-
-                          {/* Added Exercises */}
+                          {/* User Added Exercises */}
+                          {(!addedExercises[muscle.id] || addedExercises[muscle.id].length === 0) && (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <Dumbbell className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                              <p className="text-sm">아직 추가된 운동이 없습니다</p>
+                              <p className="text-xs mt-1">상단의 "운동 추가" 버튼을 눌러 운동사전에서 추가해보세요</p>
+                            </div>
+                          )}
                           {addedExercises[muscle.id]?.map((routineExercise) => {
                             const dictExercise = EXERCISE_DICTIONARY.find(e => e.id === routineExercise.exerciseId);
                             if (!dictExercise) return null;
@@ -1001,29 +977,48 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                             return (
                               <div key={routineExercise.id} className="p-4 bg-slate-900/80 rounded-xl border border-blue-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
                                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500" />
-                                <div className="space-y-1 pl-2">
+                                <div className="space-y-1 pl-2 flex-1">
                                   <div className="flex items-center gap-2">
                                     <span className="font-medium text-foreground">{dictExercise.name}</span>
                                     {dictExercise.nameEn && <span className="text-xs text-muted-foreground">{dictExercise.nameEn}</span>}
                                   </div>
-                                  <div className="flex gap-4 text-xs text-muted-foreground">
-                                    {summary ? (
-                                      <span className="text-emerald-400 font-bold">{summary}</span>
-                                    ) : (
-                                      <span>{dictExercise.equipment} • {dictExercise.difficulty}</span>
+                                    <div className="flex gap-4 text-xs text-muted-foreground">
+                                      {summary ? (
+                                        <span className="text-emerald-400 font-bold">{summary}</span>
+                                      ) : (
+                                        <span>{dictExercise.equipment} • {dictExercise.groups[0]}</span>
+                                      )}
+                                    </div>
+                                    {dictExercise.tips && dictExercise.tips.length > 0 && (
+                                      <div className="mt-2 pt-2 border-t border-slate-700/50">
+                                        <p className="text-[10px] text-blue-400 font-semibold mb-1">💡 팁</p>
+                                        <ul className="text-[11px] text-slate-400 space-y-0.5 list-disc pl-3">
+                                          {dictExercise.tips.map((tip, idx) => (
+                                            <li key={idx}>{tip}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
                                     )}
                                   </div>
+                                  <div className="flex flex-col sm:flex-row items-center gap-2 mt-3 sm:mt-0">
+                                  <Button
+                                    size="sm"
+                                    variant={summary ? "outline" : "secondary"}
+                                    className={summary ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500/10" : "bg-slate-700 hover:bg-slate-600 text-slate-200"}
+                                    onClick={() => {
+                                      openLogModal(muscle.id, dictExercise.name, dictExercise.id, routineExercise.id);
+                                    }}
+                                  >
+                                    {summary ? '기록 수정' : <><Plus className="w-4 h-4 mr-1" /> 기록</>}
+                                  </Button>
+                                  <button
+                                    onClick={() => handleRemoveExercise(muscle.id, routineExercise.id)}
+                                    className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                                    aria-label="운동 삭제"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
                                 </div>
-                                <Button
-                                  size="sm"
-                                  variant={summary ? "outline" : "secondary"}
-                                  className={summary ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500/10" : "bg-slate-700 hover:bg-slate-600 text-slate-200"}
-                                  onClick={() => {
-                                    openLogModal(muscle.id, dictExercise.name, dictExercise.id, routineExercise.id);
-                                  }}
-                                >
-                                  {summary ? '기록 수정' : <><Plus className="w-4 h-4 mr-1" /> 기록</>}
-                                </Button>
                               </div>
                             );
                           })}
@@ -1040,10 +1035,10 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-1 h-6 bg-emerald-500 rounded-full" />
-                    <h3 className="font-semibold text-lg">하체 운동 가이드</h3>
+                    <h3 className="font-semibold text-lg">하체 운동</h3>
                   </div>
                   {muscleGroups.lower.map(muscle => (
-                    <Card key={muscle.id} className="overflow-hidden bg-card/50 border-border hover:border-primary/30 transition-colors shadow-sm">
+                    <Card key={muscle.id} id={`exercise-${muscle.id}`} className="overflow-hidden bg-card/50 border-border hover:border-primary/30 transition-colors shadow-sm">
                       <div
                         className="p-4 cursor-pointer hover:bg-muted/30 transition-colors"
                         onClick={() => setExpandedExercise(expandedExercise === muscle.id ? null : muscle.id)}
@@ -1055,10 +1050,21 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                             </div>
                             <div>
                               <h3 className="font-semibold text-foreground">{muscle.name}</h3>
-                              <p className="text-sm text-muted-foreground">{muscle.exercises.length}개 운동</p>
+                              <p className="text-sm text-muted-foreground">{addedExercises[muscle.id]?.length || 0}개 운동</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-400/10 p-2 h-auto"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openSearch(muscle.id);
+                              }}
+                            >
+                              <Plus className="w-4 h-4 mr-1" /> 운동 추가
+                            </Button>
                             <Badge variant="outline" className="border-border bg-muted/50">{getWeeklyCount(muscle.id)}회 / 주</Badge>
                             <ChevronRight className={`w-5 h-5 transition-transform text-muted-foreground ${expandedExercise === muscle.id ? 'rotate-90' : ''}`} />
                           </div>
@@ -1068,32 +1074,66 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                       {expandedExercise === muscle.id && (
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-border/50 bg-background/30">
                           <div className="p-4 space-y-3">
-                            {muscle.exercises.map((exercise, idx) => (
-                              <div key={idx} className="p-4 bg-background/50 rounded-xl border border-border/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                <div className="space-y-1">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-medium text-foreground">{exercise.name}</span>
-                                    <Badge className={`${getDifficultyColor(exercise.difficulty)} border-none text-[10px]`}>
-                                      {getDifficultyLabel(exercise.difficulty)}
-                                    </Badge>
+                            {(!addedExercises[muscle.id] || addedExercises[muscle.id].length === 0) && (
+                              <div className="text-center py-8 text-muted-foreground">
+                                <Dumbbell className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                                <p className="text-sm">아직 추가된 운동이 없습니다</p>
+                                <p className="text-xs mt-1">상단의 "운동 추가" 버튼을 눌러 운동사전에서 추가해보세요</p>
+                              </div>
+                            )}
+                            {addedExercises[muscle.id]?.map((routineExercise) => {
+                              const dictExercise = EXERCISE_DICTIONARY.find(e => e.id === routineExercise.exerciseId);
+                              if (!dictExercise) return null;
+                              const summary = getLogSummary(muscle.id, dictExercise.name, routineExercise.id);
+
+                              return (
+                                <div key={routineExercise.id} className="p-4 bg-slate-900/80 rounded-xl border border-emerald-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
+                                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500" />
+                                  <div className="space-y-1 pl-2 flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-medium text-foreground">{dictExercise.name}</span>
+                                      {dictExercise.nameEn && <span className="text-xs text-muted-foreground">{dictExercise.nameEn}</span>}
+                                    </div>
+                                    <div className="flex gap-4 text-xs text-muted-foreground">
+                                      {summary ? (
+                                        <span className="text-emerald-400 font-bold">{summary}</span>
+                                      ) : (
+                                        <span>{dictExercise.equipment} • {dictExercise.groups[0]}</span>
+                                      )}
+                                    </div>
+                                    {dictExercise.tips && dictExercise.tips.length > 0 && (
+                                      <div className="mt-2 pt-2 border-t border-slate-700/50">
+                                        <p className="text-[10px] text-blue-400 font-semibold mb-1">💡 팁</p>
+                                        <ul className="text-[11px] text-slate-400 space-y-0.5 list-disc pl-3">
+                                          {dictExercise.tips.map((tip, idx) => (
+                                            <li key={idx}>{tip}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
                                   </div>
-                                  <div className="flex gap-4 text-xs text-muted-foreground">
-                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {exercise.duration}</span>
-                                    <span>{exercise.sets}</span>
+                                  <div className="flex flex-col sm:flex-row items-center gap-2 mt-3 sm:mt-0">
+                                    <Button
+                                      size="sm"
+                                      variant={summary ? "outline" : "secondary"}
+                                      className={summary ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500/10" : "bg-slate-700 hover:bg-slate-600 text-slate-200"}
+                                      onClick={() => {
+                                        openLogModal(muscle.id, dictExercise.name, dictExercise.id, routineExercise.id);
+                                      }}
+                                    >
+                                      {summary ? '기록 수정' : <><Plus className="w-4 h-4 mr-1" /> 기록</>}
+                                    </Button>
+                                    <button
+                                      onClick={() => handleRemoveExercise(muscle.id, routineExercise.id)}
+                                      className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                                      aria-label="운동 삭제"
+                                    >
+                                      <X className="w-4 h-4" />
+                                    </button>
                                   </div>
                                 </div>
-                                <Button
-                                  size="sm"
-                                  className="bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20"
-                                  onClick={() => {
-                                    setLogExercise({ muscleId: muscle.id, name: exercise.name });
-                                    setShowLogDialog(true);
-                                  }}
-                                >
-                                  <Plus className="w-4 h-4 mr-1" /> 기록
-                                </Button>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </motion.div>
                       )}
@@ -1104,10 +1144,10 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-1 h-6 bg-orange-500 rounded-full" />
-                    <h3 className="font-semibold text-lg">코어 운동 가이드</h3>
+                    <h3 className="font-semibold text-lg">코어 운동</h3>
                   </div>
                   {muscleGroups.core.map(muscle => (
-                    <Card key={muscle.id} className="overflow-hidden bg-card/50 border-border hover:border-primary/30 transition-colors shadow-sm">
+                    <Card key={muscle.id} id={`exercise-${muscle.id}`} className="overflow-hidden bg-card/50 border-border hover:border-primary/30 transition-colors shadow-sm">
                       <div
                         className="p-4 cursor-pointer hover:bg-muted/30 transition-colors"
                         onClick={() => setExpandedExercise(expandedExercise === muscle.id ? null : muscle.id)}
@@ -1119,10 +1159,21 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                             </div>
                             <div>
                               <h3 className="font-semibold text-foreground">{muscle.name}</h3>
-                              <p className="text-sm text-muted-foreground">{muscle.exercises.length}개 운동</p>
+                              <p className="text-sm text-muted-foreground">{addedExercises[muscle.id]?.length || 0}개 운동</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-orange-400 hover:text-orange-300 hover:bg-orange-400/10 p-2 h-auto"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openSearch(muscle.id);
+                              }}
+                            >
+                              <Plus className="w-4 h-4 mr-1" /> 운동 추가
+                            </Button>
                             <Badge variant="outline" className="border-border bg-muted/50">{getWeeklyCount(muscle.id)}회 / 주</Badge>
                             <ChevronRight className={`w-5 h-5 transition-transform text-muted-foreground ${expandedExercise === muscle.id ? 'rotate-90' : ''}`} />
                           </div>
@@ -1132,32 +1183,66 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                       {expandedExercise === muscle.id && (
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-border/50 bg-background/30">
                           <div className="p-4 space-y-3">
-                            {muscle.exercises.map((exercise, idx) => (
-                              <div key={idx} className="p-4 bg-background/50 rounded-xl border border-border/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                <div className="space-y-1">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-medium text-foreground">{exercise.name}</span>
-                                    <Badge className={`${getDifficultyColor(exercise.difficulty)} border-none text-[10px]`}>
-                                      {getDifficultyLabel(exercise.difficulty)}
-                                    </Badge>
+                            {(!addedExercises[muscle.id] || addedExercises[muscle.id].length === 0) && (
+                              <div className="text-center py-8 text-muted-foreground">
+                                <Dumbbell className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                                <p className="text-sm">아직 추가된 운동이 없습니다</p>
+                                <p className="text-xs mt-1">상단의 "운동 추가" 버튼을 눌러 운동사전에서 추가해보세요</p>
+                              </div>
+                            )}
+                            {addedExercises[muscle.id]?.map((routineExercise) => {
+                              const dictExercise = EXERCISE_DICTIONARY.find(e => e.id === routineExercise.exerciseId);
+                              if (!dictExercise) return null;
+                              const summary = getLogSummary(muscle.id, dictExercise.name, routineExercise.id);
+
+                              return (
+                                <div key={routineExercise.id} className="p-4 bg-slate-900/80 rounded-xl border border-orange-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
+                                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-orange-500" />
+                                  <div className="space-y-1 pl-2 flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-medium text-foreground">{dictExercise.name}</span>
+                                      {dictExercise.nameEn && <span className="text-xs text-muted-foreground">{dictExercise.nameEn}</span>}
+                                    </div>
+                                    <div className="flex gap-4 text-xs text-muted-foreground">
+                                      {summary ? (
+                                        <span className="text-emerald-400 font-bold">{summary}</span>
+                                      ) : (
+                                        <span>{dictExercise.equipment} • {dictExercise.groups[0]}</span>
+                                      )}
+                                    </div>
+                                    {dictExercise.tips && dictExercise.tips.length > 0 && (
+                                      <div className="mt-2 pt-2 border-t border-slate-700/50">
+                                        <p className="text-[10px] text-blue-400 font-semibold mb-1">💡 팁</p>
+                                        <ul className="text-[11px] text-slate-400 space-y-0.5 list-disc pl-3">
+                                          {dictExercise.tips.map((tip, idx) => (
+                                            <li key={idx}>{tip}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
                                   </div>
-                                  <div className="flex gap-4 text-xs text-muted-foreground">
-                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {exercise.duration}</span>
-                                    <span>{exercise.sets}</span>
+                                  <div className="flex flex-col sm:flex-row items-center gap-2 mt-3 sm:mt-0">
+                                    <Button
+                                      size="sm"
+                                      variant={summary ? "outline" : "secondary"}
+                                      className={summary ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500/10" : "bg-slate-700 hover:bg-slate-600 text-slate-200"}
+                                      onClick={() => {
+                                        openLogModal(muscle.id, dictExercise.name, dictExercise.id, routineExercise.id);
+                                      }}
+                                    >
+                                      {summary ? '기록 수정' : <><Plus className="w-4 h-4 mr-1" /> 기록</>}
+                                    </Button>
+                                    <button
+                                      onClick={() => handleRemoveExercise(muscle.id, routineExercise.id)}
+                                      className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                                      aria-label="운동 삭제"
+                                    >
+                                      <X className="w-4 h-4" />
+                                    </button>
                                   </div>
                                 </div>
-                                <Button
-                                  size="sm"
-                                  className="bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20"
-                                  onClick={() => {
-                                    setLogExercise({ muscleId: muscle.id, name: exercise.name });
-                                    setShowLogDialog(true);
-                                  }}
-                                >
-                                  <Plus className="w-4 h-4 mr-1" /> 기록
-                                </Button>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </motion.div>
                       )}
@@ -1428,7 +1513,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         onAddExercise={handleAddExercise}
-        targetSection={muscleGroups.upper.find(m => m.id === searchTargetSection)?.name || '운동'}
+        targetSection={allMuscles.find(m => m.id === searchTargetSection)?.name || '운동'}
         existingExerciseIds={addedExercises[searchTargetSection]?.map(e => e.exerciseId) || []}
       />
 
