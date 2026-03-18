@@ -6,6 +6,8 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { signIn, signUp, isValidEmail, User as AuthUser, requestPasswordReset, verifyResetCode, resetPassword, deleteAccount } from '../../../utils/auth';
 import { WorkoutDictionary } from './WorkoutDictionary';
+import { useLanguage } from '../contexts/LanguageContext';
+import { Globe } from 'lucide-react';
 
 interface HeaderProps {
   user: { name: string; email: string; profile_picture?: string } | null;
@@ -20,6 +22,7 @@ interface HeaderProps {
 }
 
 export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPageClick, onNotificationsClick, defaultShowLogin = false, showBackButton = false, onBack }: HeaderProps) {
+  const { language, setLanguage, t } = useLanguage();
   const [showLoginDialog, setShowLoginDialog] = useState(defaultShowLogin);
   const [showSignupDialog, setShowSignupDialog] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -257,12 +260,12 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                   <ArrowLeft className="w-5 h-5 text-foreground" />
                 </button>
               )}
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+              <div className="flex items-center gap-2">
                 <Dumbbell className="w-5 h-5 text-[#2F80FF]" />
               </div>
               <div>
                 <h1 className="text-lg font-bold tracking-tight">Fitin_Connection</h1>
-                <p className="text-[10px] text-muted-foreground hidden sm:block tracking-widest uppercase">Performance & Guide</p>
+                <p className="text-[10px] text-muted-foreground hidden sm:block tracking-widest uppercase">{t('header.performance_guide')}</p>
               </div>
             </div>
 
@@ -270,9 +273,19 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
             <div className="hidden md:flex items-center gap-3">
               <div className="flex items-center gap-2 mr-2 border-r border-border pr-4">
                 <button
+                  onClick={() => setLanguage(language === 'ko' ? 'en' : 'ko')}
+                  className="p-2 hover:bg-muted rounded-lg transition-colors group flex items-center gap-1.5"
+                  aria-label="언어 변경 / Change Language"
+                >
+                  <Globe className="w-5 h-5 text-foreground/70 group-hover:text-[#2F80FF]" />
+                  <span className="text-xs font-medium text-foreground/70 group-hover:text-[#2F80FF]">
+                    {language === 'ko' ? 'KO' : 'EN'}
+                  </span>
+                </button>
+                <button
                   onClick={() => setShowDictionary(true)}
                   className="p-2 hover:bg-muted rounded-lg transition-colors relative group"
-                  aria-label="운동 사전"
+                  aria-label={t('header.dictionary')}
                 >
                   <BookOpen className="w-5 h-5 text-foreground/70 group-hover:text-[#2F80FF]" />
                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#2F80FF] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -280,7 +293,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                 <button
                   onClick={() => onNotificationsClick?.()}
                   className="p-2 hover:bg-muted rounded-lg transition-colors relative group"
-                  aria-label="알림"
+                  aria-label={t('header.notifications')}
                 >
                   <Bell className="w-5 h-5 text-foreground/70 group-hover:text-[#2F80FF]" />
                 </button>
@@ -293,12 +306,12 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                   >
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-green-600 flex items-center justify-center overflow-hidden">
                       {user.profile_picture ? (
-                        <img src={user.profile_picture} alt="프로필" className="w-full h-full object-cover" />
+                        <img src={user.profile_picture} alt="profile" className="w-full h-full object-cover" />
                       ) : (
                         <User className="w-4 h-4 text-[#2F80FF]" />
                       )}
                     </div>
-                    <span className="font-medium text-gray-700">{user.name}님</span>
+                    <span className="font-medium text-gray-700">{t('header.welcome').replace('{name}', user.name)}</span>
                   </button>
                   <Button
                     variant="outline"
@@ -306,7 +319,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                     className="flex items-center gap-2"
                   >
                     <LogOut className="w-4 h-4" />
-                    로그아웃
+                    {t('common.logout')}
                   </Button>
                 </>
               ) : (
@@ -317,7 +330,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                     className="flex items-center gap-2"
                   >
                     <LogIn className="w-4 h-4" />
-                    로그인
+                    {t('common.login')}
                   </Button>
                   <Button
                     variant="outline"
@@ -325,7 +338,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                     className="flex items-center gap-2"
                   >
                     <UserPlus className="w-4 h-4" />
-                    회원가입
+                    {t('common.signup')}
                   </Button>
                 </>
               )}
@@ -334,14 +347,23 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
             {/* Mobile Actions */}
             <div className="flex md:hidden items-center gap-1">
               <button
+                onClick={() => setLanguage(language === 'ko' ? 'en' : 'ko')}
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
+                aria-label="Change Language"
+              >
+                <Globe className="w-5 h-5 text-foreground" />
+              </button>
+              <button
                 onClick={() => setShowDictionary(true)}
                 className="p-2 hover:bg-muted rounded-lg transition-colors"
+                aria-label={t('header.dictionary')}
               >
                 <BookOpen className="w-5 h-5 text-foreground" />
               </button>
               <button
                 onClick={() => onNotificationsClick?.()}
                 className="p-2 hover:bg-muted rounded-lg transition-colors relative"
+                aria-label={t('header.notifications')}
               >
                 <Bell className="w-5 h-5 text-foreground" />
               </button>
@@ -377,7 +399,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                         <User className="w-4 h-4 text-white" />
                       )}
                     </div>
-                    <span className="font-medium text-foreground">{user.name}님</span>
+                    <span className="font-medium text-foreground">{t('header.welcome').replace('{name}', user.name)}</span>
                   </button>
                   <Button
                     variant="ghost"
@@ -388,7 +410,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                     className="w-full justify-start flex items-center gap-2"
                   >
                     <User className="w-4 h-4" />
-                    마이페이지
+                    {t('common.mypage')}
                   </Button>
                   <Button
                     variant="ghost"
@@ -399,7 +421,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                     className="w-full justify-start flex items-center gap-2"
                   >
                     <LogOut className="w-4 h-4" />
-                    로그아웃
+                    {t('common.logout')}
                   </Button>
                 </>
               ) : (
@@ -413,7 +435,7 @@ export function Header({ user, onLogout, onLoginSuccess, onSignupClick, onMyPage
                     className="w-full justify-start flex items-center gap-2"
                   >
                     <LogIn className="w-4 h-4" />
-                    로그인
+                    {t('common.login')}
                   </Button>
                   <Button
                     variant="ghost"

@@ -7,6 +7,7 @@ import { Label } from './ui/label';
 import { Card } from './ui/card';
 import { signUp, isValidEmail, User as AuthUser } from '../../../utils/auth';
 import { getCalorieRecommendation, ActivityLevel } from '../../../utils/bmrCalculator';
+import { useLanguage } from '../contexts/LanguageContext';
 
 type OnboardingStep = 'welcome' | 'gender' | 'bodyFatGoal' | 'calorieInfo' | 'signup' | 'exercisePreference' | 'complete';
 
@@ -30,6 +31,7 @@ interface OnboardingFlowProps {
 }
 
 export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps) {
+    const { t, language } = useLanguage();
     const [step, setStep] = useState<OnboardingStep>('welcome');
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<OnboardingData>({
@@ -169,11 +171,11 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center mx-auto mb-6">
                                 <Dumbbell className="w-10 h-10 text-white" />
                             </div>
-                            <h1 className="text-2xl font-bold mb-2 text-foreground">
-                                IGC Fitin_Connection에<br />오신 것을 환영합니다!
+                            <h1 className="text-2xl font-bold mb-2 text-foreground whitespace-pre-line">
+                                {t('onboarding.welcome_title')}
                             </h1>
                             <p className="text-muted-foreground mb-8">
-                                건강한 대학생활을 함께 시작하세요
+                                {t('onboarding.welcome_sub')}
                             </p>
                             <div className="space-y-3">
                                 <Button
@@ -181,14 +183,14 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                     className="w-full py-6 text-lg bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700"
                                 >
                                     <UserPlus className="w-5 h-5 mr-2" />
-                                    회원가입하기
+                                    {t('common.signup')}
                                 </Button>
                                 <Button
                                     variant="outline"
                                     onClick={onLoginClick}
                                     className="w-full py-6 text-lg border-border hover:bg-muted/50"
                                 >
-                                    이미 계정이 있어요 (로그인)
+                                    {t('auth.already_have_account')}
                                 </Button>
                             </div>
                         </Card>
@@ -209,15 +211,15 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                         <Card className="p-8 bg-card/50 backdrop-blur-xl border-border">
                             <button onClick={goBack} className="flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors">
                                 <ArrowLeft className="w-4 h-4 mr-2" />
-                                뒤로
+                                {t('common.back')}
                             </button>
-                            <h2 className="text-2xl font-bold text-center mb-2">성별을 선택해주세요</h2>
-                            <p className="text-muted-foreground text-center mb-8">맞춤형 피트니스 플랜을 위해 필요해요</p>
+                            <h2 className="text-2xl font-bold text-center mb-2">{t('onboarding.select_gender')}</h2>
+                            <p className="text-muted-foreground text-center mb-8">{t('onboarding.select_gender_sub')}</p>
 
                             <div className="grid grid-cols-2 gap-4">
                                 {[
-                                    { value: 'male' as const, label: '남성', icon: '👨', color: 'from-blue-500 to-blue-600' },
-                                    { value: 'female' as const, label: '여성', icon: '👩', color: 'from-pink-500 to-rose-500' },
+                                    { value: 'male' as const, label: t('onboarding.gender_male'), icon: '👨', color: 'from-blue-500 to-blue-600' },
+                                    { value: 'female' as const, label: t('onboarding.gender_female'), icon: '👩', color: 'from-pink-500 to-rose-500' },
                                 ].map((option) => (
                                     <button
                                         key={option.value}
@@ -253,10 +255,10 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                         <Card className="p-8 bg-card/50 backdrop-blur-xl border-border">
                             <button onClick={goBack} className="flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors">
                                 <ArrowLeft className="w-4 h-4 mr-2" />
-                                뒤로
+                                {t('common.back')}
                             </button>
-                            <h2 className="text-2xl font-bold text-center mb-2">목표 체지방률을 선택하세요</h2>
-                            <p className="text-muted-foreground text-center mb-8">달성하고 싶은 체지방률을 선택해주세요</p>
+                            <h2 className="text-2xl font-bold text-center mb-2">{t('onboarding.select_goal')}</h2>
+                            <p className="text-muted-foreground text-center mb-8">{t('onboarding.select_goal_sub')}</p>
 
                             <div className="grid grid-cols-2 gap-3">
                                 {(data.gender === 'male'
@@ -303,19 +305,16 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                         <Card className="p-8 text-center bg-card/50 backdrop-blur-xl border-border">
                             <button onClick={goBack} className="flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors">
                                 <ArrowLeft className="w-4 h-4 mr-2" />
-                                뒤로
+                                {t('common.back')}
                             </button>
 
                             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mx-auto mb-6">
                                 <Flame className="w-8 h-8 text-white" />
                             </div>
 
-                            <h2 className="text-xl font-bold mb-4">맞춤 칼로리 가이드</h2>
-                            <p className="text-muted-foreground mb-6 leading-relaxed">
-                                회원가입을 완료하면<br />
-                                <span className="text-primary font-semibold">목표 체지방 {data.bodyFatGoal}%</span>까지<br />
-                                도달할 수 있는 <span className="text-primary font-semibold">섭취 칼로리</span>를<br />
-                                BMR(기초대사량) 공식으로 계산해 드립니다!
+                            <h2 className="text-xl font-bold mb-4">{t('onboarding.calorie_guide')}</h2>
+                            <p className="text-muted-foreground mb-6 leading-relaxed whitespace-pre-line">
+                                {t('onboarding.calorie_guide_sub').replace('{fat}', data.bodyFatGoal?.toString() || '')}
                             </p>
 
                             <div className="bg-muted/50 rounded-xl p-4 mb-6 text-sm text-muted-foreground">
@@ -331,7 +330,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                 onClick={goNext}
                                 className="w-full py-6 text-lg bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
                             >
-                                회원가입하기
+                                {t('common.signup')}
                                 <ArrowRight className="w-5 h-5 ml-2" />
                             </Button>
                         </Card>
@@ -352,17 +351,17 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                         <Card className="p-8 bg-card/50 backdrop-blur-xl border-border max-h-[85vh] overflow-y-auto">
                             <button onClick={goBack} className="flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors">
                                 <ArrowLeft className="w-4 h-4 mr-2" />
-                                뒤로
+                                {t('common.back')}
                             </button>
 
-                            <h2 className="text-2xl font-bold text-center mb-6">회원가입</h2>
+                            <h2 className="text-2xl font-bold text-center mb-6">{t('common.signup')}</h2>
 
                             <div className="space-y-4">
                                 {/* 기본 정보 */}
                                 <div className="space-y-2">
-                                    <Label>이름 <span className="text-red-500">*</span></Label>
+                                    <Label>{t('auth.name')} <span className="text-red-500">*</span></Label>
                                     <Input
-                                        placeholder="홍길동"
+                                        placeholder="John Doe"
                                         value={data.name}
                                         onChange={(e) => updateData('name', e.target.value)}
                                         className="bg-muted/50 border-border"
@@ -383,28 +382,28 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label>대학교 <span className="text-red-500">*</span></Label>
+                                    <Label>{t('auth.university')} <span className="text-red-500">*</span></Label>
                                     <select
                                         value={data.university}
                                         onChange={(e) => updateData('university', e.target.value)}
                                         className="w-full px-3 py-2 bg-muted/50 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
                                         required
                                     >
-                                        <option value="" className="bg-background">선택하세요</option>
-                                        <option value="utah" className="bg-background">University of Utah (유타대학교)</option>
-                                        <option value="stonybrook" className="bg-background">Stony Brook University (스토니브룩)</option>
+                                        <option value="" className="bg-background">{language === 'ko' ? '선택하세요' : 'Select'}</option>
+                                        <option value="utah" className="bg-background">University of Utah</option>
+                                        <option value="stonybrook" className="bg-background">Stony Brook University</option>
                                         <option value="fit" className="bg-background">Fashion Institute of Technology (FIT)</option>
-                                        <option value="ghent" className="bg-background">Ghent University (겐트대학교)</option>
-                                        <option value="gmu" className="bg-background">George Mason University (조지메이슨)</option>
+                                        <option value="ghent" className="bg-background">Ghent University</option>
+                                        <option value="gmu" className="bg-background">George Mason University</option>
                                     </select>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label>비밀번호 <span className="text-red-500">*</span></Label>
+                                        <Label>{t('auth.password')} <span className="text-red-500">*</span></Label>
                                         <Input
                                             type="password"
-                                            placeholder="8자 이상"
+                                            placeholder="Min. 8 chars"
                                             value={data.password}
                                             onChange={(e) => updateData('password', e.target.value)}
                                             className="bg-muted/50 border-border"
@@ -413,10 +412,10 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>비밀번호 확인 <span className="text-red-500">*</span></Label>
+                                        <Label>{t('auth.password_confirm')} <span className="text-red-500">*</span></Label>
                                         <Input
                                             type="password"
-                                            placeholder="비밀번호 확인"
+                                            placeholder={t('auth.password_confirm')}
                                             value={data.passwordConfirm}
                                             onChange={(e) => updateData('passwordConfirm', e.target.value)}
                                             className="bg-muted/50 border-border"
@@ -429,11 +428,11 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                 <div className="pt-4 border-t border-border">
                                     <h3 className="font-semibold mb-4 flex items-center gap-2">
                                         <User className="w-4 h-4" />
-                                        신체 정보 (BMR 계산용)
+                                        {t('onboarding.body_info')}
                                     </h3>
                                     <div className="grid grid-cols-3 gap-3">
                                         <div className="space-y-2">
-                                            <Label>키 (cm) <span className="text-red-500">*</span></Label>
+                                            <Label>{t('onboarding.height')} <span className="text-red-500">*</span></Label>
                                             <Input
                                                 type="number"
                                                 placeholder="170"
@@ -444,7 +443,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>몸무게 (kg) <span className="text-red-500">*</span></Label>
+                                            <Label>{t('onboarding.weight')} <span className="text-red-500">*</span></Label>
                                             <Input
                                                 type="number"
                                                 placeholder="70"
@@ -455,7 +454,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>나이 <span className="text-red-500">*</span></Label>
+                                            <Label>{t('onboarding.age')} <span className="text-red-500">*</span></Label>
                                             <Input
                                                 type="number"
                                                 placeholder="22"
@@ -472,7 +471,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                 <div className="pt-4 border-t border-border">
                                     <label className="flex items-start gap-2 text-sm text-muted-foreground">
                                         <input type="checkbox" required className="mt-1" />
-                                        <span><span className="text-red-500">*</span> 이용약관 및 개인정보처리방침에 동의합니다.</span>
+                                        <span><span className="text-red-500">*</span> {t('onboarding.terms_agree')}</span>
                                     </label>
                                 </div>
 
@@ -481,7 +480,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                     disabled={loading || !data.name || !data.email || !data.password || !data.university || !data.height || !data.weight || !data.age}
                                     className="w-full py-6 text-lg bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700"
                                 >
-                                    {loading ? '가입 중...' : '가입하기'}
+                                    {loading ? t('common.loading') : t('common.signup')}
                                     <ArrowRight className="w-5 h-5 ml-2" />
                                 </Button>
                             </div>
@@ -519,14 +518,14 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                                 </div>
                             )}
 
-                            <h2 className="text-2xl font-bold text-center mb-2">선호하는 운동을 선택하세요</h2>
-                            <p className="text-muted-foreground text-center mb-8">맞춤 운동 가이드를 제공해 드릴게요</p>
+                            <h2 className="text-2xl font-bold text-center mb-2">{t('onboarding.select_exercise')}</h2>
+                            <p className="text-muted-foreground text-center mb-8">{t('onboarding.select_exercise_sub')}</p>
 
                             <div className="space-y-3">
                                 {[
-                                    { value: 'running' as const, label: '러닝', icon: <Footprints className="w-8 h-8" />, desc: '유산소 중심의 달리기 운동', color: 'from-emerald-500 to-teal-500' },
-                                    { value: 'gym' as const, label: '헬스', icon: <Dumbbell className="w-8 h-8" />, desc: '웨이트 트레이닝 중심', color: 'from-blue-500 to-indigo-500' },
-                                    { value: 'crossfit' as const, label: '크로스핏', icon: <Flame className="w-8 h-8" />, desc: '고강도 복합 운동', color: 'from-orange-500 to-red-500' },
+                                    { value: 'running' as const, label: t('onboarding.exercise_running'), icon: <Footprints className="w-8 h-8" />, desc: t('onboarding.exercise_running_desc'), color: 'from-emerald-500 to-teal-500' },
+                                    { value: 'gym' as const, label: t('onboarding.exercise_gym'), icon: <Dumbbell className="w-8 h-8" />, desc: t('onboarding.exercise_gym_desc'), color: 'from-blue-500 to-indigo-500' },
+                                    { value: 'crossfit' as const, label: t('onboarding.exercise_crossfit'), icon: <Flame className="w-8 h-8" />, desc: t('onboarding.exercise_crossfit_desc'), color: 'from-orange-500 to-red-500' },
                                 ].map((option) => (
                                     <button
                                         key={option.value}

@@ -13,6 +13,7 @@ import { CompetitionPage } from './components/Competition/CompetitionPage';
 import { HomePage } from './components/HomePage';
 import { NotificationsPage } from './components/NotificationsPage';
 import { Navigation } from './components/Navigation';
+import { useLanguage } from './contexts/LanguageContext';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './components/ui/dialog';
 import { Button as UIButton } from './components/ui/button';
 import { Input } from './components/ui/input';
@@ -22,6 +23,7 @@ import { getCurrentUser, signOut, signIn, requestPasswordReset, verifyResetCode,
 type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
 
 export default function App() {
+  const { t } = useLanguage();
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [showDictionary, setShowDictionary] = useState(false);
   const [isSignupPage, setIsSignupPage] = useState(false);
@@ -66,7 +68,7 @@ export default function App() {
       }
     } catch (error) {
       console.error('로그인 에러:', error);
-      alert('로그인 중 오류가 발생했습니다.');
+      alert(t('auth.login_error_occurred'));
     } finally {
       setLoginLoading(false);
     }
@@ -121,7 +123,7 @@ export default function App() {
     signOut();
     setUser(null);
     setShowMyPage(false);
-    alert('로그아웃되었습니다.');
+    alert(t('auth.logged_out'));
   };
 
   // 회원가입 페이지인 경우
@@ -134,6 +136,7 @@ export default function App() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <span className="ml-3 text-sm text-muted-foreground">{t('common.loading')}</span>
       </div>
     );
   }
@@ -158,14 +161,14 @@ export default function App() {
         <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>로그인</DialogTitle>
+              <DialogTitle>{t('common.login')}</DialogTitle>
               <DialogDescription>
-                Fitin_Connection에 오신 것을 환영합니다!
+                {t('auth.welcome_back')}
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="login-email">이메일</Label>
+                <Label htmlFor="login-email">{t('auth.email')}</Label>
                 <Input
                   id="login-email"
                   name="email"
@@ -178,7 +181,7 @@ export default function App() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="login-password">비밀번호</Label>
+                <Label htmlFor="login-password">{t('auth.password')}</Label>
                 <Input
                   id="login-password"
                   name="password"
@@ -201,7 +204,7 @@ export default function App() {
                     disabled={loginLoading}
                   />
                   <label htmlFor="login-rememberMe" className="text-sm text-muted-foreground">
-                    로그인 상태 유지하기
+                    {t('auth.remember_me')}
                   </label>
                 </div>
                 <button
@@ -213,7 +216,7 @@ export default function App() {
                   className="text-sm text-blue-500 hover:text-blue-700 underline transition-colors"
                   disabled={loginLoading}
                 >
-                  비밀번호 찾기
+                  {t('auth.forgot_password')}
                 </button>
               </div>
               <div className="flex flex-col gap-2">
@@ -222,7 +225,7 @@ export default function App() {
                   className="w-full bg-blue-600 hover:bg-blue-700"
                   disabled={loginLoading}
                 >
-                  {loginLoading ? '로그인 중...' : '로그인'}
+                  {loginLoading ? t('common.loading') : t('common.login')}
                 </UIButton>
                 <button
                   type="button"
@@ -230,7 +233,7 @@ export default function App() {
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   disabled={loginLoading}
                 >
-                  취소
+                  {t('common.cancel')}
                 </button>
               </div>
             </form>
@@ -241,9 +244,9 @@ export default function App() {
         <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>비밀번호 찾기</DialogTitle>
+              <DialogTitle>{t('auth.forgot_password')}</DialogTitle>
               <DialogDescription>
-                가입하신 이메일을 입력하면 인증 코드를 보내드립니다.
+                {t('auth.enter_email_reset')}
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={async (e) => {
@@ -252,20 +255,20 @@ export default function App() {
               try {
                 const { success, error } = await requestPasswordReset(resetEmail);
                 if (success) {
-                  alert('인증 코드가 발송되었습니다. 이메일을 확인해주세요.');
+                  alert(t('auth.code_sent_check_email'));
                   setShowForgotPassword(false);
                   setShowVerifyCode(true);
                 } else {
-                  alert(error || '인증 코드 발송에 실패했습니다.');
+                  alert(error || t('auth.failed_to_send_code'));
                 }
               } catch {
-                alert('오류가 발생했습니다.');
+                alert(t('common.error_occurred'));
               } finally {
                 setResetLoading(false);
               }
             }} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="reset-email">이메일</Label>
+                <Label htmlFor="reset-email">{t('auth.email')}</Label>
                 <Input
                   id="reset-email"
                   type="email"
@@ -278,10 +281,10 @@ export default function App() {
               </div>
               <div className="flex flex-col gap-2">
                 <UIButton type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={resetLoading}>
-                  {resetLoading ? '발송 중...' : '인증 코드 발송'}
+                  {resetLoading ? t('common.sending') : t('auth.send_code')}
                 </UIButton>
                 <button type="button" onClick={() => { setShowForgotPassword(false); setShowLoginDialog(true); }} className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  로그인으로 돌아가기
+                  {t('auth.back_to_login')}
                 </button>
               </div>
             </form>
@@ -292,9 +295,9 @@ export default function App() {
         <Dialog open={showVerifyCode} onOpenChange={setShowVerifyCode}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>인증 코드 확인</DialogTitle>
+              <DialogTitle>{t('auth.verify_code')}</DialogTitle>
               <DialogDescription>
-                {resetEmail}로 발송된 인증 코드를 입력해주세요.
+                {t('auth.enter_code_sent').replace('{email}', resetEmail)}
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={async (e) => {
@@ -306,16 +309,16 @@ export default function App() {
                   setShowVerifyCode(false);
                   setShowNewPassword(true);
                 } else {
-                  alert(error || '인증 코드가 올바르지 않습니다.');
+                  alert(error || t('auth.invalid_code'));
                 }
               } catch {
-                alert('오류가 발생했습니다.');
+                alert(t('common.error_occurred'));
               } finally {
                 setResetLoading(false);
               }
             }} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="reset-code">인증 코드</Label>
+                <Label htmlFor="reset-code">{t('auth.verification_code')}</Label>
                 <Input
                   id="reset-code"
                   type="text"
@@ -327,7 +330,7 @@ export default function App() {
                 />
               </div>
               <UIButton type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={resetLoading}>
-                {resetLoading ? '확인 중...' : '인증 코드 확인'}
+                {resetLoading ? t('common.verifying') : t('common.confirm')}
               </UIButton>
             </form>
           </DialogContent>
