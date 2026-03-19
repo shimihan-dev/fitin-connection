@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card } from './ui/card';
-import { signUp, isValidEmail, User as AuthUser } from '../../../utils/auth';
+import { signUp, isValidEmail, User as AuthUser, updateUserProfile } from '../../../utils/auth';
 import { getCalorieRecommendation, ActivityLevel } from '../../../utils/bmrCalculator';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -159,6 +159,17 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
             preferredExercise: data.preferredExercise,
         };
         
+        // Supabase에 정보 업데이트 (user id가 있을 경우)
+        if (updatedUser.id) {
+            await updateUserProfile(updatedUser.id, {
+                height: data.height || undefined,
+                weight: data.weight || undefined,
+                age: data.age || undefined,
+                body_fat_goal: data.bodyFatGoal || undefined,
+                preferred_exercise: data.preferredExercise || undefined,
+            });
+        }
+
         localStorage.setItem('igc_fitness_user', JSON.stringify(updatedUser));
         onComplete(updatedUser);
     };

@@ -225,7 +225,7 @@ export async function getUserProfile(userId: string): Promise<{ profile: User | 
     try {
         const { data, error } = await supabase
             .from('users')
-            .select('id, email, name, university, gender, created_at, height, weight, fitness_goal, sns_link, profile_picture')
+            .select('id, email, name, university, gender, created_at, height, weight, age, fitness_goal, body_fat_goal, preferred_exercise, sns_link, profile_picture')
             .eq('id', userId)
             .single();
 
