@@ -131,19 +131,36 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
         // TODO: 운동 선호도와 추가 정보를 Supabase에 저장
         // 현재는 로컬 스토리지의 사용자 정보 업데이트
         const storedUser = localStorage.getItem('igc_fitness_user');
-        if (storedUser) {
-            const user = JSON.parse(storedUser);
-            const updatedUser = {
-                ...user,
-                height: data.height,
-                weight: data.weight,
-                age: data.age,
-                bodyFatGoal: data.bodyFatGoal,
-                preferredExercise: data.preferredExercise,
-            };
-            localStorage.setItem('igc_fitness_user', JSON.stringify(updatedUser));
-            onComplete(updatedUser);
+        
+        let user = null;
+        try {
+            if (storedUser && storedUser !== 'null' && storedUser !== 'undefined') {
+                user = JSON.parse(storedUser);
+            }
+        } catch (e) {
+            console.error('Failed to parse stored user', e);
         }
+
+        if (!user || !user.email) {
+            user = {
+                name: data.name,
+                email: data.email,
+                university: data.university,
+                gender: data.gender,
+            };
+        }
+
+        const updatedUser = {
+            ...user,
+            height: data.height,
+            weight: data.weight,
+            age: data.age,
+            bodyFatGoal: data.bodyFatGoal,
+            preferredExercise: data.preferredExercise,
+        };
+        
+        localStorage.setItem('igc_fitness_user', JSON.stringify(updatedUser));
+        onComplete(updatedUser);
     };
 
     // 애니메이션 variants

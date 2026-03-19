@@ -97,6 +97,9 @@ export async function signUp(data: SignUpData): Promise<{ user: User | null; err
             return { user: null, error: `회원가입 중 오류가 발생했습니다: ${error.message}` };
         }
 
+        // 회원가입 완료 후 자동 유지
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
+
         return { user: newUser as User, error: null };
     } catch (err) {
         console.error('회원가입 에러:', err);

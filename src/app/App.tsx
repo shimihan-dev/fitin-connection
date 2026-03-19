@@ -152,10 +152,11 @@ export default function App() {
       <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground">
         <OnboardingFlow
           onComplete={(completedUser) => {
+            const email = completedUser.email || '';
             setUser({
               id: completedUser.id,
-              name: completedUser.name || completedUser.email.split('@')[0] || t('common.user'),
-              email: completedUser.email,
+              name: completedUser.name || (email ? email.split('@')[0] : t('common.user')),
+              email: email,
               profile_picture: completedUser.profile_picture,
             });
             setCurrentPage('workout'); // 온보딩 완료 후 운동 페이지로 이동
