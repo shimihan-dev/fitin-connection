@@ -292,8 +292,7 @@ function BodyDiagram({
     return (
       <g
         key={id}
-        onClick={() => onMuscleClick(id)}
-        className="cursor-pointer transition-all duration-300"
+        className="transition-all duration-300"
         style={{ filter: getFilter(count) }}
       >
         {paths.map((path, idx) => (
@@ -799,14 +798,15 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
       setRoutineSubTab('planner');
     }
 
-    // 해당 부위로 스크롤 이동을 위한 지연 실행
-    setTimeout(() => {
-      setExpandedExercise(muscleId);
-      const element = document.getElementById(`exercise-${muscleId}`);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
+    // // 해당 부위로 스크롤 이동을 위한 지연 실행
+    // setTimeout(() => {
+    //   setExpandedExercise(muscleId);
+    //   const element = document.getElementById(`exercise-${muscleId}`);
+    //   if (element) {
+    //     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    //   }
+    // }, 100);
+
   };
 
   return (
@@ -860,8 +860,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
                     return (
                       <div
                         key={muscle.id}
-                        className="group flex items-center justify-between py-3 px-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-muted/50 border border-transparent"
-                        onClick={() => handleMuscleNavigation(muscle.id)}
+                        className="group flex items-center justify-between py-3 px-3 rounded-xl transition-all duration-200 border border-transparent"
                       >
                         <div className="flex items-center gap-3">
                           <div className={`w-1.5 h-1.5 rounded-full ${count >= 3 ? 'bg-emerald-400' : count >= 2 ? 'bg-amber-400' : count >= 1 ? 'bg-rose-400' : 'bg-slate-700'}`} />
@@ -960,68 +959,33 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
 
                     {expandedExercise === muscle.id && (
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-border/50 bg-background/30">
-                        <div className="p-4 space-y-3">
-                          {/* User Added Exercises */}
-                          {(!addedExercises[muscle.id] || addedExercises[muscle.id].length === 0) && (
-                            <div className="text-center py-8 text-muted-foreground">
-                              <Dumbbell className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                              <p className="text-sm">아직 추가된 운동이 없습니다</p>
-                              <p className="text-xs mt-1">상단의 "운동 추가" 버튼을 눌러 운동사전에서 추가해보세요</p>
-                            </div>
-                          )}
-                          {addedExercises[muscle.id]?.map((routineExercise) => {
-                            const dictExercise = EXERCISE_DICTIONARY.find(e => e.id === routineExercise.exerciseId);
-                            if (!dictExercise) return null;
-                            const summary = getLogSummary(muscle.id, dictExercise.name, routineExercise.id);
+                        <div className="p-4 space-y-6">
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-semibold text-green-400 flex items-center gap-2">
+                              <div className="w-1.5 h-1.5 rounded-full bg-green-400" /> 초급자 루틴
+                            </h4>
+                            <Card className="p-4 bg-slate-900/80 border-border">
+                              <p className="text-sm text-muted-foreground">자세한 루틴 안내가 곧 추가될 예정입니다.</p>
+                            </Card>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-semibold text-yellow-400 flex items-center gap-2">
+                              <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" /> 중급자 루틴
+                            </h4>
+                            <Card className="p-4 bg-slate-900/80 border-border">
+                              <p className="text-sm text-muted-foreground">자세한 루틴 안내가 곧 추가될 예정입니다.</p>
+                            </Card>
+                          </div>
 
-                            return (
-                              <div key={routineExercise.id} className="p-4 bg-slate-900/80 rounded-xl border border-blue-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
-                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500" />
-                                <div className="space-y-1 pl-2 flex-1">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-medium text-foreground">{dictExercise.name}</span>
-                                    {dictExercise.nameEn && <span className="text-xs text-muted-foreground">{dictExercise.nameEn}</span>}
-                                  </div>
-                                    <div className="flex gap-4 text-xs text-muted-foreground">
-                                      {summary ? (
-                                        <span className="text-emerald-400 font-bold">{summary}</span>
-                                      ) : (
-                                        <span>{dictExercise.equipment} • {dictExercise.groups[0]}</span>
-                                      )}
-                                    </div>
-                                    {dictExercise.tips && dictExercise.tips.length > 0 && (
-                                      <div className="mt-2 pt-2 border-t border-slate-700/50">
-                                        <p className="text-[10px] text-blue-400 font-semibold mb-1">💡 팁</p>
-                                        <ul className="text-[11px] text-slate-400 space-y-0.5 list-disc pl-3">
-                                          {dictExercise.tips.map((tip, idx) => (
-                                            <li key={idx}>{tip}</li>
-                                          ))}
-                                        </ul>
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="flex flex-col sm:flex-row items-center gap-2 mt-3 sm:mt-0">
-                                  <Button
-                                    size="sm"
-                                    variant={summary ? "outline" : "secondary"}
-                                    className={summary ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500/10" : "bg-slate-700 hover:bg-slate-600 text-slate-200"}
-                                    onClick={() => {
-                                      openLogModal(muscle.id, dictExercise.name, dictExercise.id, routineExercise.id);
-                                    }}
-                                  >
-                                    {summary ? '기록 수정' : <><Plus className="w-4 h-4 mr-1" /> 기록</>}
-                                  </Button>
-                                  <button
-                                    onClick={() => handleRemoveExercise(muscle.id, routineExercise.id)}
-                                    className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-colors"
-                                    aria-label="운동 삭제"
-                                  >
-                                    <X className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              </div>
-                            );
-                          })}
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-semibold text-red-400 flex items-center gap-2">
+                              <div className="w-1.5 h-1.5 rounded-full bg-red-400" /> 상급자 루틴
+                            </h4>
+                            <Card className="p-4 bg-slate-900/80 border-border">
+                              <p className="text-sm text-muted-foreground">자세한 루틴 안내가 곧 추가될 예정입니다.</p>
+                            </Card>
+                          </div>
                         </div>
                       </motion.div>
                     )}
@@ -1073,67 +1037,33 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
 
                       {expandedExercise === muscle.id && (
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-border/50 bg-background/30">
-                          <div className="p-4 space-y-3">
-                            {(!addedExercises[muscle.id] || addedExercises[muscle.id].length === 0) && (
-                              <div className="text-center py-8 text-muted-foreground">
-                                <Dumbbell className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                                <p className="text-sm">아직 추가된 운동이 없습니다</p>
-                                <p className="text-xs mt-1">상단의 "운동 추가" 버튼을 눌러 운동사전에서 추가해보세요</p>
-                              </div>
-                            )}
-                            {addedExercises[muscle.id]?.map((routineExercise) => {
-                              const dictExercise = EXERCISE_DICTIONARY.find(e => e.id === routineExercise.exerciseId);
-                              if (!dictExercise) return null;
-                              const summary = getLogSummary(muscle.id, dictExercise.name, routineExercise.id);
+                          <div className="p-4 space-y-6">
+                            <div className="space-y-3">
+                              <h4 className="text-sm font-semibold text-green-400 flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-green-400" /> 초급자 루틴
+                              </h4>
+                              <Card className="p-4 bg-slate-900/80 border-border">
+                                <p className="text-sm text-muted-foreground">자세한 루틴 안내가 곧 추가될 예정입니다.</p>
+                              </Card>
+                            </div>
+                            
+                            <div className="space-y-3">
+                              <h4 className="text-sm font-semibold text-yellow-400 flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" /> 중급자 루틴
+                              </h4>
+                              <Card className="p-4 bg-slate-900/80 border-border">
+                                <p className="text-sm text-muted-foreground">자세한 루틴 안내가 곧 추가될 예정입니다.</p>
+                              </Card>
+                            </div>
 
-                              return (
-                                <div key={routineExercise.id} className="p-4 bg-slate-900/80 rounded-xl border border-emerald-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
-                                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500" />
-                                  <div className="space-y-1 pl-2 flex-1">
-                                    <div className="flex items-center gap-2">
-                                      <span className="font-medium text-foreground">{dictExercise.name}</span>
-                                      {dictExercise.nameEn && <span className="text-xs text-muted-foreground">{dictExercise.nameEn}</span>}
-                                    </div>
-                                    <div className="flex gap-4 text-xs text-muted-foreground">
-                                      {summary ? (
-                                        <span className="text-emerald-400 font-bold">{summary}</span>
-                                      ) : (
-                                        <span>{dictExercise.equipment} • {dictExercise.groups[0]}</span>
-                                      )}
-                                    </div>
-                                    {dictExercise.tips && dictExercise.tips.length > 0 && (
-                                      <div className="mt-2 pt-2 border-t border-slate-700/50">
-                                        <p className="text-[10px] text-blue-400 font-semibold mb-1">💡 팁</p>
-                                        <ul className="text-[11px] text-slate-400 space-y-0.5 list-disc pl-3">
-                                          {dictExercise.tips.map((tip, idx) => (
-                                            <li key={idx}>{tip}</li>
-                                          ))}
-                                        </ul>
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="flex flex-col sm:flex-row items-center gap-2 mt-3 sm:mt-0">
-                                    <Button
-                                      size="sm"
-                                      variant={summary ? "outline" : "secondary"}
-                                      className={summary ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500/10" : "bg-slate-700 hover:bg-slate-600 text-slate-200"}
-                                      onClick={() => {
-                                        openLogModal(muscle.id, dictExercise.name, dictExercise.id, routineExercise.id);
-                                      }}
-                                    >
-                                      {summary ? '기록 수정' : <><Plus className="w-4 h-4 mr-1" /> 기록</>}
-                                    </Button>
-                                    <button
-                                      onClick={() => handleRemoveExercise(muscle.id, routineExercise.id)}
-                                      className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-colors"
-                                      aria-label="운동 삭제"
-                                    >
-                                      <X className="w-4 h-4" />
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })}
+                            <div className="space-y-3">
+                              <h4 className="text-sm font-semibold text-red-400 flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-red-400" /> 상급자 루틴
+                              </h4>
+                              <Card className="p-4 bg-slate-900/80 border-border">
+                                <p className="text-sm text-muted-foreground">자세한 루틴 안내가 곧 추가될 예정입니다.</p>
+                              </Card>
+                            </div>
                           </div>
                         </motion.div>
                       )}
@@ -1182,67 +1112,33 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
 
                       {expandedExercise === muscle.id && (
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="border-t border-border/50 bg-background/30">
-                          <div className="p-4 space-y-3">
-                            {(!addedExercises[muscle.id] || addedExercises[muscle.id].length === 0) && (
-                              <div className="text-center py-8 text-muted-foreground">
-                                <Dumbbell className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                                <p className="text-sm">아직 추가된 운동이 없습니다</p>
-                                <p className="text-xs mt-1">상단의 "운동 추가" 버튼을 눌러 운동사전에서 추가해보세요</p>
-                              </div>
-                            )}
-                            {addedExercises[muscle.id]?.map((routineExercise) => {
-                              const dictExercise = EXERCISE_DICTIONARY.find(e => e.id === routineExercise.exerciseId);
-                              if (!dictExercise) return null;
-                              const summary = getLogSummary(muscle.id, dictExercise.name, routineExercise.id);
+                          <div className="p-4 space-y-6">
+                            <div className="space-y-3">
+                              <h4 className="text-sm font-semibold text-green-400 flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-green-400" /> 초급자 루틴
+                              </h4>
+                              <Card className="p-4 bg-slate-900/80 border-border">
+                                <p className="text-sm text-muted-foreground">자세한 루틴 안내가 곧 추가될 예정입니다.</p>
+                              </Card>
+                            </div>
+                            
+                            <div className="space-y-3">
+                              <h4 className="text-sm font-semibold text-yellow-400 flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" /> 중급자 루틴
+                              </h4>
+                              <Card className="p-4 bg-slate-900/80 border-border">
+                                <p className="text-sm text-muted-foreground">자세한 루틴 안내가 곧 추가될 예정입니다.</p>
+                              </Card>
+                            </div>
 
-                              return (
-                                <div key={routineExercise.id} className="p-4 bg-slate-900/80 rounded-xl border border-orange-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
-                                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-orange-500" />
-                                  <div className="space-y-1 pl-2 flex-1">
-                                    <div className="flex items-center gap-2">
-                                      <span className="font-medium text-foreground">{dictExercise.name}</span>
-                                      {dictExercise.nameEn && <span className="text-xs text-muted-foreground">{dictExercise.nameEn}</span>}
-                                    </div>
-                                    <div className="flex gap-4 text-xs text-muted-foreground">
-                                      {summary ? (
-                                        <span className="text-emerald-400 font-bold">{summary}</span>
-                                      ) : (
-                                        <span>{dictExercise.equipment} • {dictExercise.groups[0]}</span>
-                                      )}
-                                    </div>
-                                    {dictExercise.tips && dictExercise.tips.length > 0 && (
-                                      <div className="mt-2 pt-2 border-t border-slate-700/50">
-                                        <p className="text-[10px] text-blue-400 font-semibold mb-1">💡 팁</p>
-                                        <ul className="text-[11px] text-slate-400 space-y-0.5 list-disc pl-3">
-                                          {dictExercise.tips.map((tip, idx) => (
-                                            <li key={idx}>{tip}</li>
-                                          ))}
-                                        </ul>
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="flex flex-col sm:flex-row items-center gap-2 mt-3 sm:mt-0">
-                                    <Button
-                                      size="sm"
-                                      variant={summary ? "outline" : "secondary"}
-                                      className={summary ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500/10" : "bg-slate-700 hover:bg-slate-600 text-slate-200"}
-                                      onClick={() => {
-                                        openLogModal(muscle.id, dictExercise.name, dictExercise.id, routineExercise.id);
-                                      }}
-                                    >
-                                      {summary ? '기록 수정' : <><Plus className="w-4 h-4 mr-1" /> 기록</>}
-                                    </Button>
-                                    <button
-                                      onClick={() => handleRemoveExercise(muscle.id, routineExercise.id)}
-                                      className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-colors"
-                                      aria-label="운동 삭제"
-                                    >
-                                      <X className="w-4 h-4" />
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })}
+                            <div className="space-y-3">
+                              <h4 className="text-sm font-semibold text-red-400 flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-red-400" /> 상급자 루틴
+                              </h4>
+                              <Card className="p-4 bg-slate-900/80 border-border">
+                                <p className="text-sm text-muted-foreground">자세한 루틴 안내가 곧 추가될 예정입니다.</p>
+                              </Card>
+                            </div>
                           </div>
                         </motion.div>
                       )}

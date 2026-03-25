@@ -41,10 +41,16 @@ export function RoutinePlanner({ user }: RoutinePlannerProps) {
   const [showTemplates, setShowTemplates] = useState(false);
   const [showCalendarView, setShowCalendarView] = useState(false);
 
-  const templates = [
-    { name: '초보자 3일 루틴', description: '주 3회, 각 30분', routines: [{ day: '월요일', workouts: ['전신 운동 20분', '스트레칭 10분'] }, { day: '수요일', workouts: ['유산소 20분', '코어 운동 10분'] }, { day: '금요일', workouts: ['상체 15분', '하체 15분'] }] },
-    { name: '중급자 4일 루틴', description: '주 4회, 각 40분', routines: [{ day: '월요일', workouts: ['상체 집중 30분', '복근 10분'] }, { day: '화요일', workouts: ['하체 집중 30분', '스트레칭 10분'] }, { day: '목요일', workouts: ['유산소 25분', '코어 15분'] }, { day: '토요일', workouts: ['전신 운동 30분', '요가 10분'] }] },
-    { name: '바쁜 대학생용', description: '주 3회, 각 20분', routines: [{ day: '월요일', workouts: ['HIIT 15분', '스트레칭 5분'] }, { day: '수요일', workouts: ['상체+코어 20분'] }, { day: '금요일', workouts: ['하체+유산소 20분'] }] },
+  interface Template {
+    name: string;
+    description: string;
+    routines: { day: string; workouts: string[] }[];
+  }
+
+  const templates: Template[] = [
+    { name: '초급자용 루틴', description: '기초 체력 향상과 자세 교정 (상세 루틴 업데이트 예정)', routines: [] },
+    { name: '중급자용 루틴', description: '근육 근력 증가와 부위별 타겟팅 (상세 루틴 업데이트 예정)', routines: [] },
+    { name: '상급자용 루틴', description: '고강도 훈련과 근비대 극대화 (상세 루틴 업데이트 예정)', routines: [] },
   ];
 
   const toggleComplete = (id: string) => {
@@ -66,6 +72,11 @@ export function RoutinePlanner({ user }: RoutinePlannerProps) {
 
   const applyTemplate = (templateIndex: number) => {
     const template = templates[templateIndex];
+    if (template.routines.length === 0) {
+      alert("자세한 루틴 안내가 곧 추가될 예정입니다!");
+      setShowTemplates(false);
+      return;
+    }
     const newRoutines = template.routines.map((routine, index) => ({
       id: Date.now().toString() + index,
       day: routine.day,
@@ -191,14 +202,16 @@ export function RoutinePlanner({ user }: RoutinePlannerProps) {
                 </div>
                 <Button size="sm" onClick={() => applyTemplate(index)} className="bg-emerald-600 hover:bg-emerald-700">적용</Button>
               </div>
-              <div className="space-y-1">
-                {template.routines.map((routine, idx) => (
-                  <div key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs border-border">{routine.day}</Badge>
-                    <span className="text-xs">{routine.workouts.join(', ')}</span>
-                  </div>
-                ))}
-              </div>
+              {template.routines.length > 0 && (
+                <div className="space-y-1 mt-3">
+                  {template.routines.map((routine, idx) => (
+                    <div key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs border-border">{routine.day}</Badge>
+                      <span className="text-xs">{routine.workouts.join(', ')}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </Card>
           ))}
         </motion.div>
