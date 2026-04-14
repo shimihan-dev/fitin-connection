@@ -157,17 +157,18 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]"
+        className="space-y-6 sm:space-y-8"
       >
-        <div className="space-y-6">
-          <div className="px-1">
-            <p className="apple-kicker">Fitin Daily</p>
-            <h1 className="mt-3 max-w-[12ch] text-[clamp(2.6rem,8vw,5.2rem)] font-black leading-[0.92] tracking-[-0.08em] text-foreground">
-              {content.greeting(user?.name || 'Fitin', now.getHours())}
-            </h1>
-            <p className="mt-3 text-base text-muted-foreground sm:text-lg">{dateLabel}</p>
-          </div>
+        <div className="px-1">
+          <p className="apple-kicker">Fitin Daily</p>
+          <h1 className="mt-3 max-w-[15ch] text-[clamp(2.6rem,8vw,5.2rem)] font-black leading-[0.92] tracking-[-0.08em] text-foreground">
+            {content.greeting(user?.name || 'Fitin', now.getHours())}
+          </h1>
+          <p className="mt-3 text-base text-muted-foreground sm:text-lg">{dateLabel}</p>
+        </div>
 
+        <div className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+          <div className="space-y-6">
           <div className="apple-panel p-6 sm:p-7">
             <div className="absolute -left-8 top-20 h-20 w-20 rotate-45 rounded-3xl bg-slate-100/90" />
             <div className="absolute bottom-[-22px] right-[-18px] h-32 w-32 rotate-[38deg] rounded-[32px] bg-slate-100/95" />
@@ -375,6 +376,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                 <p className="mt-3 text-sm leading-6 text-white/80">{content.focusBody}</p>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </motion.section>

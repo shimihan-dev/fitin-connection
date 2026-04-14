@@ -78,7 +78,7 @@ export function Header({
                 <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
                   Daily Fitness
                 </p>
-                <p className="text-lg font-black tracking-[-0.04em] text-foreground">Fitin</p>
+                <p className="text-lg font-black tracking-[-0.04em] text-foreground">Fitin_Connection</p>
               </div>
             </button>
           </div>
