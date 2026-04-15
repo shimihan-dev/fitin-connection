@@ -191,7 +191,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
     () =>
       isKorean
         ? {
-            hero: '당신의 루틴을\n더 부드럽고 선명하게.',
+            hero: '당신의 루틴을 더\n부드럽고 선명하게.',
             signUp: 'Sign Up',
             login: '이미 계정이 있어요',
             points: [
@@ -338,8 +338,18 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                     </div>
                   </div>
 
-                  <h1 className="mt-12 whitespace-pre-line text-[clamp(2.5rem,6vw,5rem)] font-black leading-[0.9] tracking-[-0.09em] text-foreground">
-                    {welcomeContent.hero}
+                  <h1
+                    className={`mt-12 font-black leading-[0.9] text-foreground ${
+                      isKorean
+                        ? 'text-[clamp(2rem,4.6vw,3.75rem)] tracking-[-0.1em]'
+                        : 'text-[clamp(2.5rem,6vw,5rem)] tracking-[-0.09em]'
+                    }`}
+                  >
+                    {welcomeContent.hero.split('\n').map((line) => (
+                      <span key={line} className="block whitespace-nowrap">
+                        {line}
+                      </span>
+                    ))}
                   </h1>
                 </div>
 
