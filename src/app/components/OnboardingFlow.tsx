@@ -8,7 +8,6 @@ import {
   Flame,
   Footprints,
   ShieldCheck,
-  Sparkles,
   Target,
   User,
   UserPlus,
@@ -192,25 +191,21 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
     () =>
       isKorean
         ? {
-            hero: '당신의 피트니스 루틴을\n더 부드럽고 더 선명하게.',
-            body: 'Fitin은 운동 가이드, 진척도, 식단 기록을 하나의 애플 스타일 경험으로 연결합니다.',
+            hero: '당신의 루틴을\n더 부드럽고 선명하게.',
             signUp: 'Sign Up',
             login: '이미 계정이 있어요',
             points: [
-              { title: '맞춤 루틴', desc: '선호 운동과 목표 체지방 기준으로 시작해요.' },
-              { title: '간결한 대시보드', desc: '모바일과 웹에서 같은 톤으로 자연스럽게 이어집니다.' },
-              { title: '빠른 체크인', desc: '하루 활동과 운동 기록을 부담 없이 관리할 수 있어요.' },
+              { title: '맞춤 루틴' },
+              { title: '빠른 체크인' },
             ],
           }
         : {
-            hero: 'Train with a calmer,\ncleaner daily rhythm.',
-            body: 'Fitin brings workouts, progress, and diet into one polished Apple-inspired flow.',
+            hero: 'Your routine,\nsmoother and clearer.',
             signUp: 'Sign Up',
             login: 'Already have an account?',
             points: [
-              { title: 'Tailored plans', desc: 'Start from your goal, body fat target, and preferred training style.' },
-              { title: 'Unified dashboard', desc: 'A natural mobile and web experience with the same visual language.' },
-              { title: 'Fast check-ins', desc: 'Log workouts and track momentum without breaking your flow.' },
+              { title: 'Tailored plans' },
+              { title: 'Fast check-ins' },
             ],
           },
     [isKorean],
@@ -339,48 +334,38 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                       <Dumbbell className="h-7 w-7" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold uppercase tracking-[0.26em] text-muted-foreground">Fitin</p>
-                      <p className="text-2xl font-black tracking-[-0.05em] text-foreground">Wellness, refined.</p>
+                      <p className="text-xs font-semibold uppercase tracking-[0.26em] text-muted-foreground">Fitin</p>
                     </div>
                   </div>
 
-                  <h1 className="mt-12 whitespace-pre-line text-[clamp(3rem,7vw,5.8rem)] font-black leading-[0.88] tracking-[-0.1em] text-foreground">
+                  <h1 className="mt-12 whitespace-pre-line text-[clamp(2.5rem,6vw,5rem)] font-black leading-[0.9] tracking-[-0.09em] text-foreground">
                     {welcomeContent.hero}
                   </h1>
-                  <p className="mt-6 max-w-[34rem] text-base leading-7 text-muted-foreground sm:text-lg">
-                    {welcomeContent.body}
-                  </p>
                 </div>
 
-                <div className="relative mt-8 grid gap-4 sm:grid-cols-3">
+                <div className="relative mt-8 grid gap-4 sm:grid-cols-2">
                   {welcomeContent.points.map((point, index) => (
                     <div key={point.title} className="apple-soft-card px-5 py-5">
                       <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-primary">
-                        {index === 0 ? <Target className="h-4 w-4" /> : index === 1 ? <Sparkles className="h-4 w-4" /> : <ShieldCheck className="h-4 w-4" />}
+                        {index === 0 ? <Target className="h-4 w-4" /> : <ShieldCheck className="h-4 w-4" />}
                       </span>
-                      <h3 className="mt-4 text-lg font-bold tracking-[-0.04em] text-foreground">{point.title}</h3>
-                      <p className="mt-2 text-sm leading-6 text-muted-foreground">{point.desc}</p>
+                      <h3 className="mt-4 text-base font-bold tracking-[-0.04em] text-foreground sm:text-[1.05rem]">{point.title}</h3>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="grid gap-6">
+              <div className="lg:self-start">
                 <div className="apple-shell p-7 sm:p-9">
                   <p className="apple-kicker">Start</p>
-                  <h2 className="mt-3 text-[2.5rem] font-black leading-[0.9] tracking-[-0.08em] text-foreground">
+                  <h2 className="mt-3 text-[2.15rem] font-black leading-[0.92] tracking-[-0.07em] text-foreground sm:text-[2.3rem]">
                     {isKorean ? '지금 바로 당신의 루틴을 시작해요.' : 'Start building your routine now.'}
                   </h2>
-                  <p className="mt-4 text-base leading-7 text-muted-foreground">
-                    {isKorean
-                      ? '운동 목표, 체지방률, 선호 운동을 바탕으로 자연스럽게 온보딩을 이어갑니다.'
-                      : 'Move through a calmer onboarding flow based on your goal, body composition target, and preferred training style.'}
-                  </p>
 
                   <div className="mt-8 space-y-3">
                     <Button
                       onClick={() => setStep('gender')}
-                      className="apple-button h-14 w-full border-0 text-base"
+                      className="apple-button h-14 w-full border-0 text-[0.95rem]"
                     >
                       <UserPlus className="mr-2 h-4 w-4" />
                       {welcomeContent.signUp}
@@ -392,38 +377,6 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                     >
                       {welcomeContent.login}
                     </button>
-                  </div>
-                </div>
-
-                <div className="apple-panel p-6 sm:p-7">
-                  <div className="flex items-center justify-between">
-                    <p className="apple-kicker">Preview</p>
-                    <span className="text-sm font-semibold text-primary">{isKorean ? '모바일 + 웹' : 'Mobile + Web'}</span>
-                  </div>
-
-                  <div className="mt-6 grid gap-4">
-                    <div className="apple-soft-card overflow-hidden p-5">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Daily Progress</p>
-                          <p className="mt-3 text-3xl font-black tracking-[-0.06em] text-foreground">
-                            {isKorean ? '오늘 아침 루틴 준비 완료' : 'Ready for your morning session'}
-                          </p>
-                        </div>
-                        <div className="h-20 w-20 rounded-[28px] bg-[linear-gradient(145deg,#ebeff8,#ffffff)] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]" />
-                      </div>
-                    </div>
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="apple-soft-card p-5">
-                        <p className="text-sm text-muted-foreground">{isKorean ? '걸음 수' : 'Steps'}</p>
-                        <p className="mt-2 text-4xl font-black tracking-[-0.08em] text-foreground">8,432</p>
-                      </div>
-                      <div className="apple-soft-card p-5">
-                        <p className="text-sm text-muted-foreground">{isKorean ? '수분 섭취' : 'Hydration'}</p>
-                        <p className="mt-2 text-4xl font-black tracking-[-0.08em] text-foreground">1.8L</p>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
