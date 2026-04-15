@@ -119,10 +119,10 @@ function StepContainer({
 
             <div className="mt-8 max-w-2xl">
               <p className="apple-kicker">Fitin Auth</p>
-              <h2 className="mt-3 text-[clamp(2.2rem,5vw,4.3rem)] font-black leading-[0.95] tracking-[-0.08em] text-foreground">
+              <h2 className="mt-3 text-[clamp(2rem,4.5vw,3.8rem)] font-black leading-[0.96] tracking-[-0.07em] text-foreground">
                 {title}
               </h2>
-              <p className="mt-4 text-base leading-7 text-muted-foreground sm:text-lg">{description}</p>
+              <p className="mt-4 text-sm leading-6 text-muted-foreground sm:text-base">{description}</p>
             </div>
 
             <div className="mt-8">{children}</div>
@@ -527,7 +527,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
           <StepContainer
             step="signup"
             title={isKorean ? '기본 정보를 입력해 주세요.' : 'Tell us the essentials.'}
-            description={isKorean ? '이미지 없이도 완성도 있는 인증 경험이 되도록 간결하고 부드럽게 구성했어요.' : 'A cleaner sign-up flow with a polished layout, ready for both mobile and web.'}
+            description={isKorean ? '계정 생성을 위해 필요한 기본 정보를 입력해 주세요.' : 'Enter the basic information needed to create your account.'}
             onBack={goBack}
             currentIndex={currentIndex}
           >
@@ -540,8 +540,8 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                   </h3>
                   <p className="mt-4 text-sm leading-7 text-muted-foreground">
                     {isKorean
-                      ? '회원가입이 끝나면 체지방 목표와 선호 운동을 바탕으로 다음 화면에서 칼로리와 운동 방향을 연결해 드립니다.'
-                      : 'Once you sign up, we use your target and preferred exercise to connect calorie guidance with the right training path.'}
+                      ? '회원가입 후에는 목표와 선호 운동을 기준으로 다음 단계를 진행합니다.'
+                      : 'After sign-up, the next step uses your goal and preferred exercise.'}
                   </p>
                 </div>
 
@@ -552,7 +552,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
                     <span className="pb-2 text-lg text-muted-foreground">{isKorean ? 'body fat goal' : 'body fat goal'}</span>
                   </div>
                   <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                    {isKorean ? '이 목표를 기준으로 시작 칼로리와 추천 흐름을 제안합니다.' : 'We use this target to suggest your starting calories and training flow.'}
+                    {isKorean ? '입력한 목표를 기준으로 다음 단계가 설정됩니다.' : 'The next step is set from this target.'}
                   </p>
                 </div>
               </div>

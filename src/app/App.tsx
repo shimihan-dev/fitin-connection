@@ -127,7 +127,7 @@ export default function App() {
       case 'workout':     return <WorkoutGuide user={user} />;
       case 'competition': return <CompetitionPage user={user} />;
       case 'routine':     return <RoutinePlanner user={user} />;
-      case 'progress':    return <Progress user={user} />;
+      case 'progress':    return <Progress user={user} onNavigate={setCurrentPage} />;
       case 'diet':        return <Diet user={user} />;
       case 'board':       return <Board user={user} />;
       case 'admin':       return <AdminDashboard onBack={() => setCurrentPage('home')} />;
@@ -145,16 +145,22 @@ export default function App() {
 
       <Header
         user={user}
+        currentPage={currentPage}
+        onNavigate={(page) => {
+          setCurrentPage(page);
+          setShowMyPage(false);
+          setShowNotifications(false);
+        }}
         onLogout={handleLogoutWithRedirect}
         onLoginSuccess={handleLoginSuccessWithSlides}
         onMyPageClick={() => setShowMyPage(true)}
         onNotificationsClick={() => { setShowNotifications(true); setShowMyPage(false); }}
-        showBackButton={currentPage !== 'home' || showMyPage || showNotifications}
+        showBackButton={showMyPage || showNotifications}
         onBack={() => { setCurrentPage('home'); setShowMyPage(false); setShowNotifications(false); }}
       />
 
       <main className={`flex-1 overflow-y-auto pt-18 scroll-smooth ${showBottomNav ? 'pb-24 md:pb-0' : ''}`}>
-        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8 pb-8">
+        <div className="mx-auto max-w-[1520px] px-4 sm:px-6 lg:px-8 pb-10">
           <Suspense fallback={<PageSpinner />}>
             {showNotifications ? (
               <NotificationsPage />

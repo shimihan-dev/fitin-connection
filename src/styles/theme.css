@@ -213,6 +213,18 @@
     @apply inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/80 px-3 py-1 text-[11px] font-semibold tracking-[0.18em] uppercase text-[#1d4ed8] shadow-[0_8px_24px_rgba(15,23,42,0.06)];
   }
 
+  .apple-segmented {
+    @apply inline-flex items-center rounded-full border border-white/80 bg-white/74 p-1.5 shadow-[0_10px_28px_rgba(15,23,42,0.06)] backdrop-blur-xl;
+  }
+
+  .apple-micro-card {
+    @apply rounded-[20px] border border-white/70 bg-white/66 px-4 py-3 shadow-[0_10px_28px_rgba(15,23,42,0.05)] backdrop-blur-xl;
+  }
+
+  .apple-divider {
+    @apply h-px bg-[linear-gradient(90deg,transparent,rgba(148,163,184,0.35),transparent)];
+  }
+
   .apple-input {
     @apply h-14 rounded-[20px] border border-white/80 bg-white/92 px-4 text-base shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition-shadow focus-visible:ring-4 focus-visible:ring-primary/10;
   }

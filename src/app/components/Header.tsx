@@ -13,12 +13,15 @@ import {
   X,
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
-import { Button } from './ui/button';
 import { WorkoutDictionary } from './WorkoutDictionary';
 import { useLanguage } from '../contexts/LanguageContext';
 
+type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
+
 interface HeaderProps {
   user: { name: string; email: string; profile_picture?: string } | null;
+  currentPage?: Page;
+  onNavigate?: (page: Page) => void;
   onLogout: () => void;
   onLoginSuccess?: (_user: unknown) => void;
   onSignupClick?: () => void;
@@ -30,10 +33,19 @@ interface HeaderProps {
 }
 
 const iconButtonClass =
-  'flex h-11 w-11 items-center justify-center rounded-full border border-white/80 bg-white/72 text-foreground shadow-[0_10px_28px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-white';
+  'flex h-10 w-10 items-center justify-center rounded-full bg-white/78 text-foreground shadow-[0_12px_24px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-white';
+
+const navItems: { id: Page; label: string; match: (page?: Page) => boolean }[] = [
+  { id: 'home', label: 'Dashboard', match: (page) => page === 'home' },
+  { id: 'workout', label: 'Workouts', match: (page) => ['workout', 'routine', 'progress', 'competition'].includes(page || '') },
+  { id: 'diet', label: 'Nutrition', match: (page) => page === 'diet' },
+  { id: 'board', label: 'Community', match: (page) => page === 'board' },
+];
 
 export function Header({
   user,
+  currentPage,
+  onNavigate,
   onLogout,
   onMyPageClick,
   onNotificationsClick,
@@ -50,12 +62,13 @@ export function Header({
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between rounded-full border border-white/80 bg-white/72 px-4 py-3 shadow-[0_14px_40px_rgba(15,23,42,0.10)] backdrop-blur-2xl sm:px-5">
-          <div className="flex items-center gap-3">
+        <div className="mx-auto flex max-w-[1520px] items-center gap-4 rounded-full bg-white/66 px-4 py-3 shadow-[0_18px_50px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:px-5 lg:px-6">
+          <div className="flex min-w-0 items-center gap-3">
             {showBackButton && (
               <button
+                type="button"
                 onClick={onBack}
-                className={`${iconButtonClass} h-10 w-10`}
+                className={`${iconButtonClass} shrink-0`}
                 aria-label={t('common.back')}
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -64,42 +77,55 @@ export function Header({
 
             <button
               type="button"
-              onClick={() => onMyPageClick?.()}
-              className="flex items-center gap-3 rounded-full pr-2 transition-transform hover:scale-[1.01]"
+              onClick={() => onNavigate?.('home')}
+              className="flex min-w-0 items-center gap-3 rounded-full pr-1 text-left"
             >
-              <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-[radial-gradient(circle_at_30%_30%,#ffb44d,#ff9a3c_60%,#f0882a)] text-lg font-semibold text-slate-950 shadow-[0_10px_24px_rgba(255,153,46,0.28)]">
-                {user?.profile_picture ? (
-                  <img src={user.profile_picture} alt="profile" className="h-full w-full object-cover" />
-                ) : (
-                  userInitial
-                )}
-              </div>
-              <div className="text-left leading-tight">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[radial-gradient(circle_at_30%_30%,#ffcb75,#ffb14d_58%,#f59326)] text-slate-950 shadow-[0_12px_28px_rgba(245,147,38,0.28)]">
+                <Dumbbell className="h-5 w-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
                   Daily Fitness
-                </p>
-                <p className="text-lg font-black tracking-[-0.04em] text-foreground">Fitin_Connection</p>
-              </div>
+                </span>
+                <span className="block truncate text-xl font-black tracking-[-0.06em] text-foreground">
+                  Fitin_Connection
+                </span>
+              </span>
             </button>
           </div>
 
-          <div className="hidden items-center gap-2 md:flex">
+          <nav className="hidden flex-1 items-center justify-center lg:flex">
+            <div className="inline-flex items-center gap-1 rounded-full bg-white/70 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+              {navItems.map((item) => {
+                const isActive = item.match(currentPage);
+
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => onNavigate?.(item.id)}
+                    className={`rounded-full px-5 py-2.5 text-sm font-medium transition-all ${
+                      isActive
+                        ? 'bg-white text-primary shadow-[0_12px_24px_rgba(15,23,42,0.08)]'
+                        : 'text-slate-500 hover:text-foreground'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+
+          <div className="ml-auto hidden items-center gap-2 md:flex">
             <button
               type="button"
               onClick={() => setLanguage(language === 'ko' ? 'en' : 'ko')}
-              className={`${iconButtonClass} px-3 w-auto gap-2`}
+              className="apple-segmented px-3"
               aria-label="Change Language"
             >
-              <Globe className="h-4 w-4" />
-              <span className="text-xs font-semibold">{language === 'ko' ? 'KO' : 'EN'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowDictionary(true)}
-              className={iconButtonClass}
-              aria-label={t('header.dictionary')}
-            >
-              <BookOpen className="h-4 w-4" />
+              <Globe className="h-4 w-4 text-primary" />
+              <span className="text-xs font-semibold text-foreground">{language === 'ko' ? 'KO' : 'EN'}</span>
             </button>
             <button
               type="button"
@@ -117,13 +143,25 @@ export function Header({
             >
               <Settings2 className="h-4 w-4" />
             </button>
+            <button
+              type="button"
+              onClick={() => onMyPageClick?.()}
+              className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-[radial-gradient(circle_at_30%_30%,#edf4ff,#dbe8ff_58%,#c8dafc)] text-sm font-bold text-primary shadow-[0_12px_24px_rgba(15,23,42,0.08)]"
+              aria-label={t('common.mypage')}
+            >
+              {user?.profile_picture ? (
+                <img src={user.profile_picture} alt="profile" className="h-full w-full object-cover" />
+              ) : (
+                userInitial
+              )}
+            </button>
           </div>
 
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="ml-auto flex items-center gap-2 md:hidden">
             <button
               type="button"
               onClick={() => onNotificationsClick?.()}
-              className={`${iconButtonClass} h-10 w-10`}
+              className={iconButtonClass}
               aria-label={t('header.notifications')}
             >
               <Bell className="h-4 w-4" />
@@ -131,7 +169,7 @@ export function Header({
             <button
               type="button"
               onClick={() => setShowMobileMenu((prev) => !prev)}
-              className={`${iconButtonClass} h-10 w-10`}
+              className={iconButtonClass}
               aria-label="Open menu"
             >
               {showMobileMenu ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -140,65 +178,89 @@ export function Header({
         </div>
 
         {showMobileMenu && (
-          <div className="mx-auto mt-3 max-w-[1200px] md:hidden">
+          <div className="mx-auto mt-3 max-w-[1520px] md:hidden">
             <div className="apple-shell px-4 py-4">
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowDictionary(true);
-                    setShowMobileMenu(false);
-                  }}
-                  className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
-                >
-                  <span>
-                    <span className="apple-kicker">Library</span>
-                    <span className="mt-1 block text-sm font-semibold">Workout Dictionary</span>
-                  </span>
-                  <BookOpen className="h-5 w-5 text-primary" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLanguage(language === 'ko' ? 'en' : 'ko');
-                    setShowMobileMenu(false);
-                  }}
-                  className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
-                >
-                  <span>
-                    <span className="apple-kicker">Language</span>
-                    <span className="mt-1 block text-sm font-semibold">{language === 'ko' ? 'Switch to EN' : 'Switch to KO'}</span>
-                  </span>
-                  <Globe className="h-5 w-5 text-primary" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onMyPageClick?.();
-                    setShowMobileMenu(false);
-                  }}
-                  className="apple-soft-card col-span-2 flex items-center justify-between px-4 py-4 text-left"
-                >
-                  <span>
-                    <span className="apple-kicker">Profile</span>
-                    <span className="mt-1 block text-sm font-semibold">{t('common.mypage')}</span>
-                  </span>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowAccountDialog(true);
-                    setShowMobileMenu(false);
-                  }}
-                  className="apple-soft-card col-span-2 flex items-center justify-between px-4 py-4 text-left"
-                >
-                  <span>
-                    <span className="apple-kicker">Settings</span>
-                    <span className="mt-1 block text-sm font-semibold">{t('common.system_settings')}</span>
-                  </span>
-                  <Settings2 className="h-5 w-5 text-primary" />
-                </button>
+              <div className="grid gap-3">
+                <div className="grid grid-cols-2 gap-3">
+                  {navItems.map((item) => {
+                    const isActive = item.match(currentPage);
+
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => {
+                          onNavigate?.(item.id);
+                          setShowMobileMenu(false);
+                        }}
+                        className={`rounded-[22px] px-4 py-4 text-left text-sm font-semibold transition-all ${
+                          isActive ? 'bg-blue-50 text-primary' : 'apple-soft-card'
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowDictionary(true);
+                      setShowMobileMenu(false);
+                    }}
+                    className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
+                  >
+                    <span>
+                      <span className="apple-kicker">Library</span>
+                      <span className="mt-1 block text-sm font-semibold">Workout Dictionary</span>
+                    </span>
+                    <BookOpen className="h-5 w-5 text-primary" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLanguage(language === 'ko' ? 'en' : 'ko');
+                      setShowMobileMenu(false);
+                    }}
+                    className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
+                  >
+                    <span>
+                      <span className="apple-kicker">Language</span>
+                      <span className="mt-1 block text-sm font-semibold">{language === 'ko' ? 'Switch to EN' : 'Switch to KO'}</span>
+                    </span>
+                    <Globe className="h-5 w-5 text-primary" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onMyPageClick?.();
+                      setShowMobileMenu(false);
+                    }}
+                    className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
+                  >
+                    <span>
+                      <span className="apple-kicker">Profile</span>
+                      <span className="mt-1 block text-sm font-semibold">{t('common.mypage')}</span>
+                    </span>
+                    <User className="h-5 w-5 text-primary" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAccountDialog(true);
+                      setShowMobileMenu(false);
+                    }}
+                    className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
+                  >
+                    <span>
+                      <span className="apple-kicker">Settings</span>
+                      <span className="mt-1 block text-sm font-semibold">{t('common.system_settings')}</span>
+                    </span>
+                    <Settings2 className="h-5 w-5 text-primary" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -208,15 +270,15 @@ export function Header({
       <WorkoutDictionary open={showDictionary} onOpenChange={setShowDictionary} />
 
       <Dialog open={showAccountDialog} onOpenChange={setShowAccountDialog}>
-        <DialogContent className="max-w-[calc(100%-1.5rem)] rounded-[28px] border-white/80 bg-white/88 p-0 shadow-[0_28px_80px_rgba(15,23,42,0.14)] backdrop-blur-2xl sm:max-w-md">
-          <div className="relative overflow-hidden rounded-[28px] p-6">
+        <DialogContent className="max-w-[calc(100%-1.5rem)] rounded-[30px] border-white/80 bg-white/90 p-0 shadow-[0_28px_80px_rgba(15,23,42,0.14)] backdrop-blur-2xl sm:max-w-md">
+          <div className="relative overflow-hidden rounded-[30px] p-6">
             <div className="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top_left,rgba(20,99,255,0.22),transparent_60%),radial-gradient(circle_at_top_right,rgba(56,189,248,0.18),transparent_55%)]" />
             <DialogHeader className="relative space-y-2 text-left">
               <DialogTitle className="text-2xl font-black tracking-[-0.05em] text-foreground">
                 {t('common.system_settings')}
               </DialogTitle>
               <DialogDescription className="text-sm leading-6 text-muted-foreground">
-                {user?.name || 'Fitin'} 계정과 앱 환경을 관리할 수 있어요.
+                {user?.name || 'Fitin'} 계정과 앱 환경을 한 곳에서 관리할 수 있어요.
               </DialogDescription>
             </DialogHeader>
 
@@ -259,22 +321,53 @@ export function Header({
 
               <button
                 type="button"
-                onClick={() => {
-                  setShowAccountDialog(false);
-                  onLogout();
-                }}
-                className="apple-soft-card flex w-full items-center justify-between px-4 py-4 text-left text-destructive"
+                onClick={() => setShowDictionary(true)}
+                className="apple-soft-card flex w-full items-center justify-between px-4 py-4 text-left"
               >
                 <span className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-destructive">
-                    <LogOut className="h-4 w-4" />
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-primary">
+                    <BookOpen className="h-4 w-4" />
                   </span>
                   <span>
-                    <span className="block text-sm font-semibold">{t('common.logout')}</span>
-                    <span className="text-xs text-muted-foreground">현재 세션에서 로그아웃</span>
+                    <span className="block text-sm font-semibold text-foreground">Workout Dictionary</span>
+                    <span className="text-xs text-muted-foreground">운동 용어와 동작 가이드를 빠르게 확인</span>
                   </span>
                 </span>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setLanguage(language === 'ko' ? 'en' : 'ko')}
+                className="apple-soft-card flex w-full items-center justify-between px-4 py-4 text-left"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-primary">
+                    <Globe className="h-4 w-4" />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-foreground">Language</span>
+                    <span className="text-xs text-muted-foreground">{language === 'ko' ? '한국어에서 English로 전환' : 'Switch from English to Korean'}</span>
+                  </span>
+                </span>
+                <span className="text-xs font-semibold text-primary">{language === 'ko' ? 'KO' : 'EN'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={onLogout}
+                className="apple-soft-card flex w-full items-center justify-between px-4 py-4 text-left text-destructive"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-50 text-destructive">
+                    <LogOut className="h-4 w-4" />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold">Logout</span>
+                    <span className="text-xs text-destructive/70">현재 세션에서 로그아웃</span>
+                  </span>
+                </span>
+                <ChevronRight className="h-4 w-4 text-destructive/60" />
               </button>
             </div>
           </div>
