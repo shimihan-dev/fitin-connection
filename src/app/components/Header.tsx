@@ -104,7 +104,7 @@ export function Header({
                     key={item.id}
                     type="button"
                     onClick={() => onNavigate?.(item.id)}
-                    className={`rounded-full px-5 py-2.5 text-sm font-medium transition-all ${
+                    className={`whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-medium transition-all ${
                       isActive
                         ? 'bg-white text-primary shadow-[0_12px_24px_rgba(15,23,42,0.08)]'
                         : 'text-slate-500 hover:text-foreground'
@@ -193,7 +193,7 @@ export function Header({
                           onNavigate?.(item.id);
                           setShowMobileMenu(false);
                         }}
-                        className={`rounded-[22px] px-4 py-4 text-left text-sm font-semibold transition-all ${
+                        className={`overflow-hidden whitespace-nowrap rounded-[22px] px-4 py-4 text-left text-sm font-semibold transition-all ${
                           isActive ? 'bg-blue-50 text-primary' : 'apple-soft-card'
                         }`}
                       >
@@ -212,9 +212,9 @@ export function Header({
                     }}
                     className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
                   >
-                    <span>
+                    <span className="min-w-0">
                       <span className="apple-kicker">Library</span>
-                      <span className="mt-1 block text-sm font-semibold">Workout Dictionary</span>
+                      <span className="mt-1 block truncate whitespace-nowrap text-sm font-semibold">Workout Dictionary</span>
                     </span>
                     <BookOpen className="h-5 w-5 text-primary" />
                   </button>
@@ -226,9 +226,9 @@ export function Header({
                     }}
                     className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
                   >
-                    <span>
+                    <span className="min-w-0">
                       <span className="apple-kicker">Language</span>
-                      <span className="mt-1 block text-sm font-semibold">{language === 'ko' ? 'Switch to EN' : 'Switch to KO'}</span>
+                      <span className="mt-1 block truncate whitespace-nowrap text-sm font-semibold">{language === 'ko' ? 'Switch to EN' : 'Switch to KO'}</span>
                     </span>
                     <Globe className="h-5 w-5 text-primary" />
                   </button>
@@ -240,9 +240,9 @@ export function Header({
                     }}
                     className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
                   >
-                    <span>
+                    <span className="min-w-0">
                       <span className="apple-kicker">Profile</span>
-                      <span className="mt-1 block text-sm font-semibold">{t('common.mypage')}</span>
+                      <span className="mt-1 block truncate whitespace-nowrap text-sm font-semibold">{t('common.mypage')}</span>
                     </span>
                     <User className="h-5 w-5 text-primary" />
                   </button>
@@ -254,9 +254,9 @@ export function Header({
                     }}
                     className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
                   >
-                    <span>
+                    <span className="min-w-0">
                       <span className="apple-kicker">Settings</span>
-                      <span className="mt-1 block text-sm font-semibold">{t('common.system_settings')}</span>
+                      <span className="mt-1 block truncate whitespace-nowrap text-sm font-semibold">{t('common.system_settings')}</span>
                     </span>
                     <Settings2 className="h-5 w-5 text-primary" />
                   </button>
@@ -274,7 +274,7 @@ export function Header({
           <div className="relative overflow-hidden rounded-[30px] p-6">
             <div className="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top_left,rgba(20,99,255,0.22),transparent_60%),radial-gradient(circle_at_top_right,rgba(56,189,248,0.18),transparent_55%)]" />
             <DialogHeader className="relative space-y-2 text-left">
-              <DialogTitle className="text-2xl font-black tracking-[-0.05em] text-foreground">
+              <DialogTitle className="whitespace-nowrap text-2xl font-black tracking-[-0.05em] text-foreground">
                 {t('common.system_settings')}
               </DialogTitle>
               <DialogDescription className="text-sm leading-6 text-muted-foreground">
@@ -291,9 +291,9 @@ export function Header({
                     userInitial
                   )}
                 </div>
-                <div>
-                  <p className="text-base font-semibold text-foreground">{user?.name}</p>
-                  <p className="text-sm text-muted-foreground">{user?.email}</p>
+                <div className="min-w-0">
+                  <p className="truncate whitespace-nowrap text-base font-semibold text-foreground">{user?.name}</p>
+                  <p className="truncate whitespace-nowrap text-sm text-muted-foreground">{user?.email}</p>
                 </div>
               </div>
             </div>
@@ -311,9 +311,9 @@ export function Header({
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-primary">
                     <User className="h-4 w-4" />
                   </span>
-                  <span>
-                    <span className="block text-sm font-semibold text-foreground">{t('common.mypage')}</span>
-                    <span className="text-xs text-muted-foreground">프로필과 개인 설정</span>
+                  <span className="min-w-0">
+                    <span className="block whitespace-nowrap text-sm font-semibold text-foreground">{t('common.mypage')}</span>
+                    <span className="block truncate text-xs text-muted-foreground">프로필과 설정</span>
                   </span>
                 </span>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -328,9 +328,9 @@ export function Header({
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-primary">
                     <BookOpen className="h-4 w-4" />
                   </span>
-                  <span>
-                    <span className="block text-sm font-semibold text-foreground">Workout Dictionary</span>
-                    <span className="text-xs text-muted-foreground">운동 용어와 동작 가이드를 빠르게 확인</span>
+                  <span className="min-w-0">
+                    <span className="block whitespace-nowrap text-sm font-semibold text-foreground">Workout Dictionary</span>
+                    <span className="block truncate text-xs text-muted-foreground">운동 사전 열기</span>
                   </span>
                 </span>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -345,9 +345,9 @@ export function Header({
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-primary">
                     <Globe className="h-4 w-4" />
                   </span>
-                  <span>
-                    <span className="block text-sm font-semibold text-foreground">Language</span>
-                    <span className="text-xs text-muted-foreground">{language === 'ko' ? '한국어에서 English로 전환' : 'Switch from English to Korean'}</span>
+                  <span className="min-w-0">
+                    <span className="block whitespace-nowrap text-sm font-semibold text-foreground">Language</span>
+                    <span className="block truncate text-xs text-muted-foreground">{language === 'ko' ? 'English로 전환' : '한국어로 전환'}</span>
                   </span>
                 </span>
                 <span className="text-xs font-semibold text-primary">{language === 'ko' ? 'KO' : 'EN'}</span>
@@ -362,9 +362,9 @@ export function Header({
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-50 text-destructive">
                     <LogOut className="h-4 w-4" />
                   </span>
-                  <span>
-                    <span className="block text-sm font-semibold">Logout</span>
-                    <span className="text-xs text-destructive/70">현재 세션에서 로그아웃</span>
+                  <span className="min-w-0">
+                    <span className="block whitespace-nowrap text-sm font-semibold">Logout</span>
+                    <span className="block truncate text-xs text-destructive/70">계정 로그아웃</span>
                   </span>
                 </span>
                 <ChevronRight className="h-4 w-4 text-destructive/60" />

@@ -42,10 +42,10 @@ export function Progress({ user, onNavigate }: ProgressProps) {
   const content = isKorean
     ? {
         heroKicker: 'Performance Analysis',
-        heroTitle: '활동 흐름이 가장\n좋은 구간이에요.',
+        heroTitle: '활동 흐름이 가장 좋아요.',
         heroBody: '주간 목표를 이미 넘어섰어요. 지금은 회복 세션과 수분 밸런스를 함께 챙기면 다음 이틀이 더 안정적입니다.',
-        secondaryCta: '대시보드 보기',
-        primaryCta: '운동 기록 추가',
+        secondaryCta: '대시보드',
+        primaryCta: '기록 추가',
         summaryStats: ['일 평균', '활동 일수', '수분 섭취'],
         chartTitle: 'Weekly Intensity',
         chartBody: '활동 시간과 회복 리듬을 함께 보는 이번 주 흐름',
@@ -76,10 +76,10 @@ export function Progress({ user, onNavigate }: ProgressProps) {
       }
     : {
         heroKicker: 'Performance Analysis',
-        heroTitle: 'Your activity is\npeaking.',
+        heroTitle: 'Your activity is peaking.',
         heroBody: 'You have already pushed past your weekly target. Prioritize recovery blocks and hydration over the next 48 hours.',
-        secondaryCta: 'Open Dashboard',
-        primaryCta: 'Log Session',
+        secondaryCta: 'Dashboard',
+        primaryCta: 'Add Log',
         summaryStats: ['Avg day', 'Active days', 'Hydration'],
         chartTitle: 'Weekly Intensity',
         chartBody: 'A live view of your active minutes against recovery rhythm',
@@ -244,7 +244,7 @@ export function Progress({ user, onNavigate }: ProgressProps) {
             <header className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
               <div>
                 <p className="apple-kicker">{content.heroKicker}</p>
-                <h1 className="mt-4 whitespace-pre-line text-[clamp(2.8rem,6vw,5rem)] font-black leading-[0.92] tracking-[-0.08em] text-foreground">
+                <h1 className="mt-4 max-w-full text-[clamp(2.35rem,5vw,4.7rem)] font-black leading-[0.94] tracking-[-0.08em] text-foreground lg:whitespace-nowrap">
                   {content.heroTitle}
                 </h1>
                 <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
@@ -252,7 +252,7 @@ export function Progress({ user, onNavigate }: ProgressProps) {
                 </p>
                 <div className="mt-6 grid gap-3 sm:grid-cols-3">
                   <div className="apple-micro-card">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                    <p className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                       {content.summaryStats[0]}
                     </p>
                     <p className="mt-2 text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
@@ -260,7 +260,7 @@ export function Progress({ user, onNavigate }: ProgressProps) {
                     </p>
                   </div>
                   <div className="apple-micro-card">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                    <p className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                       {content.summaryStats[1]}
                     </p>
                     <p className="mt-2 text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
@@ -268,7 +268,7 @@ export function Progress({ user, onNavigate }: ProgressProps) {
                     </p>
                   </div>
                   <div className="apple-micro-card">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                    <p className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                       {content.summaryStats[2]}
                     </p>
                     <p className="mt-2 text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
@@ -303,7 +303,7 @@ export function Progress({ user, onNavigate }: ProgressProps) {
                 <div className="relative flex flex-col">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <h2 className="text-[2rem] font-black tracking-[-0.06em] text-foreground">
+                      <h2 className="whitespace-nowrap text-[2rem] font-black tracking-[-0.06em] text-foreground">
                         {content.chartTitle}
                       </h2>
                       <p className="mt-2 text-sm text-muted-foreground">{content.chartBody}</p>
@@ -363,14 +363,14 @@ export function Progress({ user, onNavigate }: ProgressProps) {
                   <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-primary">
                     <Footprints className="h-5 w-5" />
                   </span>
-                  <span className="text-sm font-bold text-orange-600">
+                  <span className="whitespace-nowrap text-sm font-bold text-orange-600">
                     +{Math.max(1.1, (stepsToday - 10000) / 1000).toFixed(1)}k {content.todayGain}
                   </span>
                 </div>
                 <h3 className="mt-10 text-5xl font-black tracking-[-0.08em] text-foreground">
                   {stepsToday.toLocaleString()}
                 </h3>
-                <p className="mt-2 text-base text-muted-foreground">{content.stepsLabel}</p>
+                <p className="mt-2 whitespace-nowrap text-base text-muted-foreground">{content.stepsLabel}</p>
                 <p className="mt-4 text-sm font-semibold text-primary">+{activityDelta}% {content.fromLastWeek}</p>
                 <div className="mt-14 rounded-[24px] bg-slate-100/90 p-4">
                   <div className="flex items-center justify-between text-xs font-semibold">
@@ -412,7 +412,7 @@ export function Progress({ user, onNavigate }: ProgressProps) {
               <div className="relative overflow-hidden rounded-[34px] bg-[linear-gradient(160deg,#22242b,#1d1f25_58%,#30333c)] p-6 text-white shadow-[0_28px_80px_rgba(17,24,39,0.18)] xl:col-span-5 sm:p-7">
                 <div className="absolute -bottom-10 -right-10 h-44 w-44 rounded-full bg-white/12" />
                 <div className="relative">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60">
+                  <p className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60">
                     {content.heartLabel}
                   </p>
                   <div className="mt-8 flex items-end gap-2">
@@ -443,7 +443,7 @@ export function Progress({ user, onNavigate }: ProgressProps) {
 
               <div className="apple-panel xl:col-span-3 p-6 sm:p-7">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
+                  <h3 className="whitespace-nowrap text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
                     {content.nutritionLabel}
                   </h3>
                   <button
@@ -486,7 +486,7 @@ export function Progress({ user, onNavigate }: ProgressProps) {
 
           <section className="space-y-5">
             <div className="flex items-center justify-between px-1">
-              <h2 className="text-[2rem] font-black tracking-[-0.06em] text-foreground">
+              <h2 className="whitespace-nowrap text-[2rem] font-black tracking-[-0.06em] text-foreground">
                 {content.recentTitle}
               </h2>
               <button
@@ -646,8 +646,8 @@ export function Progress({ user, onNavigate }: ProgressProps) {
 function MetricCell({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-[22px] bg-slate-50 px-4 py-3 text-center">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
-      <p className="mt-2 text-base font-bold tracking-[-0.04em] text-foreground">{value}</p>
+      <p className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
+      <p className="mt-2 whitespace-nowrap text-base font-bold tracking-[-0.04em] text-foreground">{value}</p>
     </div>
   );
 }

@@ -60,8 +60,8 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
         openNutrition: '영양 보기',
         fuelStatus: 'Fuel Status',
         communityTitle: 'Fitin Circle',
-        communityLink: '전체 활동 보기',
-        recoveryTitle: 'Personalized Recovery',
+        communityLink: '활동 보기',
+        recoveryTitle: 'Recovery Picks',
         recoveryCards: [
           {
             title: '호흡 세션',
@@ -96,7 +96,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
         liveCircle: '실시간 활동',
         macroNote: '저녁 식사 전 단백질만 조금 더 보완하면 균형이 좋아져요.',
         rhythmNote: '가장 강했던 흐름',
-        openRecovery: '회복 루틴 보기',
+        openRecovery: '루틴 보기',
       }
     : {
         heroKicker: 'Dashboard',
@@ -117,8 +117,8 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
         openNutrition: 'Open Nutrition',
         fuelStatus: 'Fuel Status',
         communityTitle: 'Fitin Circle',
-        communityLink: 'See all activity',
-        recoveryTitle: 'Personalized Recovery',
+        communityLink: 'See activity',
+        recoveryTitle: 'Recovery Picks',
         recoveryCards: [
           {
             title: 'Breathwork session',
@@ -306,7 +306,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
             <header className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_auto] xl:items-end">
               <div>
                 <p className="apple-kicker">{content.heroKicker}</p>
-                <h1 className="mt-4 max-w-[12ch] text-[clamp(2.8rem,6vw,5rem)] font-black leading-[0.92] tracking-[-0.08em] text-foreground">
+                <h1 className="mt-4 max-w-full text-[clamp(2.35rem,5vw,4.8rem)] font-black leading-[0.94] tracking-[-0.08em] text-foreground lg:whitespace-nowrap">
                   {greeting}
                   <span className="text-primary">.</span>
                 </h1>
@@ -315,7 +315,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                 </p>
                 <div className="mt-6 grid gap-3 sm:grid-cols-3">
                   <div className="apple-micro-card">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                    <p className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                       {content.summaryStats[0]}
                     </p>
                     <p className="mt-2 text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
@@ -323,7 +323,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                     </p>
                   </div>
                   <div className="apple-micro-card">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                    <p className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                       {content.summaryStats[1]}
                     </p>
                     <p className="mt-2 text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
@@ -331,7 +331,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                     </p>
                   </div>
                   <div className="apple-micro-card">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                    <p className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                       {content.summaryStats[2]}
                     </p>
                     <p className="mt-2 text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
@@ -370,7 +370,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className="apple-kicker">{content.activityLabel}</p>
-                        <h2 className="mt-3 text-3xl font-black tracking-[-0.06em] text-foreground sm:text-[2.35rem]">
+                        <h2 className="mt-3 whitespace-nowrap text-3xl font-black tracking-[-0.06em] text-foreground sm:text-[2.35rem]">
                           {content.activityTitle}
                         </h2>
                       </div>
@@ -384,17 +384,17 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
 
                     <div className="mt-12 grid gap-4 sm:grid-cols-3">
                       <div className="apple-soft-card px-4 py-4">
-                        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{content.sessionsLabel}</p>
+                        <p className="whitespace-nowrap text-xs uppercase tracking-[0.18em] text-muted-foreground">{content.sessionsLabel}</p>
                         <p className="mt-2 text-2xl font-black tracking-[-0.05em] text-foreground">{Math.max(3, sessionsThisWeek || 4)}</p>
                       </div>
                       <div className="apple-soft-card px-4 py-4">
-                        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{content.weeklyTotalLabel}</p>
+                        <p className="whitespace-nowrap text-xs uppercase tracking-[0.18em] text-muted-foreground">{content.weeklyTotalLabel}</p>
                         <p className="mt-2 text-2xl font-black tracking-[-0.05em] text-foreground">
                           {weeklyTotalMinutes} {content.minutesUnit}
                         </p>
                       </div>
                       <div className="apple-soft-card px-4 py-4">
-                        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{content.peakLabel}</p>
+                        <p className="whitespace-nowrap text-xs uppercase tracking-[0.18em] text-muted-foreground">{content.peakLabel}</p>
                         <p className="mt-2 text-2xl font-black tracking-[-0.05em] text-foreground">{peakDay.label}</p>
                         <p className="mt-1 text-xs font-semibold text-muted-foreground">{peakDay.minutes} {content.minutesUnit}</p>
                       </div>
@@ -404,7 +404,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                       <p className="text-sm font-medium text-muted-foreground">
                         {content.movementFocus}: {content.movementBody}
                       </p>
-                      <div className="flex flex-wrap items-end gap-2">
+                      <div className="flex flex-wrap items-end gap-2 sm:flex-nowrap">
                         <span className="text-[clamp(3.4rem,8vw,5.4rem)] font-black leading-none tracking-[-0.1em] text-foreground">
                           {steps.toLocaleString()}
                         </span>
@@ -419,8 +419,8 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                         />
                       </div>
                       <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-                        <span>{content.goalLabel}: {stepsGoal.toLocaleString()}</span>
-                        <span>{content.rhythmNote}: {peakDay.label}</span>
+                        <span className="whitespace-nowrap">{content.goalLabel}: {stepsGoal.toLocaleString()}</span>
+                        <span className="whitespace-nowrap">{content.rhythmNote}: {peakDay.label}</span>
                       </div>
                     </div>
                   </div>
@@ -429,7 +429,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="apple-panel p-6 sm:p-7">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
+                      <h3 className="whitespace-nowrap text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
                         {content.fuelStatus}
                       </h3>
                       <span className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-foreground">
@@ -448,7 +448,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                   <div className="apple-panel p-6 sm:p-7">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
+                        <h3 className="whitespace-nowrap text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
                           {content.communityTitle}
                         </h3>
                         <p className="mt-1 text-sm text-muted-foreground">{content.liveCircle}</p>
@@ -498,7 +498,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                           </span>
                           <span className={`text-sm font-bold ${card.tone}`}>{card.note}</span>
                         </div>
-                        <p className="mt-10 text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+                        <p className="mt-10 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
                           {card.title}
                         </p>
                         <div className="mt-2 flex items-end gap-1.5">
@@ -524,7 +524,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[22px] bg-white/10 backdrop-blur-sm">
                             <Dumbbell className="h-7 w-7 text-white" />
                           </div>
-                          <p className="max-w-[14ch] text-4xl font-black leading-[0.94] tracking-[-0.08em]">
+                          <p className="text-[clamp(1.95rem,3.1vw,2.85rem)] font-black leading-[0.96] tracking-[-0.08em] sm:whitespace-nowrap">
                             {content.featuredTitle}
                           </p>
                           <p className="mt-3 max-w-[18ch] text-sm leading-6 text-white/72">
@@ -536,7 +536,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
 
                     <div className="p-6 sm:p-7">
                       <p className="apple-kicker">{content.featuredTag}</p>
-                      <h3 className="mt-3 text-[2rem] font-black leading-[1] tracking-[-0.06em] text-foreground">
+                      <h3 className="mt-3 text-[clamp(1.7rem,2.6vw,2.15rem)] font-black leading-[1] tracking-[-0.06em] text-foreground sm:whitespace-nowrap">
                         {content.featuredTitle}
                       </h3>
                       <p className="mt-4 text-base leading-7 text-muted-foreground">
@@ -549,13 +549,13 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                       </div>
                       <div className="mt-8 grid gap-3 sm:grid-cols-2">
                         <div className="apple-soft-card px-4 py-4">
-                          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                          <p className="whitespace-nowrap text-xs uppercase tracking-[0.18em] text-muted-foreground">
                             {isKorean ? '예상 시간' : 'Duration'}
                           </p>
                           <p className="mt-2 text-xl font-bold tracking-[-0.04em] text-foreground">{content.featuredDuration}</p>
                         </div>
                         <div className="apple-soft-card px-4 py-4">
-                          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                          <p className="whitespace-nowrap text-xs uppercase tracking-[0.18em] text-muted-foreground">
                             {isKorean ? '강도' : 'Intensity'}
                           </p>
                           <p className="mt-2 text-xl font-bold tracking-[-0.04em] text-foreground">{content.featuredLevel}</p>
@@ -587,7 +587,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="apple-kicker">{content.activityLabel}</p>
-                      <h3 className="mt-2 text-[1.75rem] font-black tracking-[-0.06em] text-foreground">
+                      <h3 className="mt-2 whitespace-nowrap text-[1.75rem] font-black tracking-[-0.06em] text-foreground">
                         {isKorean ? '주간 흐름' : 'Weekly Rhythm'}
                       </h3>
                       <p className="mt-2 text-sm text-muted-foreground">
@@ -633,8 +633,8 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                     <span className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100 text-violet-600">
                       <Trophy className="h-5 w-5" />
                     </span>
-                    <h3 className="text-xl font-black tracking-tight text-foreground">
-                      {isKorean ? 'SBD 대회 현황' : 'SBD Competition Status'}
+                    <h3 className="whitespace-nowrap text-xl font-black tracking-tight text-foreground">
+                      {isKorean ? 'SBD 현황' : 'SBD Status'}
                     </h3>
                   </div>
                   <button
@@ -665,7 +665,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
 
           <section className="space-y-5">
             <div className="flex items-center justify-between px-1">
-              <h2 className="text-[2rem] font-black tracking-[-0.06em] text-foreground">
+              <h2 className="whitespace-nowrap text-[2rem] font-black tracking-[-0.06em] text-foreground">
                 {content.recoveryTitle}
               </h2>
               <button
@@ -686,7 +686,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                     <span className={`flex h-14 w-14 items-center justify-center rounded-[20px] ${card.bg} ${card.tint}`}>
                       <Icon className="h-5 w-5" />
                     </span>
-                    <h3 className="mt-8 text-[1.65rem] font-black leading-[1.05] tracking-[-0.05em] text-foreground">
+                    <h3 className="mt-8 text-[1.45rem] font-black leading-[1.08] tracking-[-0.05em] text-foreground sm:whitespace-nowrap">
                       {card.title}
                     </h3>
                     <p className="mt-4 text-base leading-7 text-muted-foreground">{card.body}</p>

@@ -586,19 +586,19 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
           <div className="flex bg-muted/50 p-1 rounded-xl border border-border/50 w-fit mx-auto sm:mx-0">
             <button
               onClick={() => setRoutineSubTab('planner')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${routineSubTab === 'planner' ? 'bg-primary text-white shadow-lg shadow-primary/25' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`whitespace-nowrap px-4 py-2 rounded-lg text-sm font-medium transition-all ${routineSubTab === 'planner' ? 'bg-primary text-white shadow-lg shadow-primary/25' : 'text-muted-foreground hover:text-foreground'}`}
             >
               루틴 플래너
             </button>
             <button
               onClick={() => setRoutineSubTab('upper')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${routineSubTab === 'upper' ? 'bg-primary text-white shadow-lg shadow-primary/25' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`whitespace-nowrap px-4 py-2 rounded-lg text-sm font-medium transition-all ${routineSubTab === 'upper' ? 'bg-primary text-white shadow-lg shadow-primary/25' : 'text-muted-foreground hover:text-foreground'}`}
             >
               상체 운동
             </button>
             <button
               onClick={() => setRoutineSubTab('lower')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${routineSubTab === 'lower' ? 'bg-primary text-white shadow-lg shadow-primary/25' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`whitespace-nowrap px-4 py-2 rounded-lg text-sm font-medium transition-all ${routineSubTab === 'lower' ? 'bg-primary text-white shadow-lg shadow-primary/25' : 'text-muted-foreground hover:text-foreground'}`}
             >
               하체 운동
             </button>

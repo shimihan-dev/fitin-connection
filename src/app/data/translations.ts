@@ -12,7 +12,7 @@ export const translations = {
             verifying: '확인 중...',
             changing: '변경 중...',
             user: '사용자',
-            system_settings: '시스템 설정',
+            system_settings: '앱 설정',
             show_welcome_slides: '로그인 후 소개 슬라이드 표시',
         },
         header: {
@@ -127,7 +127,7 @@ export const translations = {
             verifying: 'Verifying...',
             changing: 'Changing...',
             user: 'User',
-            system_settings: 'System Settings',
+            system_settings: 'Settings',
             show_welcome_slides: 'Show welcome slides after login',
         },
         header: {

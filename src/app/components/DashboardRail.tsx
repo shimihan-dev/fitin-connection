@@ -60,15 +60,15 @@ export function DashboardRail({ user, activeSection, onNavigate }: DashboardRail
             )}
           </div>
           <div className="min-w-0">
-            <p className="truncate text-base font-bold tracking-[-0.03em] text-foreground">
+            <p className="truncate whitespace-nowrap text-base font-bold tracking-[-0.03em] text-foreground">
               {user?.name || 'Fitin'} Elite
             </p>
-            <p className="text-xs text-muted-foreground">{labels.membership}</p>
+            <p className="whitespace-nowrap text-xs text-muted-foreground">{labels.membership}</p>
           </div>
         </div>
         <div className="mt-4 flex items-center justify-between px-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          <span>Connected</span>
-          <span className="text-primary">6d streak</span>
+          <span className="whitespace-nowrap">Connected</span>
+          <span className="whitespace-nowrap text-primary">6d streak</span>
         </div>
       </div>
 
@@ -98,7 +98,7 @@ export function DashboardRail({ user, activeSection, onNavigate }: DashboardRail
                 >
                   <Icon className="h-[18px] w-[18px]" />
                 </span>
-                <span>{item.label}</span>
+                <span className="whitespace-nowrap">{item.label}</span>
               </button>
             );
           })}
@@ -108,7 +108,7 @@ export function DashboardRail({ user, activeSection, onNavigate }: DashboardRail
       <div className="rounded-[34px] bg-white/42 p-4 shadow-[0_22px_70px_rgba(15,23,42,0.06)] backdrop-blur-xl">
         <div className="rounded-[26px] bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(246,249,255,0.72))] p-4">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#1d4ed8]">
+            <p className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.22em] text-[#1d4ed8]">
               {labels.weeklyGoal}
             </p>
             <span className="text-sm font-bold text-foreground">82%</span>
@@ -119,7 +119,7 @@ export function DashboardRail({ user, activeSection, onNavigate }: DashboardRail
           <button
             type="button"
             onClick={() => onNavigate('workout')}
-            className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[linear-gradient(135deg,#0f63ff,#0b56dd)] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_34px_rgba(20,99,255,0.24)] transition-transform hover:-translate-y-0.5"
+            className="mt-5 inline-flex w-full items-center justify-center whitespace-nowrap rounded-full bg-[linear-gradient(135deg,#0f63ff,#0b56dd)] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_34px_rgba(20,99,255,0.24)] transition-transform hover:-translate-y-0.5"
           >
             {labels.startWorkout}
           </button>
