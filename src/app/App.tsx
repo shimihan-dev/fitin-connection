@@ -19,11 +19,12 @@ const Board           = lazy(() => import('./components/Board').then(m => ({ def
 const MyPage          = lazy(() => import('./components/MyPage').then(m => ({ default: m.MyPage })));
 const NotificationsPage = lazy(() => import('./components/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
 const CompetitionPage = lazy(() => import('./components/Competition/CompetitionPage').then(m => ({ default: m.CompetitionPage })));
+const AdminDashboard  = lazy(() => import('./components/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
 
 // PT 기능 (Phase 4 - 나중에 추가)
 const TrainerDashboard = lazy(() => import('./components/TrainerDashboard'));
 
-type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
+type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board' | 'admin';
 
 const PageSpinner = () => (
   <div className="flex justify-center items-center pt-20">
@@ -129,6 +130,7 @@ export default function App() {
       case 'progress':    return <Progress user={user} />;
       case 'diet':        return <Diet user={user} />;
       case 'board':       return <Board user={user} />;
+      case 'admin':       return <AdminDashboard onBack={() => setCurrentPage('home')} />;
       default:            return <HomePage user={user} onNavigate={setCurrentPage} />;
     }
   };
@@ -157,7 +159,7 @@ export default function App() {
             {showNotifications ? (
               <NotificationsPage />
             ) : showMyPage ? (
-              <MyPage user={user} onBack={() => setShowMyPage(false)} />
+              <MyPage user={user} onBack={() => setShowMyPage(false)} onAdminClick={() => { setShowMyPage(false); setCurrentPage('admin'); }} />
             ) : (
               renderPage()
             )}

@@ -1,6 +1,6 @@
 import { Activity, Compass, Dumbbell, Home, MessageSquare, Trophy } from 'lucide-react';
 
-type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
+type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board' | 'admin';
 
 interface NavigationProps {
   currentPage: Page;

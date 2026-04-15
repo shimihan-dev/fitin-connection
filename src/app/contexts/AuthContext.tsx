@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { getCurrentUser, signOut, User } from '../../../utils/auth';
 
 interface AuthContextType {
-  user: { name: string; email: string; id?: string; profile_picture?: string; role?: 'user' | 'trainer' } | null;
+  user: { name: string; email: string; id?: string; profile_picture?: string; role?: 'user' | 'trainer' | 'admin' } | null;
   setUser: (u: AuthContextType['user']) => void;
   handleLogout: () => void;
   handleLoginSuccess: (loggedInUser: User) => void;

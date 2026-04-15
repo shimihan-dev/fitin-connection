@@ -17,6 +17,7 @@ export interface User {
     preferred_exercise?: 'running' | 'gym' | 'crossfit';
     sns_link?: string;
     profile_picture?: string;
+    role?: 'admin' | 'trainer' | 'user';
 }
 
 // 회원가입 데이터 타입
@@ -113,7 +114,7 @@ export async function signIn(email: string, password: string, rememberMe: boolea
         // 이메일로 사용자 조회
         const { data: user, error } = await supabase
             .from('users')
-            .select('id, email, name, university, gender, created_at, password_hash, is_deleted, profile_picture')
+            .select('id, email, name, university, gender, created_at, password_hash, is_deleted, profile_picture, role')
             .eq('email', email.toLowerCase())
             .single();
 
@@ -225,7 +226,7 @@ export async function getUserProfile(userId: string): Promise<{ profile: User | 
     try {
         const { data, error } = await supabase
             .from('users')
-            .select('id, email, name, university, gender, created_at, height, weight, age, fitness_goal, body_fat_goal, preferred_exercise, sns_link, profile_picture')
+            .select('id, email, name, university, gender, created_at, height, weight, age, fitness_goal, body_fat_goal, preferred_exercise, sns_link, profile_picture, role')
             .eq('id', userId)
             .single();
 

@@ -10,11 +10,12 @@ import { Switch } from './ui/switch';
 import { supabase } from '../../../utils/supabase/client';
 
 interface MyPageProps {
-    user: { name: string; email: string; id?: string; profile_picture?: string };
+    user: { name: string; email: string; id?: string; profile_picture?: string; role?: string };
     onBack: () => void;
+    onAdminClick?: () => void;
 }
 
-export function MyPage({ user, onBack }: MyPageProps) {
+export function MyPage({ user, onBack, onAdminClick }: MyPageProps) {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [uploadingPicture, setUploadingPicture] = useState(false);
@@ -287,6 +288,19 @@ export function MyPage({ user, onBack }: MyPageProps) {
 
             {/* ── Phase 4: 트레이너 연결 공유 토글 ── */}
             {user.id && <TrainerSharingSection userId={user.id} />}
+
+            {/* 관리자 도구 */}
+            {(user.role === 'admin' || user.email === 'yunsok.shim@gmail.com') && onAdminClick && (
+                <Card className="p-5 border-primary/50 bg-primary/5">
+                    <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2 text-primary">
+                        <Settings className="w-4 h-4" />
+                        관리자 설정
+                    </h3>
+                    <Button onClick={onAdminClick} variant="outline" className="w-full border-primary/50 text-primary hover:bg-primary/10">
+                        관리자 대시보드 열기
+                    </Button>
+                </Card>
+            )}
 
             {/* 저장 버튼 */}
             <Button

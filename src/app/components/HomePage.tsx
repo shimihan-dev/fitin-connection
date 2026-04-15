@@ -15,6 +15,8 @@ import {
   Utensils,
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useState, useEffect } from 'react';
+import { getGlobalSetting } from '../../../utils/globalSettings';
 
 type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
 
@@ -101,6 +103,19 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
       return [];
     }
   }, [user?.email]);
+
+  const [sbdStatusText, setSbdStatusText] = useState<string | null>(null);
+  const [sbdStatusImage, setSbdStatusImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchSbdStatus() {
+      const text = await getGlobalSetting('sbd_status_text');
+      const img = await getGlobalSetting('sbd_status_image');
+      if (text) setSbdStatusText(text);
+      if (img) setSbdStatusImage(img);
+    }
+    fetchSbdStatus();
+  }, []);
 
   const now = new Date();
   const seed = getSeed(user?.email || user?.name || 'fitin');
@@ -350,6 +365,47 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
               })}
             </div>
           </div>
+
+          {/* SBD Competition Status Section */}
+          {(sbdStatusText || sbdStatusImage) && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="apple-panel p-6 sm:p-7 relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 h-32 w-32 bg-violet-100 rounded-bl-[100px] -z-10 blur-2xl opacity-50" />
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100 text-violet-600">
+                    <Trophy className="h-5 w-5" />
+                  </span>
+                  <h3 className="text-xl font-black tracking-tight text-foreground">
+                    SBD 대회 현황
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onNavigate('competition')}
+                  className="text-sm font-semibold text-violet-600 hover:text-violet-700 transition-colors"
+                >
+                  자세히 보기 &rarr;
+                </button>
+              </div>
+
+              {sbdStatusImage && (
+                <div className="mt-4 rounded-xl overflow-hidden border border-border shadow-sm">
+                  <img src={sbdStatusImage} alt="SBD Competition Leaderboard" className="w-full h-auto object-cover" />
+                </div>
+              )}
+              {sbdStatusText && (
+                <div className="mt-4 p-4 rounded-xl bg-violet-50/50 border border-violet-100">
+                  <p className="text-sm md:text-base font-medium text-violet-900 break-words">
+                    {sbdStatusText}
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          )}
 
           <div className="relative overflow-hidden rounded-[34px] bg-[linear-gradient(145deg,#1a6d70,#102a2a)] p-6 text-white shadow-[0_30px_60px_rgba(16,42,42,0.24)]">
             <div className="absolute right-[-42px] top-[-46px] h-44 w-44 rounded-full bg-white/10 blur-2xl" />
