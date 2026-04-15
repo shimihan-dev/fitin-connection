@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Utensils, Plus, Trash2, Sun, CloudSun, Moon, Apple, Beef, Droplets, Brain, Heart } from 'lucide-react';
 import { Card } from './ui/card';
@@ -58,6 +58,37 @@ export function Diet({ user }: DietProps) {
         lunch: [],
         dinner: [],
     });
+
+    const [schoolMenuImage, setSchoolMenuImage] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (user?.email) {
+            try {
+                const stored = localStorage.getItem(`school_menu_${user.email}`);
+                if (stored) setSchoolMenuImage(stored);
+            } catch (err) { console.error('Failed to parse school menu image:', err); }
+        }
+    }, [user]);
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            const result = reader.result as string;
+            setSchoolMenuImage(result);
+            if (user?.email) {
+                localStorage.setItem(`school_menu_${user.email}`, result);
+            }
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+    };
+
+    const handleDeleteImage = () => {
+        setSchoolMenuImage(null);
+        if (user?.email) localStorage.removeItem(`school_menu_${user.email}`);
+    };
 
     const addMeal = (mealType: keyof DailyMeals) => {
         setMeals({
@@ -163,6 +194,40 @@ export function Diet({ user }: DietProps) {
 
                 {/* 식단 기록 탭 */}
                 <TabsContent value="diet" className="space-y-6">
+                    {/* 이번 주 학식 식단표 */}
+                    <Card className="p-4 bg-card/50 border-border">
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="font-semibold text-foreground flex items-center gap-2">
+                                📅 이번 주 학식 식단표
+                            </h3>
+                            {schoolMenuImage && (
+                                <Button variant="ghost" size="sm" onClick={handleDeleteImage} className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 w-8 p-0">
+                                    <Trash2 className="w-4 h-4" />
+                                </Button>
+                            )}
+                        </div>
+                        {schoolMenuImage ? (
+                            <div className="relative">
+                                <img src={schoolMenuImage} alt="School Menu" className="w-full rounded-lg border border-border" />
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-border rounded-lg bg-card/30">
+                                <p className="text-sm text-muted-foreground mb-3">식단표 이미지를 업로드하세요</p>
+                                <Label htmlFor="menu-upload" className="cursor-pointer">
+                                    <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium">
+                                        <Plus className="w-4 h-4" /> 이미지 선택
+                                    </div>
+                                </Label>
+                                <Input
+                                    id="menu-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleImageUpload}
+                                />
+                            </div>
+                        )}
+                    </Card>
                     {/* 일일 총합 카드 */}
                     <Card className="p-4 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border-emerald-500/30">
                         <h3 className="font-semibold text-emerald-400 mb-3 text-center">📊 오늘 총 섭취량</h3>

@@ -138,8 +138,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
   const completion = Math.min(96, Math.max(28, Math.round((sessionsThisWeek / 4) * 100)));
 
   const quickActions: { id: Page; label: string; icon: typeof Dumbbell; tint: string; bg: string }[] = [
-    { id: 'workout', label: isKorean ? '운동' : 'Workout', icon: Dumbbell, tint: 'text-blue-600', bg: 'bg-blue-50' },
-    { id: 'routine', label: isKorean ? '루틴' : 'Routine', icon: CalendarDays, tint: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { id: 'workout', label: isKorean ? '운동/루틴' : 'Workout/Routine', icon: Dumbbell, tint: 'text-blue-600', bg: 'bg-blue-50' },
     { id: 'progress', label: isKorean ? '기록' : 'Progress', icon: Activity, tint: 'text-indigo-600', bg: 'bg-indigo-50' },
     { id: 'diet', label: isKorean ? '식단' : 'Diet', icon: Utensils, tint: 'text-cyan-600', bg: 'bg-cyan-50' },
     { id: 'competition', label: isKorean ? '대회' : 'Compete', icon: Trophy, tint: 'text-violet-600', bg: 'bg-violet-50' },
