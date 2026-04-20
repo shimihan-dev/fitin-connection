@@ -1,0 +1,16 @@
+{
+  "name": "Fitin Connection",
+  "short_name": "Fitin",
+  "description": "IGC students' running, gym, and SBD dashboard platform.",
+  "display": "standalone",
+  "background_color": "#f5f5f7",
+  "theme_color": "#10131a",
+  "icons": [
+    {
+      "src": "/fitin-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

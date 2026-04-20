@@ -4,7 +4,6 @@ import {
   Bell,
   BookOpen,
   ChevronRight,
-  Dumbbell,
   Globe,
   LogOut,
   Menu,
@@ -80,16 +79,20 @@ export function Header({
               onClick={() => onNavigate?.('home')}
               className="flex min-w-0 items-center gap-3 rounded-full pr-1 text-left"
             >
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[radial-gradient(circle_at_30%_30%,#ffcb75,#ffb14d_58%,#f59326)] text-slate-950 shadow-[0_12px_28px_rgba(245,147,38,0.28)]">
-                <Dumbbell className="h-5 w-5" />
+              <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-[16px] bg-white shadow-[0_12px_28px_rgba(15,23,42,0.12)]">
+                <img src="/fitin-icon.svg" alt="Fitin Connection logo" className="h-full w-full object-cover" />
               </span>
               <span className="min-w-0">
-                <span className="block truncate text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                  Daily Fitness
-                </span>
-                <span className="block truncate text-xl font-black tracking-[-0.06em] text-foreground">
-                  Fitin_Connection
-                </span>
+                <img
+                  src="/fitin-wordmark.svg"
+                  alt="Fitin Connection"
+                  className="hidden h-10 w-auto max-w-[220px] object-contain sm:block"
+                />
+                <img
+                  src="/fitin-wordmark.svg"
+                  alt="Fitin Connection"
+                  className="h-8 w-auto max-w-[150px] object-contain sm:hidden"
+                />
               </span>
             </button>
           </div>

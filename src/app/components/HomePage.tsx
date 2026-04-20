@@ -2,20 +2,21 @@ import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import {
   ArrowUpRight,
-  Droplets,
+  Award,
+  ClipboardCheck,
   Dumbbell,
-  Flame,
   Footprints,
-  HeartPulse,
-  MoonStar,
-  Sparkles,
+  Medal,
+  Star,
   Trophy,
-  Users,
-  Utensils,
 } from 'lucide-react';
 import { getGlobalSetting } from '../../../utils/globalSettings';
 import { useLanguage } from '../contexts/LanguageContext';
+import { INITIAL_RECORDS, UNIVERSITIES } from '../types/competition';
 import { DashboardRail } from './DashboardRail';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Textarea } from './ui/textarea';
 
 type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
 
@@ -31,157 +32,324 @@ interface WorkoutLog {
   type: string;
 }
 
+interface RunningRecord {
+  id: string;
+  date: string;
+  imageUrl: string;
+  distance: number;
+  duration: string;
+  pace: string;
+}
+
+interface WeeklyEntry {
+  name: string;
+  focus: string;
+  score: number;
+}
+
 const mondayBasedIndex = (date: Date) => (date.getDay() + 6) % 7;
 
 const getSeed = (value: string) =>
   value.split('').reduce((acc, char, index) => acc + char.charCodeAt(0) * (index + 1), 0);
 
+const runningPattern = /(run|running|러닝|조깅)/i;
+
+const tierThresholds = [
+  {
+    key: 'bronze',
+    min: 0,
+    label: 'Bronze',
+    rewardKo: '커뮤니티 배지 + 오픈짐 체크인 1회',
+    rewardEn: 'Community badge + 1 open gym check-in',
+    cardClass: 'border-[#d9b38c] bg-[#f6ebe0]',
+    chipClass: 'bg-[#8f5d34] text-white',
+    textClass: 'text-[#8f5d34]',
+  },
+  {
+    key: 'silver',
+    min: 260,
+    label: 'Silver',
+    rewardKo: '오픈짐 우선 예약 + 리뷰 배지',
+    rewardEn: 'Priority open gym booking + review badge',
+    cardClass: 'border-slate-300 bg-slate-100',
+    chipClass: 'bg-slate-600 text-white',
+    textClass: 'text-slate-600',
+  },
+  {
+    key: 'gold',
+    min: 420,
+    label: 'Gold',
+    rewardKo: 'PT 멘토링 우선 신청 + SBD 이벤트 초대',
+    rewardEn: 'Priority PT mentoring + SBD event invite',
+    cardClass: 'border-amber-300 bg-amber-50',
+    chipClass: 'bg-amber-500 text-slate-950',
+    textClass: 'text-amber-600',
+  },
+];
+
+function parseStoredArray<T>(key: string): T[] {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as T[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function getTierMeta(score: number, isKorean: boolean) {
+  const tier =
+    [...tierThresholds].reverse().find((item) => score >= item.min) ?? tierThresholds[0];
+
+  return {
+    ...tier,
+    reward: isKorean ? tier.rewardKo : tier.rewardEn,
+  };
+}
+
+function getNextTier(score: number, isKorean: boolean) {
+  const nextTier = tierThresholds.find((item) => score < item.min);
+  if (!nextTier) return null;
+
+  return {
+    ...nextTier,
+    reward: isKorean ? nextTier.rewardKo : nextTier.rewardEn,
+    remaining: nextTier.min - score,
+  };
+}
+
 export function HomePage({ user, onNavigate }: HomePageProps) {
   const { language } = useLanguage();
   const isKorean = language === 'ko';
 
-  const content = isKorean
+  const copy = isKorean
     ? {
-        heroKicker: '오늘의 대시보드',
-        summary: '이번 주 움직임 목표의 82%까지 왔어요. 지금 흐름이 아주 좋습니다.',
-        activityLabel: 'Daily Activity',
-        activityTitle: 'Steps & Mobility',
-        activityUnit: 'steps',
-        heartRate: '휴식 심박',
-        sleep: '수면 시간',
-        sleepState: '안정적',
-        featuredTag: "TODAY'S PICK",
-        featuredTitle: 'Metabolic Ignite',
-        featuredBody: '짧고 강한 인터벌과 코어 자극을 섞어서 아침 컨디션을 깨워주는 세션입니다.',
-        featuredDuration: '45분',
-        featuredLevel: 'High',
-        featuredSupport: '모빌리티 워밍업과 인터벌 메인 블록이 자연스럽게 연결돼요.',
-        exploreCompetition: '대회 둘러보기',
-        openNutrition: '영양 보기',
-        fuelStatus: 'Fuel Status',
-        communityTitle: 'Fitin Circle',
-        communityLink: '활동 보기',
-        recoveryTitle: 'Recovery Picks',
-        recoveryCards: [
+        heroKicker: 'Fitin Dashboard',
+        heroBody: '러닝, 헬스, IGC SBD 기록을 한 화면에서 관리하고 주간 리포트와 PT 멘토링까지 바로 연결해보세요.',
+        heroLead: '운동 기록, 보상, 멘토링을 하나의 흐름으로 연결하는 Fitin Connection 메인 허브입니다.',
+        summaryStats: ['주간 포인트', '연속 기록', '현재 티어'],
+        openRunning: '러닝 열기',
+        openCompetition: 'SBD 보기',
+        quickAccess: 'Offerings',
+        quickAccessBody: '핵심 프로그램과 이동 동선을 한 번에 정리했습니다.',
+        heroNotes: [
+          { title: 'Programs', body: '러닝, 헬스, IGC SBD를 각각 독립된 허브로 구성' },
+          { title: 'Mentoring', body: '단계형 신청과 우선 배정 안내를 바로 확인' },
+          { title: 'Schedule', body: '시간표와 오픈짐 운영 시간을 한 섹션에 요약' },
+        ],
+        weeklyReportTitle: 'Weekly Report',
+        weeklyReportBody: '주간 활동량을 순위표와 보상 티어로 정리했습니다.',
+        tierGuideTitle: 'Tier Reward Guide',
+        storiesTitle: '성공 스토리',
+        storiesBody: '실제 이용자들의 변화와 후기를 한눈에 확인하세요.',
+        mentoringTitle: 'PT 멘토링 프로그램',
+        mentoringBody: '러닝 폼, 헬스 루틴, SBD 기록 향상을 위한 1:1 또는 소규모 멘토링을 신청할 수 있습니다.',
+        mentoringTrack: '멘토링 트랙',
+        mentoringSlot: '희망 시간',
+        mentoringGoal: '신청 내용',
+        mentoringGoalPlaceholder: '목표, 현재 고민, 원하는 코칭 내용을 적어주세요.',
+        mentoringSubmit: '멘토링 신청하기',
+        mentoringSuccess: '멘토링 신청이 접수되었습니다. 운영진이 이메일로 안내드릴게요.',
+        mentoringSteps: [
+          { title: 'Step 1', body: '러닝, 헬스, SBD 중 필요한 트랙을 선택합니다.' },
+          { title: 'Step 2', body: '가능한 시간대를 고르고 현재 고민을 간단히 적습니다.' },
+          { title: 'Step 3', body: '운영진이 확인 후 배정 일정과 준비사항을 전달합니다.' },
+        ],
+        scheduleTitle: 'Fitin Connection 시간표',
+        scheduleBody: 'Inspire and be inspired',
+        sbdNoticeFallback: '학교별 대표 기록과 개인 랭킹을 요약했습니다.',
+        leaderboardColumns: ['순위', '이름', '포커스', '포인트', '티어', '보상'],
+        reviews: [
           {
-            title: '호흡 세션',
-            body: '강도가 높았던 날의 긴장을 낮추는 10분 회복 루틴입니다.',
-            icon: Sparkles,
-            tint: 'text-primary',
-            bg: 'bg-blue-50',
+            name: '김하늘',
+            program: '러닝 8주 프로그램',
+            quote: '주 2회 기록만 올렸는데도 5K 기록이 꾸준히 줄었고, 루틴을 지키는 힘이 생겼어요.',
+            result: '5K 34분 → 27분',
           },
           {
-            title: '미네랄 회복',
-            body: '근육 피로가 쌓인 날엔 수분과 전해질 밸런스를 먼저 챙겨보세요.',
-            icon: Utensils,
-            tint: 'text-emerald-600',
-            bg: 'bg-emerald-50',
+            name: '박민준',
+            program: '헬스 루틴 리빌드',
+            quote: '헬스장에서 뭘 해야 할지 몰랐는데, Fitin 루틴 덕분에 상체/하체 분할이 완전히 잡혔어요.',
+            result: '주간 운동 1회 → 4회',
           },
           {
-            title: 'Hydration Check',
-            body: '점심 전 한 잔만 더 마시면 오늘 섭취 목표에 가까워집니다.',
-            icon: Droplets,
-            tint: 'text-orange-500',
-            bg: 'bg-orange-50',
+            name: '이소연',
+            program: 'SBD 챌린지',
+            quote: '벤치와 데드리프트 기록이 보이는 구조라 경쟁심이 생겼고, 학교 대표전도 목표로 잡게 됐어요.',
+            result: 'Total 255kg → 315kg',
           },
         ],
-        goalLabel: '목표',
-        sessionsLabel: '이번 주 세션',
-        weeklyTotalLabel: '이번 주 총량',
-        peakLabel: '피크 요일',
-        movementFocus: '오늘 집중 포인트',
-        movementBody: '스트레칭과 중심 안정화에 집중해 보세요.',
-        summaryStats: ['이번 주', '연속 기록', '평균 세션'],
-        minutesUnit: '분',
-        liveCircle: '실시간 활동',
-        macroNote: '저녁 식사 전 단백질만 조금 더 보완하면 균형이 좋아져요.',
-        rhythmNote: '가장 강했던 흐름',
-        openRecovery: '루틴 보기',
+        scheduleHeaders: ['Time', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        scheduleRows: [
+          { time: '07:00', values: ['Running', '-', 'Running', '-', '-', '-'] },
+          { time: '08:00', values: ['Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym'] },
+          { time: '09:00', values: ['Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym'] },
+          { time: '10:00', values: ['Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym'] },
+          { time: '11:00', values: ['Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym'] },
+          { time: '12:00-18:00', values: ['Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym'] },
+          { time: '19:00', values: ['Open Gym', 'PT (selected only)', 'Open Gym', 'Open Gym', 'Open Gym', '-'] },
+          { time: '20:00-22:00', values: ['Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', '-'] },
+        ],
+        mentoringTracks: [
+          { value: 'running', label: '러닝 폼/페이스 코칭' },
+          { value: 'gym', label: '헬스 루틴/근성장 코칭' },
+          { value: 'sbd', label: 'SBD 테크닉/기록 향상' },
+        ],
+        mentoringSlots: ['화요일 19:00', '목요일 19:00', '토요일 10:00'],
+        topCards: {
+          running: {
+            title: 'Running',
+            body: '러닝 기록과 거리, 페이스를 빠르게 확인하고 바로 업로드하세요.',
+            metrics: ['이번 주 거리', '러닝 세션', '최근 페이스'],
+            cta: '러닝 기록 보러가기',
+            footer: 'Workout Guide의 러닝 탭으로 이동',
+          },
+          gym: {
+            title: 'Gym / 헬스',
+            body: '헬스 루틴과 주간 세션 흐름을 보고 오늘의 분할을 바로 시작할 수 있어요.',
+            metrics: ['헬스 세션', '주간 운동 시간', '추천 포커스'],
+            cta: '헬스 루틴 열기',
+            footer: 'Routine Planner로 바로 이동',
+          },
+          sbd: {
+            title: 'IGC SBD',
+            body: '개인 기록과 학교별 순위를 요약해서 바로 경쟁 현황을 확인할 수 있어요.',
+            metrics: ['1위 선수', '1위 학교', '최고 Total'],
+            cta: 'SBD 순위 보기',
+            footer: 'Competition 페이지로 이동',
+          },
+        },
       }
     : {
-        heroKicker: 'Dashboard',
-        summary: "You're 82% toward your weekly movement goal. Keep the momentum gentle and steady.",
-        activityLabel: 'Daily Activity',
-        activityTitle: 'Steps & Mobility',
-        activityUnit: 'steps',
-        heartRate: 'Resting Heart Rate',
-        sleep: 'Sleep Duration',
-        sleepState: 'Optimal',
-        featuredTag: "TODAY'S PICK",
-        featuredTitle: 'Metabolic Ignite',
-        featuredBody: 'A short, sharper conditioning block that wakes up the body with intervals and core work.',
-        featuredDuration: '45 min',
-        featuredLevel: 'High',
-        featuredSupport: 'Mobility prep rolls directly into a sharper interval block for a cleaner morning start.',
-        exploreCompetition: 'Explore Competition',
-        openNutrition: 'Open Nutrition',
-        fuelStatus: 'Fuel Status',
-        communityTitle: 'Fitin Circle',
-        communityLink: 'See activity',
-        recoveryTitle: 'Recovery Picks',
-        recoveryCards: [
+        heroKicker: 'Fitin Dashboard',
+        heroBody: 'Manage your running, gym, and IGC SBD records in one place, then jump straight into weekly reports and PT mentoring.',
+        heroLead: 'A single Fitin Connection hub where activity, rewards, and mentoring all flow together.',
+        summaryStats: ['Weekly Score', 'Active Streak', 'Current Tier'],
+        openRunning: 'Open Running',
+        openCompetition: 'Open SBD',
+        quickAccess: 'Offerings',
+        quickAccessBody: 'The key programs and navigation paths are laid out in one clean section.',
+        heroNotes: [
+          { title: 'Programs', body: 'Running, Gym, and IGC SBD each live in their own dedicated hub.' },
+          { title: 'Mentoring', body: 'A step-based application flow sits directly on the dashboard.' },
+          { title: 'Schedule', body: 'Timetable and open gym availability are summarized at the end.' },
+        ],
+        weeklyReportTitle: 'Weekly Report',
+        weeklyReportBody: 'This week is organized as a ranking table with reward tiers.',
+        tierGuideTitle: 'Tier Reward Guide',
+        storiesTitle: 'Success Stories',
+        storiesBody: 'See what users have achieved with Fitin Connection.',
+        mentoringTitle: 'PT Mentoring Program',
+        mentoringBody: 'Apply for one-on-one or small-group mentoring for running form, gym planning, and SBD performance.',
+        mentoringTrack: 'Mentoring Track',
+        mentoringSlot: 'Preferred Time',
+        mentoringGoal: 'Application Notes',
+        mentoringGoalPlaceholder: 'Share your goal, current issue, and the type of coaching you want.',
+        mentoringSubmit: 'Apply for Mentoring',
+        mentoringSuccess: 'Your mentoring application has been submitted. We will follow up by email.',
+        mentoringSteps: [
+          { title: 'Step 1', body: 'Choose the track you want help with: running, gym, or SBD.' },
+          { title: 'Step 2', body: 'Pick a time slot and leave a short note about your current goal.' },
+          { title: 'Step 3', body: 'The team reviews it and sends back your assigned mentoring plan.' },
+        ],
+        scheduleTitle: 'Fitin Connection Schedule',
+        scheduleBody: 'Inspire and be inspired',
+        sbdNoticeFallback: 'A summary of top personal totals and university rankings.',
+        leaderboardColumns: ['Rank', 'Name', 'Focus', 'Points', 'Tier', 'Reward'],
+        reviews: [
           {
-            title: 'Breathwork session',
-            body: 'A 10-minute decompression block to lower tension after a higher-intensity day.',
-            icon: Sparkles,
-            tint: 'text-primary',
-            bg: 'bg-blue-50',
+            name: 'Haneul Kim',
+            program: '8-Week Running Program',
+            quote: 'Just logging two runs a week gave me enough structure to keep improving and finally enjoy the process.',
+            result: '5K 34 min -> 27 min',
           },
           {
-            title: 'Mineral recovery',
-            body: 'Refill fluids and electrolytes first when your legs feel heavier than usual.',
-            icon: Utensils,
-            tint: 'text-emerald-600',
-            bg: 'bg-emerald-50',
+            name: 'Minjun Park',
+            program: 'Gym Routine Rebuild',
+            quote: 'I stopped wandering around the gym. The split became clear and I actually started following a plan.',
+            result: '1 workout/week -> 4 workouts/week',
           },
           {
-            title: 'Hydration check',
-            body: 'One more glass before lunch will bring you close to today’s target.',
-            icon: Droplets,
-            tint: 'text-orange-500',
-            bg: 'bg-orange-50',
+            name: 'Soyeon Lee',
+            program: 'SBD Challenge',
+            quote: 'Seeing my bench and deadlift totals in one place gave me a real target and made the competition feel tangible.',
+            result: 'Total 255 kg -> 315 kg',
           },
         ],
-        goalLabel: 'Goal',
-        sessionsLabel: 'Sessions This Week',
-        weeklyTotalLabel: 'Weekly Total',
-        peakLabel: 'Peak Day',
-        movementFocus: 'Focus for today',
-        movementBody: 'Keep today centered on mobility and controlled core stability.',
-        summaryStats: ['This week', 'Active streak', 'Avg session'],
-        minutesUnit: 'min',
-        liveCircle: 'Live circle',
-        macroNote: 'A small protein top-up before dinner would put the day in a cleaner balance.',
-        rhythmNote: 'Peak rhythm',
-        openRecovery: 'Open recovery',
+        scheduleHeaders: ['Time', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        scheduleRows: [
+          { time: '07:00', values: ['Running', '-', 'Running', '-', '-', '-'] },
+          { time: '08:00', values: ['Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym'] },
+          { time: '09:00', values: ['Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym'] },
+          { time: '10:00', values: ['Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym'] },
+          { time: '11:00', values: ['Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym'] },
+          { time: '12:00-18:00', values: ['Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym'] },
+          { time: '19:00', values: ['Open Gym', 'PT (selected only)', 'Open Gym', 'Open Gym', 'Open Gym', '-'] },
+          { time: '20:00-22:00', values: ['Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', 'Open Gym', '-'] },
+        ],
+        mentoringTracks: [
+          { value: 'running', label: 'Running form / pace coaching' },
+          { value: 'gym', label: 'Gym routine / hypertrophy coaching' },
+          { value: 'sbd', label: 'SBD technique / total improvement' },
+        ],
+        mentoringSlots: ['Tuesday 19:00', 'Thursday 19:00', 'Saturday 10:00'],
+        topCards: {
+          running: {
+            title: 'Running',
+            body: 'Review your distance, pace, and recent running uploads in one place.',
+            metrics: ['Weekly Distance', 'Running Sessions', 'Recent Pace'],
+            cta: 'Open Running Logs',
+            footer: 'Jump to the running tab in Workout Guide',
+          },
+          gym: {
+            title: 'Gym',
+            body: 'See your gym routine, weekly workload, and today’s recommended split at a glance.',
+            metrics: ['Gym Sessions', 'Weekly Minutes', 'Recommended Focus'],
+            cta: 'Open Gym Routine',
+            footer: 'Jump straight into Routine Planner',
+          },
+          sbd: {
+            title: 'IGC SBD',
+            body: 'Get a quick summary of personal totals and university rankings before opening the full leaderboard.',
+            metrics: ['Top Athlete', 'Top University', 'Best Total'],
+            cta: 'Open SBD Rankings',
+            footer: 'Go directly to Competition',
+          },
+        },
       };
 
-  const storedWorkouts = useMemo<WorkoutLog[]>(() => {
-    if (!user?.email || typeof window === 'undefined') return [];
+  const storedWorkouts = useMemo<WorkoutLog[]>(
+    () => parseStoredArray<WorkoutLog>(`workouts_${user?.email}`),
+    [user?.email],
+  );
 
-    try {
-      const raw = localStorage.getItem(`workouts_${user.email}`);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }, [user?.email]);
+  const runningRecords = useMemo<RunningRecord[]>(
+    () => parseStoredArray<RunningRecord>(`running_records_v2_${user?.email}`),
+    [user?.email],
+  );
 
   const [sbdStatusText, setSbdStatusText] = useState<string | null>(null);
-  const [sbdStatusImage, setSbdStatusImage] = useState<string | null>(null);
+  const [mentoringTrack, setMentoringTrack] = useState(copy.mentoringTracks[1]?.value ?? 'gym');
+  const [mentoringSlot, setMentoringSlot] = useState(copy.mentoringSlots[0]);
+  const [mentoringGoal, setMentoringGoal] = useState('');
+  const [applicationMessage, setApplicationMessage] = useState('');
 
   useEffect(() => {
     async function fetchSbdStatus() {
       const text = await getGlobalSetting('sbd_status_text');
-      const img = await getGlobalSetting('sbd_status_image');
       if (text) setSbdStatusText(text);
-      if (img) setSbdStatusImage(img);
     }
 
     fetchSbdStatus();
   }, []);
+
+  useEffect(() => {
+    setMentoringTrack(copy.mentoringTracks[1]?.value ?? 'gym');
+    setMentoringSlot(copy.mentoringSlots[0]);
+  }, [isKorean]);
 
   const now = new Date();
   const seed = getSeed(user?.email || user?.name || 'fitin');
@@ -193,57 +361,47 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
   const greeting = (() => {
     const name = user?.name || 'Fitin';
     if (isKorean) {
-      if (now.getHours() < 12) return `${name}님, 좋은 아침이에요`;
-      if (now.getHours() < 18) return `${name}님, 좋은 오후예요`;
-      return `${name}님, 편안한 저녁이에요`;
+      if (now.getHours() < 12) return `${name}님, 오늘도 연결됐어요`;
+      if (now.getHours() < 18) return `${name}님, 오늘 흐름 좋아요`;
+      return `${name}님, 저녁 루틴 준비됐어요`;
     }
 
-    if (now.getHours() < 12) return `Good Morning, ${name}`;
-    if (now.getHours() < 18) return `Good Afternoon, ${name}`;
-    return `Good Evening, ${name}`;
+    if (now.getHours() < 12) return `You're connected, ${name}`;
+    if (now.getHours() < 18) return `Momentum looks good, ${name}`;
+    return `Your evening routine is ready, ${name}`;
   })();
 
-  const totalMinutes = storedWorkouts.reduce((acc, workout) => acc + workout.minutes, 0);
-  const sessionsThisWeek = storedWorkouts.filter((workout) => new Date(workout.date) >= startOfWeek).length;
-  const steps = Math.round(7600 + (seed % 2600) + totalMinutes * 2.2);
-  const stepsGoal = 15000;
-  const stepsProgress = Math.min(100, Math.round((steps / stepsGoal) * 100));
-  const hydrationLiters = Number((1.45 + ((seed % 7) * 0.12) + Math.min(totalMinutes / 700, 0.65)).toFixed(1));
-  const restingHeartRate = Math.max(58, 67 - Math.min(8, Math.round(totalMinutes / 180)) + (seed % 4));
-  const sleepHours = 7 + ((seed + todayIndex) % 2);
-  const sleepMinutes = 18 + ((seed + todayIndex * 7) % 35);
+  const dateLabel = new Intl.DateTimeFormat(isKorean ? 'ko-KR' : 'en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  }).format(now);
 
-  const weekdayLabels = isKorean ? ['월', '화', '수', '목', '금', '토', '일'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const weeklyMinutes = weekdayLabels.map((label, index) => {
-    const day = new Date(startOfWeek);
-    day.setDate(startOfWeek.getDate() + index);
+  const weeklyWorkoutLogs = storedWorkouts.filter((workout) => new Date(workout.date) >= startOfWeek);
+  const runningWorkoutLogs = weeklyWorkoutLogs.filter((workout) => runningPattern.test(workout.type));
+  const gymWorkoutLogs = weeklyWorkoutLogs.filter((workout) => !runningPattern.test(workout.type));
+  const weeklyRunningRecords = runningRecords.filter((record) => new Date(record.date) >= startOfWeek);
+  const totalMinutes = weeklyWorkoutLogs.reduce((acc, workout) => acc + workout.minutes, 0);
+  const runningDistanceFromRecords = weeklyRunningRecords.reduce((acc, record) => acc + record.distance, 0);
+  const fallbackRunningDistance = runningWorkoutLogs.reduce((acc, workout) => acc + workout.minutes / 11, 0);
+  const runningDistance = Number(
+    (runningDistanceFromRecords || fallbackRunningDistance || 10 + (seed % 7)).toFixed(1),
+  );
+  const runningSessions = weeklyRunningRecords.length || runningWorkoutLogs.length || 2 + (seed % 2);
+  const gymSessions = gymWorkoutLogs.length || 3 + (seed % 3);
+  const gymMinutes = gymWorkoutLogs.reduce((acc, workout) => acc + workout.minutes, 0) || 210 + (seed % 70);
+  const latestPace = weeklyRunningRecords[0]?.pace || `6'${String(5 + (seed % 6)).padStart(2, '0')}"`;
+  const gymFocusOptions = isKorean
+    ? ['하체 + 코어', '등 + 가슴', '어깨 + 팔']
+    : ['Lower body + core', 'Back + chest', 'Shoulders + arms'];
+  const recommendedFocus = gymFocusOptions[seed % gymFocusOptions.length];
+  const weeklyScore = Math.round(totalMinutes + runningDistance * 11 + gymSessions * 26);
 
-    const loggedMinutes = storedWorkouts
-      .filter((workout) => new Date(workout.date).toDateString() === day.toDateString())
-      .reduce((total, workout) => total + workout.minutes, 0);
-
-    const fallbackMinutes = 24 + ((seed + index * 17) % 58);
-    const minutes = loggedMinutes || fallbackMinutes;
-
-    return {
-      label,
-      minutes,
-      active: index === todayIndex,
-    };
-  });
-
-  const maxMinutes = Math.max(...weeklyMinutes.map((item) => item.minutes), 1);
-  const weeklyTotalMinutes = weeklyMinutes.reduce((total, item) => total + item.minutes, 0);
-  const averageDailyMinutes = Math.round(weeklyTotalMinutes / weeklyMinutes.length);
-  const peakDay = weeklyMinutes.reduce((best, item) => (item.minutes > best.minutes ? item : best), weeklyMinutes[0]);
-  const protein = 124 + (seed % 32);
-  const carbs = 188 + (seed % 46);
-  const fats = 48 + (seed % 18);
   const workoutDates = new Set(storedWorkouts.map((item) => new Date(item.date).toDateString()));
   let streakDays = 0;
 
   if (storedWorkouts.length === 0) {
-    streakDays = 3 + (seed % 4);
+    streakDays = 4 + (seed % 3);
   } else {
     const cursor = new Date(now);
     cursor.setHours(0, 0, 0, 0);
@@ -253,44 +411,124 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
     }
   }
 
-  const communityItems = isKorean
-    ? [
-        { name: 'Marcus Chen', body: '"Yoga Flow" 완료' },
-        { name: 'Sarah Williams', body: '5K PR 달성' },
-        { name: 'David Miller', body: '"Marathon Prep" 시작' },
-      ]
-    : [
-        { name: 'Marcus Chen', body: 'Completed "Yoga Flow"' },
-        { name: 'Sarah Williams', body: 'Just hit a 5K PR' },
-        { name: 'David Miller', body: 'Joined "Marathon Prep"' },
-      ];
+  const tierMeta = getTierMeta(weeklyScore, isKorean);
+  const nextTier = getNextTier(weeklyScore, isKorean);
 
-  const dateLabel = new Intl.DateTimeFormat(isKorean ? 'ko-KR' : 'en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  }).format(now);
+  const topLifter = [...INITIAL_RECORDS].sort((a, b) => b.total - a.total)[0];
+  const universityRankings = UNIVERSITIES.map((uni) => {
+    const records = INITIAL_RECORDS.filter((record) => record.universityId === uni.id);
+    const total = records.reduce((acc, record) => acc + record.total, 0);
+    const average = records.length ? Math.round(total / records.length) : 0;
 
-  const metricCards = [
+    return {
+      ...uni,
+      average,
+    };
+  }).sort((a, b) => b.average - a.average);
+  const topUniversity = universityRankings[0];
+  const sbdNotice = sbdStatusText || copy.sbdNoticeFallback;
+
+  const weeklyEntries: WeeklyEntry[] = [
     {
-      title: content.heartRate,
-      value: `${restingHeartRate}`,
-      suffix: 'BPM',
-      note: '+4% avg',
-      icon: HeartPulse,
-      tone: 'text-rose-500',
-      bg: 'bg-rose-50',
+      name: user?.name || (isKorean ? '내 기록' : 'My Record'),
+      focus: runningSessions >= gymSessions ? copy.topCards.running.title : copy.topCards.gym.title,
+      score: weeklyScore,
     },
     {
-      title: content.sleep,
-      value: `${sleepHours}h ${sleepMinutes}m`,
-      suffix: '',
-      note: content.sleepState,
-      icon: MoonStar,
-      tone: 'text-indigo-500',
-      bg: 'bg-indigo-50',
+      name: isKorean ? 'Marcus' : 'Marcus',
+      focus: copy.topCards.running.title,
+      score: weeklyScore + 72,
+    },
+    {
+      name: isKorean ? '소연' : 'Soyeon',
+      focus: copy.topCards.sbd.title,
+      score: Math.max(220, weeklyScore - 18),
+    },
+    {
+      name: isKorean ? 'Daniel' : 'Daniel',
+      focus: copy.topCards.gym.title,
+      score: Math.max(200, weeklyScore - 64),
+    },
+    {
+      name: isKorean ? '유진' : 'Eugene',
+      focus: copy.topCards.running.title,
+      score: Math.max(180, weeklyScore - 104),
+    },
+  ].sort((a, b) => b.score - a.score);
+
+  const topCards = [
+    {
+      title: copy.topCards.running.title,
+      body: copy.topCards.running.body,
+      icon: Footprints,
+      page: 'workout' as Page,
+      accentClass: 'from-[#0f172a] via-[#164fbb] to-[#56a6ff]',
+      chipClass: 'bg-white/18 text-white',
+      metrics: [
+        { label: copy.topCards.running.metrics[0], value: `${runningDistance} km` },
+        { label: copy.topCards.running.metrics[1], value: `${runningSessions}` },
+        { label: copy.topCards.running.metrics[2], value: latestPace },
+      ],
+      cta: copy.topCards.running.cta,
+      footer: copy.topCards.running.footer,
+    },
+    {
+      title: copy.topCards.gym.title,
+      body: copy.topCards.gym.body,
+      icon: Dumbbell,
+      page: 'routine' as Page,
+      accentClass: 'from-[#30261d] via-[#6e4b22] to-[#d39746]',
+      chipClass: 'bg-white/18 text-white',
+      metrics: [
+        { label: copy.topCards.gym.metrics[0], value: `${gymSessions}` },
+        { label: copy.topCards.gym.metrics[1], value: `${gymMinutes} min` },
+        { label: copy.topCards.gym.metrics[2], value: recommendedFocus },
+      ],
+      cta: copy.topCards.gym.cta,
+      footer: copy.topCards.gym.footer,
+    },
+    {
+      title: copy.topCards.sbd.title,
+      body: copy.topCards.sbd.body,
+      icon: Trophy,
+      page: 'competition' as Page,
+      accentClass: 'from-[#121418] via-[#1e2c44] to-[#394f7e]',
+      chipClass: 'bg-white/18 text-white',
+      metrics: [
+        { label: copy.topCards.sbd.metrics[0], value: topLifter?.userName || '-' },
+        { label: copy.topCards.sbd.metrics[1], value: topUniversity?.name || '-' },
+        { label: copy.topCards.sbd.metrics[2], value: `${topLifter?.total || 0} kg` },
+      ],
+      cta: copy.topCards.sbd.cta,
+      footer: copy.topCards.sbd.footer,
+      notice: sbdNotice,
     },
   ];
+
+  const handleMentoringSubmit = () => {
+    if (!mentoringGoal.trim()) {
+      alert(isKorean ? '신청 내용을 입력해주세요.' : 'Please add a short note for your application.');
+      return;
+    }
+
+    if (typeof window === 'undefined') return;
+
+    const nextItem = {
+      id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      name: user?.name || 'Fitin User',
+      email: user?.email || '',
+      track: mentoringTrack,
+      slot: mentoringSlot,
+      goal: mentoringGoal.trim(),
+      createdAt: new Date().toISOString(),
+    };
+
+    const key = 'fitin_pt_mentoring_requests_v1';
+    const previous = parseStoredArray<typeof nextItem>(key);
+    localStorage.setItem(key, JSON.stringify([nextItem, ...previous]));
+    setMentoringGoal('');
+    setApplicationMessage(copy.mentoringSuccess);
+  };
 
   return (
     <div className="py-3 sm:py-5">
@@ -303,436 +541,518 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-8"
           >
-            <header className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_auto] xl:items-end">
+            <header className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px] xl:items-stretch">
               <div>
-                <p className="apple-kicker">{content.heroKicker}</p>
-                <h1 className="mt-4 max-w-full text-[clamp(2.35rem,5vw,4.8rem)] font-black leading-[0.94] tracking-[-0.08em] text-foreground lg:whitespace-nowrap">
+                <p className="apple-kicker">{copy.heroKicker}</p>
+                <h1 className="mt-4 text-[clamp(2.25rem,4.8vw,4.5rem)] font-black leading-[0.94] tracking-[-0.08em] text-foreground">
                   {greeting}
                   <span className="text-primary">.</span>
                 </h1>
-                <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
-                  {dateLabel}. {content.summary}
+                <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
+                  {dateLabel}. {copy.heroBody}
                 </p>
+                <p className="mt-4 max-w-2xl text-sm leading-6 text-foreground/74 sm:text-base">
+                  {copy.heroLead}
+                </p>
+
                 <div className="mt-6 grid gap-3 sm:grid-cols-3">
                   <div className="apple-micro-card">
                     <p className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                      {content.summaryStats[0]}
+                      {copy.summaryStats[0]}
                     </p>
-                    <p className="mt-2 text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
-                      {weeklyTotalMinutes} {content.minutesUnit}
-                    </p>
+                    <p className="mt-2 text-[1.55rem] font-black tracking-[-0.05em] text-foreground">{weeklyScore} pt</p>
                   </div>
                   <div className="apple-micro-card">
                     <p className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                      {content.summaryStats[1]}
+                      {copy.summaryStats[1]}
                     </p>
-                    <p className="mt-2 text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
-                      {streakDays}d
-                    </p>
+                    <p className="mt-2 text-[1.55rem] font-black tracking-[-0.05em] text-foreground">{streakDays}d</p>
                   </div>
                   <div className="apple-micro-card">
                     <p className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                      {content.summaryStats[2]}
+                      {copy.summaryStats[2]}
                     </p>
-                    <p className="mt-2 text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
-                      {Math.max(22, Math.round(weeklyTotalMinutes / Math.max(1, sessionsThisWeek || 4)))} {content.minutesUnit}
+                    <p className={`mt-2 text-[1.55rem] font-black tracking-[-0.05em] ${tierMeta.textClass}`}>
+                      {tierMeta.label}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-3 xl:justify-end">
-                <button
-                  type="button"
-                  onClick={() => onNavigate('competition')}
-                  className="apple-ghost-button gap-2 px-5"
-                >
-                  <Trophy className="h-4 w-4 text-primary" />
-                  {content.exploreCompetition}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onNavigate('diet')}
-                  className="apple-button gap-2 px-6"
-                >
-                  <Utensils className="h-4 w-4" />
-                  {content.openNutrition}
-                </button>
+              <div className="apple-panel flex flex-col justify-between p-6 sm:p-7">
+                <div>
+                  <p className="apple-kicker">{copy.quickAccess}</p>
+                  <h2 className="mt-3 text-[1.8rem] font-black tracking-[-0.06em] text-foreground">
+                    Fitin Connection
+                  </h2>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy.quickAccessBody}</p>
+                </div>
+
+                <div className="mt-6 space-y-3">
+                  {copy.heroNotes.map((note) => (
+                    <div key={note.title} className="apple-soft-card px-4 py-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+                        {note.title}
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-foreground/76">{note.body}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('workout')}
+                    className="apple-ghost-button gap-2 px-5"
+                  >
+                    <Footprints className="h-4 w-4 text-primary" />
+                    {copy.openRunning}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('competition')}
+                    className="apple-button gap-2 px-6"
+                  >
+                    <Trophy className="h-4 w-4" />
+                    {copy.openCompetition}
+                  </button>
+                </div>
               </div>
             </header>
 
-            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.22fr)_minmax(360px,0.92fr)]">
-              <div className="space-y-6">
-                <div className="apple-panel min-h-[420px] p-6 sm:p-8">
-                  <div className="absolute -bottom-10 right-6 h-36 w-36 rounded-[44px] bg-slate-100/90" />
-                  <div className="absolute bottom-10 right-28 h-28 w-28 rounded-[38px] bg-slate-100/85" />
-                  <div className="relative flex h-full flex-col">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="apple-kicker">{content.activityLabel}</p>
-                        <h2 className="mt-3 whitespace-nowrap text-3xl font-black tracking-[-0.06em] text-foreground sm:text-[2.35rem]">
-                          {content.activityTitle}
-                        </h2>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="apple-chip">{stepsProgress}%</span>
-                        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-primary">
-                          <ArrowUpRight className="h-5 w-5" />
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="mt-12 grid gap-4 sm:grid-cols-3">
-                      <div className="apple-soft-card px-4 py-4">
-                        <p className="whitespace-nowrap text-xs uppercase tracking-[0.18em] text-muted-foreground">{content.sessionsLabel}</p>
-                        <p className="mt-2 text-2xl font-black tracking-[-0.05em] text-foreground">{Math.max(3, sessionsThisWeek || 4)}</p>
-                      </div>
-                      <div className="apple-soft-card px-4 py-4">
-                        <p className="whitespace-nowrap text-xs uppercase tracking-[0.18em] text-muted-foreground">{content.weeklyTotalLabel}</p>
-                        <p className="mt-2 text-2xl font-black tracking-[-0.05em] text-foreground">
-                          {weeklyTotalMinutes} {content.minutesUnit}
-                        </p>
-                      </div>
-                      <div className="apple-soft-card px-4 py-4">
-                        <p className="whitespace-nowrap text-xs uppercase tracking-[0.18em] text-muted-foreground">{content.peakLabel}</p>
-                        <p className="mt-2 text-2xl font-black tracking-[-0.05em] text-foreground">{peakDay.label}</p>
-                        <p className="mt-1 text-xs font-semibold text-muted-foreground">{peakDay.minutes} {content.minutesUnit}</p>
-                      </div>
-                    </div>
-
-                    <div className="mt-auto pt-12">
-                      <p className="text-sm font-medium text-muted-foreground">
-                        {content.movementFocus}: {content.movementBody}
-                      </p>
-                      <div className="flex flex-wrap items-end gap-2 sm:flex-nowrap">
-                        <span className="text-[clamp(3.4rem,8vw,5.4rem)] font-black leading-none tracking-[-0.1em] text-foreground">
-                          {steps.toLocaleString()}
-                        </span>
-                        <span className="pb-2 text-lg font-semibold text-muted-foreground">
-                          / {stepsGoal.toLocaleString()} {content.activityUnit}
-                        </span>
-                      </div>
-                      <div className="mt-5 h-4 rounded-full bg-slate-200/90 p-1">
-                        <div
-                          className="h-full rounded-full bg-[linear-gradient(90deg,#0f63ff,#6ea0ff)] shadow-[0_12px_22px_rgba(20,99,255,0.22)]"
-                          style={{ width: `${stepsProgress}%` }}
-                        />
-                      </div>
-                      <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-                        <span className="whitespace-nowrap">{content.goalLabel}: {stepsGoal.toLocaleString()}</span>
-                        <span className="whitespace-nowrap">{content.rhythmNote}: {peakDay.label}</span>
-                      </div>
-                    </div>
-                  </div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between px-1">
+                <div>
+                  <p className="apple-kicker">{copy.quickAccess}</p>
+                  <h2 className="mt-2 text-[1.95rem] font-black tracking-[-0.06em] text-foreground">
+                    Running, Gym, IGC SBD
+                  </h2>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy.quickAccessBody}</p>
                 </div>
+              </div>
 
-                <div className="grid gap-6 md:grid-cols-2">
-                  <div className="apple-panel p-6 sm:p-7">
-                    <div className="flex items-center justify-between">
-                      <h3 className="whitespace-nowrap text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
-                        {content.fuelStatus}
-                      </h3>
-                      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-foreground">
-                        <Utensils className="h-[18px] w-[18px]" />
-                      </span>
-                    </div>
-                    <div className="mt-8 space-y-6">
-                      <MacroRow label="Protein" current={protein} goal={180} barClass="bg-blue-500" />
-                      <MacroRow label="Carbs" current={carbs} goal={250} barClass="bg-orange-500" />
-                      <MacroRow label="Fats" current={fats} goal={70} barClass="bg-emerald-500" />
-                    </div>
-                    <div className="apple-divider mt-7" />
-                    <p className="mt-5 text-sm leading-6 text-muted-foreground">{content.macroNote}</p>
-                  </div>
+              <div className="grid gap-6 xl:grid-cols-3">
+                {topCards.map((card) => {
+                  const Icon = card.icon;
 
-                  <div className="apple-panel p-6 sm:p-7">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="whitespace-nowrap text-[1.55rem] font-black tracking-[-0.05em] text-foreground">
-                          {content.communityTitle}
-                        </h3>
-                        <p className="mt-1 text-sm text-muted-foreground">{content.liveCircle}</p>
-                      </div>
-                      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-foreground">
-                        <Users className="h-[18px] w-[18px]" />
-                      </span>
-                    </div>
-                    <div className="mt-6 space-y-4">
-                      {communityItems.map((item, index) => (
-                        <div key={item.name} className="flex items-center gap-3">
-                          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(180deg,#dbe9ff,#c8dbff)] text-sm font-bold text-primary">
-                            {item.name.charAt(0)}
-                          </span>
-                          <div className="min-w-0">
-                            <p className="truncate text-base font-semibold tracking-[-0.03em] text-foreground">{item.name}</p>
-                            <p className="truncate text-sm text-muted-foreground">{item.body}</p>
+                  return (
+                    <button
+                      key={card.title}
+                      type="button"
+                      onClick={() => onNavigate(card.page)}
+                      className={`group relative overflow-hidden rounded-[34px] bg-gradient-to-br ${card.accentClass} p-6 text-left text-white shadow-[0_24px_70px_rgba(15,23,42,0.16)] transition-transform hover:-translate-y-1 sm:p-7`}
+                    >
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.22),transparent_30%),radial-gradient(circle_at_84%_22%,rgba(255,255,255,0.14),transparent_24%)]" />
+                      <div className="relative flex h-full flex-col">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] ${card.chipClass}`}>
+                              {copy.quickAccess}
+                            </span>
+                            <h3 className="mt-4 text-[2rem] font-black tracking-[-0.06em]">{card.title}</h3>
                           </div>
-                          <span className="ml-auto rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-500">
-                            {index + 1}
+                          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/14">
+                            <Icon className="h-5 w-5" />
                           </span>
                         </div>
-                      ))}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => onNavigate('board')}
-                      className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary"
-                    >
-                      {content.communityLink}
-                      <ArrowUpRight className="h-4 w-4" />
+
+                        <p className="mt-5 max-w-[30ch] text-sm leading-6 text-white/78">{card.body}</p>
+
+                        <div className="mt-6 grid gap-3">
+                          {card.metrics.map((metric) => (
+                            <div key={metric.label} className="rounded-[22px] border border-white/16 bg-white/10 px-4 py-4 backdrop-blur-md">
+                              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/64">{metric.label}</p>
+                              <p className="mt-2 text-xl font-black tracking-[-0.04em]">{metric.value}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        {card.notice ? (
+                          <div className="mt-5 rounded-[22px] border border-white/14 bg-black/14 px-4 py-4 text-sm leading-6 text-white/78">
+                            {card.notice}
+                          </div>
+                        ) : null}
+
+                        <div className="mt-auto pt-6">
+                          <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                            {card.cta}
+                            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                          </div>
+                          <p className="mt-2 text-xs uppercase tracking-[0.16em] text-white/56">{card.footer}</p>
+                        </div>
+                      </div>
                     </button>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="apple-panel p-6 sm:p-8"
+          >
+            <div className="grid gap-8 xl:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)]">
+              <div className="space-y-5">
+                <div>
+                  <p className="apple-kicker">{copy.weeklyReportTitle}</p>
+                  <h2 className="mt-3 text-[2rem] font-black tracking-[-0.06em] text-foreground">
+                    {copy.weeklyReportTitle}
+                  </h2>
+                  <p className="mt-3 text-base leading-7 text-muted-foreground">{copy.weeklyReportBody}</p>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    {copy.tierGuideTitle}
+                  </p>
+                  {tierThresholds.map((tier) => (
+                    <div key={tier.key} className={`rounded-[24px] border px-4 py-4 ${tier.cardClass}`}>
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] ${tier.chipClass}`}>
+                            {tier.label}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            {tier.key === 'bronze' ? '0+' : tier.key === 'silver' ? '260+' : '420+'} pt
+                          </span>
+                        </div>
+                        {tierMeta.key === tier.key ? (
+                          <span className="text-sm font-semibold text-foreground">{isKorean ? '현재 티어' : 'Current tier'}</span>
+                        ) : null}
+                      </div>
+                      <p className="mt-3 text-sm leading-6 text-foreground/82">
+                        {isKorean ? tier.rewardKo : tier.rewardEn}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="rounded-[26px] bg-[linear-gradient(135deg,#10131a,#1f3e75)] p-5 text-white shadow-[0_20px_50px_rgba(15,23,42,0.16)]">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/60">
+                        {isKorean ? '이번 주 보상' : 'Weekly reward'}
+                      </p>
+                      <p className="mt-2 text-2xl font-black tracking-[-0.05em]">{tierMeta.label}</p>
+                    </div>
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/12">
+                      <Award className="h-5 w-5" />
+                    </span>
+                  </div>
+                  <p className="mt-4 text-sm leading-6 text-white/76">{tierMeta.reward}</p>
+                  <div className="mt-5 rounded-[20px] border border-white/12 bg-white/10 px-4 py-4">
+                    {nextTier ? (
+                      <p className="text-sm leading-6 text-white/78">
+                        {isKorean
+                          ? `${nextTier.label}까지 ${nextTier.remaining}pt 남았어요.`
+                          : `${nextTier.remaining} points left to reach ${nextTier.label}.`}
+                      </p>
+                    ) : (
+                      <p className="text-sm leading-6 text-white/78">
+                        {isKorean ? '최상위 티어를 유지하고 있어요. 지금 흐름을 이어가세요.' : 'You are already in the top tier. Keep the momentum going.'}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-6">
-                <div className="grid gap-6 sm:grid-cols-2">
-                  {metricCards.map((card) => {
-                    const Icon = card.icon;
-
-                    return (
-                      <div key={card.title} className="apple-panel p-6 sm:p-7">
-                        <div className="flex items-center justify-between">
-                          <span className={`flex h-12 w-12 items-center justify-center rounded-full ${card.bg} ${card.tone}`}>
-                            <Icon className="h-5 w-5" />
-                          </span>
-                          <span className={`text-sm font-bold ${card.tone}`}>{card.note}</span>
-                        </div>
-                        <p className="mt-10 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-                          {card.title}
-                        </p>
-                        <div className="mt-2 flex items-end gap-1.5">
-                          <span className="text-5xl font-black tracking-[-0.08em] text-foreground">{card.value}</span>
-                          {card.suffix ? <span className="pb-2 text-lg text-foreground/70">{card.suffix}</span> : null}
-                        </div>
-                      </div>
-                    );
-                  })}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="apple-kicker">{copy.weeklyReportTitle}</p>
+                    <h3 className="mt-2 text-[1.7rem] font-black tracking-[-0.05em] text-foreground">
+                      {isKorean ? '주간 순위표' : 'Weekly Leaderboard'}
+                    </h3>
+                  </div>
+                  <span className="apple-chip">
+                    <Medal className="h-3.5 w-3.5" />
+                    {weeklyEntries.length}
+                  </span>
                 </div>
 
-                <div className="apple-panel overflow-hidden">
-                  <div className="grid md:grid-cols-[0.88fr_1.12fr]">
-                    <div className="relative min-h-[280px] overflow-hidden bg-[linear-gradient(160deg,#183f4b,#2a666d_48%,#0f2025)] p-6 text-white">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(255,255,255,0.18),transparent_24%),radial-gradient(circle_at_84%_24%,rgba(255,164,104,0.24),transparent_26%)]" />
-                      <div className="absolute -bottom-8 right-8 h-36 w-24 rotate-[12deg] rounded-[30px] bg-white/12" />
-                      <div className="absolute bottom-10 right-28 h-20 w-20 rounded-full bg-white/10" />
-                      <div className="relative flex h-full flex-col">
-                        <span className="inline-flex w-fit items-center rounded-full border border-white/18 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/78">
-                          {content.featuredTag}
-                        </span>
-                        <div className="mt-auto">
-                          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[22px] bg-white/10 backdrop-blur-sm">
-                            <Dumbbell className="h-7 w-7 text-white" />
-                          </div>
-                          <p className="text-[clamp(1.95rem,3.1vw,2.85rem)] font-black leading-[0.96] tracking-[-0.08em] sm:whitespace-nowrap">
-                            {content.featuredTitle}
-                          </p>
-                          <p className="mt-3 max-w-[18ch] text-sm leading-6 text-white/72">
-                            {content.featuredSupport}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                <div className="overflow-x-auto rounded-[26px] border border-white/80 bg-white/72">
+                  <table className="min-w-full text-left">
+                    <thead className="bg-slate-50/90">
+                      <tr>
+                        {copy.leaderboardColumns.map((column) => (
+                          <th
+                            key={column}
+                            className="whitespace-nowrap px-4 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground"
+                          >
+                            {column}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {weeklyEntries.map((entry, index) => {
+                        const entryTier = getTierMeta(entry.score, isKorean);
+                        const isCurrentUser = entry.name === (user?.name || (isKorean ? '내 기록' : 'My Record'));
 
-                    <div className="p-6 sm:p-7">
-                      <p className="apple-kicker">{content.featuredTag}</p>
-                      <h3 className="mt-3 text-[clamp(1.7rem,2.6vw,2.15rem)] font-black leading-[1] tracking-[-0.06em] text-foreground sm:whitespace-nowrap">
-                        {content.featuredTitle}
-                      </h3>
-                      <p className="mt-4 text-base leading-7 text-muted-foreground">
-                        {content.featuredBody}
-                      </p>
-                      <div className="mt-5 flex flex-wrap gap-2">
-                        <span className="apple-chip">Mobility</span>
-                        <span className="apple-chip">Intervals</span>
-                        <span className="apple-chip">Core</span>
-                      </div>
-                      <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                        <div className="apple-soft-card px-4 py-4">
-                          <p className="whitespace-nowrap text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                            {isKorean ? '예상 시간' : 'Duration'}
-                          </p>
-                          <p className="mt-2 text-xl font-bold tracking-[-0.04em] text-foreground">{content.featuredDuration}</p>
-                        </div>
-                        <div className="apple-soft-card px-4 py-4">
-                          <p className="whitespace-nowrap text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                            {isKorean ? '강도' : 'Intensity'}
-                          </p>
-                          <p className="mt-2 text-xl font-bold tracking-[-0.04em] text-foreground">{content.featuredLevel}</p>
-                        </div>
-                      </div>
-                      <div className="mt-8 flex flex-wrap items-center gap-3">
-                        <button
-                          type="button"
-                          onClick={() => onNavigate('workout')}
-                          className="apple-button gap-2 px-6"
-                        >
-                          <Flame className="h-4 w-4" />
-                          {isKorean ? '세션 시작' : 'Start Session'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onNavigate('progress')}
-                          className="apple-ghost-button gap-2"
-                        >
-                          <Footprints className="h-4 w-4 text-primary" />
-                          {isKorean ? '활동 보기' : 'View Activity'}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="apple-panel p-6 sm:p-7">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="apple-kicker">{content.activityLabel}</p>
-                      <h3 className="mt-2 whitespace-nowrap text-[1.75rem] font-black tracking-[-0.06em] text-foreground">
-                        {isKorean ? '주간 흐름' : 'Weekly Rhythm'}
-                      </h3>
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        {content.rhythmNote}: {peakDay.label} · {averageDailyMinutes} {content.minutesUnit}/{isKorean ? '일' : 'day'}
-                      </p>
-                    </div>
-                    <span className="text-sm font-bold text-primary">{stepsProgress}%</span>
-                  </div>
-                  <div className="mt-8 flex h-[180px] items-end gap-3">
-                    {weeklyMinutes.map((item) => (
-                      <div key={item.label} className="flex flex-1 flex-col items-center gap-3">
-                        <div className="flex h-full w-full items-end rounded-[22px] bg-slate-100/80 p-2">
-                          <div
-                            className={`w-full rounded-[18px] ${
-                              item.active
-                                ? 'bg-[linear-gradient(180deg,#1a6bff,#0f58ea)] shadow-[0_14px_28px_rgba(20,99,255,0.22)]'
-                                : 'bg-[linear-gradient(180deg,#d7deec,#eef2f8)]'
-                            }`}
-                            style={{ height: `${Math.max(18, Math.round((item.minutes / maxMinutes) * 100))}%` }}
-                          />
-                        </div>
-                        <span className={`text-[11px] font-semibold uppercase tracking-[0.18em] ${item.active ? 'text-primary' : 'text-muted-foreground'}`}>
-                          {item.label}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                        return (
+                          <tr
+                            key={`${entry.name}_${entry.score}`}
+                            className={`${isCurrentUser ? 'bg-blue-50/70' : 'bg-white/75'} border-t border-slate-100`}
+                          >
+                            <td className="px-4 py-4 text-sm font-bold text-foreground">{index + 1}</td>
+                            <td className="px-4 py-4">
+                              <div className="flex items-center gap-3">
+                                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-foreground">
+                                  {entry.name.charAt(0)}
+                                </span>
+                                <div>
+                                  <p className="text-sm font-semibold text-foreground">{entry.name}</p>
+                                  {isCurrentUser ? (
+                                    <p className="text-xs text-primary">{isKorean ? '내 기록' : 'Your entry'}</p>
+                                  ) : null}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="whitespace-nowrap px-4 py-4 text-sm text-muted-foreground">{entry.focus}</td>
+                            <td className="whitespace-nowrap px-4 py-4 text-sm font-semibold text-foreground">{entry.score} pt</td>
+                            <td className="px-4 py-4">
+                              <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] ${entryTier.chipClass}`}>
+                                {entryTier.label}
+                              </span>
+                            </td>
+                            <td className="min-w-[220px] px-4 py-4 text-sm text-muted-foreground">{entryTier.reward}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
           </motion.section>
 
-          {(sbdStatusText || sbdStatusImage) && (
-            <motion.section
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="apple-panel relative overflow-hidden p-6 sm:p-7"
-            >
-              <div className="absolute top-0 right-0 h-32 w-32 rounded-bl-[100px] bg-violet-100 blur-2xl opacity-50" />
-              <div className="relative">
-                <div className="mb-4 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100 text-violet-600">
-                      <Trophy className="h-5 w-5" />
-                    </span>
-                    <h3 className="whitespace-nowrap text-xl font-black tracking-tight text-foreground">
-                      {isKorean ? 'SBD 현황' : 'SBD Status'}
-                    </h3>
+          <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]"
+          >
+            <div className="apple-panel p-6 sm:p-7">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="apple-kicker">{copy.storiesTitle}</p>
+                  <h2 className="mt-2 text-[1.75rem] font-black tracking-[-0.05em] text-foreground">
+                    {copy.storiesTitle}
+                  </h2>
+                </div>
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-500">
+                  <Star className="h-5 w-5" />
+                </span>
+              </div>
+
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy.storiesBody}</p>
+
+              <div className="mt-6 space-y-4">
+                {copy.reviews.map((review) => (
+                  <div key={review.name} className="apple-soft-card p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="text-lg font-black tracking-[-0.04em] text-foreground">{review.name}</p>
+                        <p className="text-sm text-primary">{review.program}</p>
+                      </div>
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-600">
+                        {review.result}
+                      </span>
+                    </div>
+                    <p className="mt-4 text-sm leading-7 text-muted-foreground">"{review.quote}"</p>
                   </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="apple-panel p-6 sm:p-7">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="apple-kicker">{copy.mentoringTitle}</p>
+                  <h2 className="mt-2 text-[1.75rem] font-black tracking-[-0.05em] text-foreground">
+                    {copy.mentoringTitle}
+                  </h2>
+                </div>
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-primary">
+                  <ClipboardCheck className="h-5 w-5" />
+                </span>
+              </div>
+
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy.mentoringBody}</p>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                {copy.mentoringSteps.map((step, index) => (
+                  <div key={step.title} className="apple-soft-card px-4 py-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                      {step.title}
+                    </p>
+                    <p className="mt-2 text-base font-black tracking-[-0.04em] text-foreground">
+                      {index === 0
+                        ? isKorean ? '트랙 선택' : 'Pick Track'
+                        : index === 1
+                          ? isKorean ? '시간/목표 작성' : 'Select Slot'
+                          : isKorean ? '배정 안내' : 'Get Assigned'}
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground">{step.body}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 space-y-5">
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    {copy.mentoringTrack}
+                  </Label>
+                  <select
+                    value={mentoringTrack}
+                    onChange={(event) => setMentoringTrack(event.target.value)}
+                    className="apple-input w-full border-0 bg-white/92 text-foreground"
+                  >
+                    {copy.mentoringTracks.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    {copy.mentoringSlot}
+                  </Label>
+                  <select
+                    value={mentoringSlot}
+                    onChange={(event) => setMentoringSlot(event.target.value)}
+                    className="apple-input w-full border-0 bg-white/92 text-foreground"
+                  >
+                    {copy.mentoringSlots.map((slot) => (
+                      <option key={slot} value={slot}>
+                        {slot}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    {copy.mentoringGoal}
+                  </Label>
+                  <Textarea
+                    value={mentoringGoal}
+                    onChange={(event) => setMentoringGoal(event.target.value)}
+                    placeholder={copy.mentoringGoalPlaceholder}
+                    className="apple-input min-h-[140px] border-0 bg-white/92 py-4 text-base text-foreground"
+                  />
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+                  <Input
+                    value={user?.email || ''}
+                    readOnly
+                    className="apple-input border-0 bg-slate-50 text-muted-foreground"
+                  />
                   <button
                     type="button"
-                    onClick={() => onNavigate('competition')}
-                    className="text-sm font-semibold text-violet-600 transition-colors hover:text-violet-700"
+                    onClick={handleMentoringSubmit}
+                    className="apple-button h-14 px-6"
                   >
-                    {isKorean ? '자세히 보기' : 'View details'}
+                    {copy.mentoringSubmit}
                   </button>
                 </div>
 
-                {sbdStatusImage ? (
-                  <div className="mt-4 overflow-hidden rounded-xl border border-border shadow-sm">
-                    <img src={sbdStatusImage} alt="SBD Competition Leaderboard" className="h-auto w-full object-cover" />
-                  </div>
-                ) : null}
-
-                {sbdStatusText ? (
-                  <div className="mt-4 rounded-xl border border-violet-100 bg-violet-50/50 p-4">
-                    <p className="break-words text-sm font-medium text-violet-900 md:text-base">
-                      {sbdStatusText}
-                    </p>
+                {applicationMessage ? (
+                  <div className="rounded-[22px] border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm leading-6 text-emerald-700">
+                    {applicationMessage}
                   </div>
                 ) : null}
               </div>
-            </motion.section>
-          )}
+            </div>
+          </motion.section>
 
-          <section className="space-y-5">
-            <div className="flex items-center justify-between px-1">
-              <h2 className="whitespace-nowrap text-[2rem] font-black tracking-[-0.06em] text-foreground">
-                {content.recoveryTitle}
-              </h2>
-              <button
-                type="button"
-                onClick={() => onNavigate('routine')}
-                className="hidden text-sm font-semibold text-primary sm:inline-flex"
-              >
-                {isKorean ? '루틴 열기' : 'Open routine'}
-              </button>
+          <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="overflow-hidden rounded-[34px] bg-[linear-gradient(160deg,#162126,#24353d_48%,#111a1f)] p-6 text-white shadow-[0_28px_80px_rgba(17,24,39,0.18)] sm:p-8"
+          >
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <img src="/fitin-wordmark.svg" alt="Fitin Connection" className="h-12 w-auto rounded-[18px] object-contain" />
+                <h2 className="mt-5 text-[1.95rem] font-black tracking-[-0.06em] text-white">
+                  {copy.scheduleTitle}
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-white/68">{copy.scheduleBody}</p>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="rounded-[22px] border border-white/12 bg-white/8 px-4 py-4 backdrop-blur-md">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/56">
+                    {isKorean ? '러닝' : 'Running'}
+                  </p>
+                  <p className="mt-2 text-xl font-black">Mon / Wed 07:00</p>
+                </div>
+                <div className="rounded-[22px] border border-white/12 bg-white/8 px-4 py-4 backdrop-blur-md">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/56">
+                    {isKorean ? '오픈짐' : 'Open Gym'}
+                  </p>
+                  <p className="mt-2 text-xl font-black">08:00-22:00</p>
+                </div>
+                <div className="rounded-[22px] border border-white/12 bg-white/8 px-4 py-4 backdrop-blur-md">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/56">
+                    {isKorean ? 'PT' : 'PT'}
+                  </p>
+                  <p className="mt-2 text-xl font-black">{isKorean ? '화 19:00' : 'Tue 19:00'}</p>
+                </div>
+              </div>
             </div>
 
-            <div className="grid gap-5 md:grid-cols-3">
-              {content.recoveryCards.map((card) => {
-                const Icon = card.icon;
+            <div className="mt-8 overflow-x-auto rounded-[28px] border border-white/12 bg-black/12">
+              <table className="min-w-full text-left">
+                <thead className="bg-white/10">
+                  <tr>
+                    {copy.scheduleHeaders.map((header) => (
+                      <th
+                        key={header}
+                        className="whitespace-nowrap px-4 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-white/70"
+                      >
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {copy.scheduleRows.map((row) => (
+                    <tr key={row.time} className="border-t border-white/8">
+                      <td className="whitespace-nowrap px-4 py-4 text-sm font-semibold text-white/72">{row.time}</td>
+                      {row.values.map((value, index) => {
+                        const isRunning = value === 'Running';
+                        const isPt = value.includes('PT');
 
-                return (
-                  <div key={card.title} className="apple-panel p-6 sm:p-7">
-                    <span className={`flex h-14 w-14 items-center justify-center rounded-[20px] ${card.bg} ${card.tint}`}>
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <h3 className="mt-8 text-[1.45rem] font-black leading-[1.08] tracking-[-0.05em] text-foreground sm:whitespace-nowrap">
-                      {card.title}
-                    </h3>
-                    <p className="mt-4 text-base leading-7 text-muted-foreground">{card.body}</p>
-                    <button
-                      type="button"
-                      onClick={() => onNavigate('routine')}
-                      className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary"
-                    >
-                      {content.openRecovery}
-                      <ArrowUpRight className="h-4 w-4" />
-                    </button>
-                  </div>
-                );
-              })}
+                        return (
+                          <td key={`${row.time}_${index}`} className="px-4 py-4">
+                            <span
+                              className={`inline-flex min-w-[120px] justify-center rounded-[16px] px-3 py-3 text-sm font-semibold ${
+                                value === '-'
+                                  ? 'text-white/24'
+                                  : isRunning
+                                    ? 'bg-white text-slate-900'
+                                    : isPt
+                                      ? 'bg-amber-50 text-slate-900'
+                                      : 'bg-white/10 text-white/84'
+                              }`}
+                            >
+                              {value}
+                            </span>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </section>
+          </motion.section>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function MacroRow({
-  label,
-  current,
-  goal,
-  barClass,
-}: {
-  label: string;
-  current: number;
-  goal: number;
-  barClass: string;
-}) {
-  return (
-    <div>
-      <div className="flex items-center justify-between text-sm font-semibold text-foreground">
-        <span>{label}</span>
-        <span className="text-muted-foreground">
-          {current}g / {goal}g
-        </span>
-      </div>
-      <div className="mt-3 h-2 rounded-full bg-slate-200">
-        <div
-          className={`h-2 rounded-full ${barClass}`}
-          style={{ width: `${Math.min(100, Math.round((current / goal) * 100))}%` }}
-        />
       </div>
     </div>
   );

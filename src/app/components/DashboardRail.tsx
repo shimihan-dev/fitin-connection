@@ -1,10 +1,9 @@
 import {
-  Activity,
   Dumbbell,
+  Footprints,
   Grid2x2,
-  HeartPulse,
-  MoonStar,
-  Target,
+  MessageSquare,
+  Trophy,
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -25,26 +24,26 @@ export function DashboardRail({ user, activeSection, onNavigate }: DashboardRail
   const labels = isKorean
     ? {
         membership: '프리미엄 멤버',
-        startWorkout: '운동 시작',
+        startWorkout: '바로 시작',
         weeklyGoal: '주간 목표',
         items: [
           { id: 'overview' as const, label: '개요', icon: Grid2x2, page: 'home' as Page },
-          { id: 'activity' as const, label: '활동', icon: Dumbbell, page: 'progress' as Page },
-          { id: 'heart', label: '심박', icon: HeartPulse, page: 'progress' as Page },
-          { id: 'sleep', label: '수면', icon: MoonStar, page: 'progress' as Page },
-          { id: 'goals', label: '목표', icon: Target, page: 'competition' as Page },
+          { id: 'running', label: '러닝', icon: Footprints, page: 'workout' as Page },
+          { id: 'gym', label: '헬스', icon: Dumbbell, page: 'routine' as Page },
+          { id: 'sbd', label: 'IGC SBD', icon: Trophy, page: 'competition' as Page },
+          { id: 'community', label: '커뮤니티', icon: MessageSquare, page: 'board' as Page },
         ],
       }
     : {
         membership: 'Premium Member',
-        startWorkout: 'Start Workout',
+        startWorkout: 'Quick Start',
         weeklyGoal: 'Weekly Goal',
         items: [
           { id: 'overview' as const, label: 'Overview', icon: Grid2x2, page: 'home' as Page },
-          { id: 'activity' as const, label: 'Activity', icon: Dumbbell, page: 'progress' as Page },
-          { id: 'heart', label: 'Heart Rate', icon: HeartPulse, page: 'progress' as Page },
-          { id: 'sleep', label: 'Sleep', icon: MoonStar, page: 'progress' as Page },
-          { id: 'goals', label: 'Goals', icon: Target, page: 'competition' as Page },
+          { id: 'running', label: 'Running', icon: Footprints, page: 'workout' as Page },
+          { id: 'gym', label: 'Gym', icon: Dumbbell, page: 'routine' as Page },
+          { id: 'sbd', label: 'IGC SBD', icon: Trophy, page: 'competition' as Page },
+          { id: 'community', label: 'Community', icon: MessageSquare, page: 'board' as Page },
         ],
       };
 
