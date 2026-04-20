@@ -578,7 +578,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                     </div>
                   </div>
 
-                  <div className="grid gap-4 lg:grid-cols-3">
+                  <div className="grid gap-4">
                     {topCards.map((card) => {
                       const Icon = card.icon;
 
@@ -590,42 +590,48 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                           className={`group relative overflow-hidden rounded-[34px] bg-gradient-to-br ${card.accentClass} p-6 text-left text-white shadow-[0_24px_70px_rgba(15,23,42,0.16)] transition-transform hover:-translate-y-1 sm:p-7`}
                         >
                           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.22),transparent_30%),radial-gradient(circle_at_84%_22%,rgba(255,255,255,0.14),transparent_24%)]" />
-                          <div className="relative flex h-full flex-col">
-                            <div className="flex items-start justify-between gap-4">
-                              <div>
-                                <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] ${card.chipClass}`}>
-                                  {copy.quickAccess}
-                                </span>
-                                <h3 className="mt-4 text-[2rem] font-black tracking-[-0.06em]">{card.title}</h3>
-                              </div>
-                              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/14">
-                                <Icon className="h-5 w-5" />
-                              </span>
-                            </div>
-
-                            <p className="mt-5 max-w-[30ch] text-sm leading-6 text-white/78">{card.body}</p>
-
-                            <div className="mt-6 grid gap-3">
-                              {card.metrics.map((metric) => (
-                                <div key={metric.label} className="rounded-[22px] border border-white/16 bg-white/10 px-4 py-4 backdrop-blur-md">
-                                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/64">{metric.label}</p>
-                                  <p className="mt-2 text-xl font-black tracking-[-0.04em]">{metric.value}</p>
+                          <div className="relative flex h-full flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,0.88fr)_minmax(360px,1.12fr)] lg:gap-6">
+                            <div className="flex h-full flex-col">
+                              <div className="flex items-start justify-between gap-4">
+                                <div>
+                                  <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] ${card.chipClass}`}>
+                                    {copy.quickAccess}
+                                  </span>
+                                  <h3 className="mt-4 text-[2rem] font-black tracking-[-0.06em] sm:text-[2.2rem]">
+                                    {card.title}
+                                  </h3>
                                 </div>
-                              ))}
+                                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/14">
+                                  <Icon className="h-5 w-5" />
+                                </span>
+                              </div>
+
+                              <p className="mt-5 max-w-[42ch] text-sm leading-6 text-white/78">{card.body}</p>
+
+                              <div className="mt-6 lg:mt-auto lg:pt-6">
+                                <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                                  {card.cta}
+                                  <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                                </div>
+                                <p className="mt-2 text-xs uppercase tracking-[0.16em] text-white/56">{card.footer}</p>
+                              </div>
                             </div>
 
-                            {card.notice ? (
-                              <div className="mt-5 rounded-[22px] border border-white/14 bg-black/14 px-4 py-4 text-sm leading-6 text-white/78">
-                                {card.notice}
+                            <div className="grid gap-3 lg:content-start">
+                              <div className="grid gap-3 sm:grid-cols-3">
+                                {card.metrics.map((metric) => (
+                                  <div key={metric.label} className="rounded-[22px] border border-white/16 bg-white/10 px-4 py-4 backdrop-blur-md">
+                                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/64">{metric.label}</p>
+                                    <p className="mt-2 text-xl font-black tracking-[-0.04em]">{metric.value}</p>
+                                  </div>
+                                ))}
                               </div>
-                            ) : null}
 
-                            <div className="mt-auto pt-6">
-                              <div className="flex items-center gap-2 text-sm font-semibold text-white">
-                                {card.cta}
-                                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                              </div>
-                              <p className="mt-2 text-xs uppercase tracking-[0.16em] text-white/56">{card.footer}</p>
+                              {card.notice ? (
+                                <div className="rounded-[22px] border border-white/14 bg-black/14 px-4 py-4 text-sm leading-6 text-white/78">
+                                  {card.notice}
+                                </div>
+                              ) : null}
                             </div>
                           </div>
                         </button>
