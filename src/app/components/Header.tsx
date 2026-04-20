@@ -22,6 +22,7 @@ interface HeaderProps {
   currentPage?: Page;
   onNavigate?: (page: Page) => void;
   onLogout: () => void;
+  onLoginClick?: () => void;
   onLoginSuccess?: (_user: unknown) => void;
   onSignupClick?: () => void;
   onMyPageClick?: () => void;
@@ -46,6 +47,8 @@ export function Header({
   currentPage,
   onNavigate,
   onLogout,
+  onLoginClick,
+  onSignupClick,
   onMyPageClick,
   onNotificationsClick,
   showBackButton = false,
@@ -130,45 +133,76 @@ export function Header({
               <Globe className="h-4 w-4 text-primary" />
               <span className="text-xs font-semibold text-foreground">{language === 'ko' ? 'KO' : 'EN'}</span>
             </button>
-            <button
-              type="button"
-              onClick={() => onNotificationsClick?.()}
-              className={iconButtonClass}
-              aria-label={t('header.notifications')}
-            >
-              <Bell className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowAccountDialog(true)}
-              className={iconButtonClass}
-              aria-label={t('common.system_settings')}
-            >
-              <Settings2 className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => onMyPageClick?.()}
-              className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-[radial-gradient(circle_at_30%_30%,#edf4ff,#dbe8ff_58%,#c8dafc)] text-sm font-bold text-primary shadow-[0_12px_24px_rgba(15,23,42,0.08)]"
-              aria-label={t('common.mypage')}
-            >
-              {user?.profile_picture ? (
-                <img src={user.profile_picture} alt="profile" className="h-full w-full object-cover" />
-              ) : (
-                userInitial
-              )}
-            </button>
+            {user ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => onNotificationsClick?.()}
+                  className={iconButtonClass}
+                  aria-label={t('header.notifications')}
+                >
+                  <Bell className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAccountDialog(true)}
+                  className={iconButtonClass}
+                  aria-label={t('common.system_settings')}
+                >
+                  <Settings2 className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onMyPageClick?.()}
+                  className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-[radial-gradient(circle_at_30%_30%,#edf4ff,#dbe8ff_58%,#c8dafc)] text-sm font-bold text-primary shadow-[0_12px_24px_rgba(15,23,42,0.08)]"
+                  aria-label={t('common.mypage')}
+                >
+                  {user?.profile_picture ? (
+                    <img src={user.profile_picture} alt="profile" className="h-full w-full object-cover" />
+                  ) : (
+                    userInitial
+                  )}
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => onLoginClick?.()}
+                  className="apple-ghost-button h-11 px-5"
+                >
+                  {t('common.login')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onSignupClick?.()}
+                  className="apple-button h-11 px-5"
+                >
+                  {t('common.signup')}
+                </button>
+              </>
+            )}
           </div>
 
           <div className="ml-auto flex items-center gap-2 md:hidden">
-            <button
-              type="button"
-              onClick={() => onNotificationsClick?.()}
-              className={iconButtonClass}
-              aria-label={t('header.notifications')}
-            >
-              <Bell className="h-4 w-4" />
-            </button>
+            {user ? (
+              <button
+                type="button"
+                onClick={() => onNotificationsClick?.()}
+                className={iconButtonClass}
+                aria-label={t('header.notifications')}
+              >
+                <Bell className="h-4 w-4" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onLoginClick?.()}
+                className="apple-ghost-button h-10 px-4"
+              >
+                {t('common.login')}
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setShowMobileMenu((prev) => !prev)}
@@ -235,34 +269,69 @@ export function Header({
                     </span>
                     <Globe className="h-5 w-5 text-primary" />
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onMyPageClick?.();
-                      setShowMobileMenu(false);
-                    }}
-                    className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
-                  >
-                    <span className="min-w-0">
-                      <span className="apple-kicker">Profile</span>
-                      <span className="mt-1 block truncate whitespace-nowrap text-sm font-semibold">{t('common.mypage')}</span>
-                    </span>
-                    <User className="h-5 w-5 text-primary" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowAccountDialog(true);
-                      setShowMobileMenu(false);
-                    }}
-                    className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
-                  >
-                    <span className="min-w-0">
-                      <span className="apple-kicker">Settings</span>
-                      <span className="mt-1 block truncate whitespace-nowrap text-sm font-semibold">{t('common.system_settings')}</span>
-                    </span>
-                    <Settings2 className="h-5 w-5 text-primary" />
-                  </button>
+                  {user ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onMyPageClick?.();
+                          setShowMobileMenu(false);
+                        }}
+                        className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
+                      >
+                        <span className="min-w-0">
+                          <span className="apple-kicker">Profile</span>
+                          <span className="mt-1 block truncate whitespace-nowrap text-sm font-semibold">{t('common.mypage')}</span>
+                        </span>
+                        <User className="h-5 w-5 text-primary" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowAccountDialog(true);
+                          setShowMobileMenu(false);
+                        }}
+                        className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
+                      >
+                        <span className="min-w-0">
+                          <span className="apple-kicker">Settings</span>
+                          <span className="mt-1 block truncate whitespace-nowrap text-sm font-semibold">{t('common.system_settings')}</span>
+                        </span>
+                        <Settings2 className="h-5 w-5 text-primary" />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onLoginClick?.();
+                          setShowMobileMenu(false);
+                        }}
+                        className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
+                      >
+                        <span className="min-w-0">
+                          <span className="apple-kicker">Access</span>
+                          <span className="mt-1 block truncate whitespace-nowrap text-sm font-semibold">{t('common.login')}</span>
+                        </span>
+                        <User className="h-5 w-5 text-primary" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSignupClick?.();
+                          setShowMobileMenu(false);
+                        }}
+                        className="apple-soft-card flex items-center justify-between px-4 py-4 text-left"
+                      >
+                        <span className="min-w-0">
+                          <span className="apple-kicker">Start</span>
+                          <span className="mt-1 block truncate whitespace-nowrap text-sm font-semibold">{t('common.signup')}</span>
+                        </span>
+                        <ChevronRight className="h-5 w-5 text-primary" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -272,6 +341,7 @@ export function Header({
 
       <WorkoutDictionary open={showDictionary} onOpenChange={setShowDictionary} />
 
+      {user ? (
       <Dialog open={showAccountDialog} onOpenChange={setShowAccountDialog}>
         <DialogContent className="max-w-[calc(100%-1.5rem)] rounded-[30px] border-white/80 bg-white/90 p-0 shadow-[0_28px_80px_rgba(15,23,42,0.14)] backdrop-blur-2xl sm:max-w-md">
           <div className="relative overflow-hidden rounded-[30px] p-6">
@@ -376,6 +446,7 @@ export function Header({
           </div>
         </DialogContent>
       </Dialog>
+      ) : null}
     </>
   );
 }

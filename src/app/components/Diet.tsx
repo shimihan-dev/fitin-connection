@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { getGlobalSetting } from '../../../utils/globalSettings';
 
 interface DietProps {
-    user: { name: string; email: string };
+    user: { name: string; email: string } | null;
 }
 
 interface MealItem {

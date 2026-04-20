@@ -3,7 +3,6 @@ import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
 import { HomePage } from './components/HomePage';
 import { WelcomeSlides } from './components/WelcomeSlides';
-import { OnboardingFlow } from './components/OnboardingFlow';
 import { SignupPage } from './components/SignupPage';
 import { LoginDialog } from './components/auth/LoginDialog';
 import { ResetPasswordDialog } from './components/auth/ResetPassWordDialog';
@@ -64,6 +63,10 @@ export default function App() {
     alert(t('auth.logged_out'));
   };
 
+  const handleGuestNavigate = (page: Page) => {
+    setCurrentPage(page === 'admin' ? 'home' : page);
+  };
+
   // ── 회원가입 페이지 ──────────────────────────────────────────
   if (isSignupPage) {
     return (
@@ -84,22 +87,45 @@ export default function App() {
     );
   }
 
-  // ── 비로그인 → 온보딩 ────────────────────────────────────────
+  const renderGuestPage = () => {
+    switch (currentPage) {
+      case 'home':        return <HomePage user={null} onNavigate={handleGuestNavigate} />;
+      case 'workout':     return <WorkoutGuide user={null} />;
+      case 'competition': return <CompetitionPage user={null} />;
+      case 'routine':     return <RoutinePlanner user={null} />;
+      case 'progress':    return <Progress user={null} onNavigate={handleGuestNavigate} />;
+      case 'diet':        return <Diet user={null} />;
+      case 'board':       return <Board user={null} />;
+      default:            return <HomePage user={null} onNavigate={handleGuestNavigate} />;
+    }
+  };
+
+  // ── 비로그인 → 공개 메인 ────────────────────────────────────
   if (!user) {
     return (
-      <div className="min-h-screen bg-background text-foreground">
-        <OnboardingFlow
-          onComplete={(completedUser) => {
-            const email = completedUser.email || '';
-            handleLoginSuccess({
-              ...completedUser,
-              name: completedUser.name || (email ? email.split('@')[0] : t('common.user')),
-              email,
-            } as any);
-            setCurrentPage('home');
-          }}
+      <div className="flex min-h-[100dvh] flex-col bg-background text-foreground">
+        <Header
+          user={null}
+          currentPage={currentPage}
+          onNavigate={handleGuestNavigate}
+          onLogout={() => setShowLoginDialog(true)}
           onLoginClick={() => setShowLoginDialog(true)}
+          onSignupClick={() => setIsSignupPage(true)}
+          onMyPageClick={() => setShowLoginDialog(true)}
+          onNotificationsClick={() => setShowLoginDialog(true)}
         />
+
+        <main className="flex-1 overflow-y-auto pt-18 scroll-smooth pb-24 md:pb-0">
+          <div className="mx-auto max-w-[1520px] px-4 pb-10 sm:px-6 lg:px-8">
+            <Suspense fallback={<PageSpinner />}>
+              {renderGuestPage()}
+            </Suspense>
+          </div>
+        </main>
+
+        <div className="md:hidden">
+          <Navigation currentPage={currentPage} onNavigate={handleGuestNavigate} />
+        </div>
 
         <LoginDialog
           open={showLoginDialog}
