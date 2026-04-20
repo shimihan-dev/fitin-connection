@@ -5,6 +5,7 @@ import {
   BookOpen,
   ChevronRight,
   Globe,
+  Instagram,
   LogOut,
   Menu,
   Settings2,
@@ -34,6 +35,8 @@ interface HeaderProps {
 
 const iconButtonClass =
   'flex h-10 w-10 items-center justify-center rounded-full bg-white/78 text-foreground shadow-[0_12px_24px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-white';
+const instagramUrl =
+  'https://www.instagram.com/fitinconnection_official?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==';
 
 const navItems: { id: Page; label: string; match: (page?: Page) => boolean }[] = [
   { id: 'home', label: 'Dashboard', match: (page) => page === 'home' },
@@ -80,23 +83,13 @@ export function Header({
             <button
               type="button"
               onClick={() => onNavigate?.('home')}
-              className="flex min-w-0 items-center gap-3 rounded-full pr-1 text-left"
+              className="flex min-w-0 items-center rounded-[22px] p-1 text-left transition-transform hover:-translate-y-0.5"
             >
-              <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-[16px] bg-white shadow-[0_12px_28px_rgba(15,23,42,0.12)]">
-                <img src="/fitin-icon.svg" alt="Fitin Connection logo" className="h-full w-full object-cover" />
-              </span>
-              <span className="min-w-0">
-                <img
-                  src="/fitin-wordmark.svg"
-                  alt="Fitin Connection"
-                  className="hidden h-10 w-auto max-w-[220px] object-contain sm:block"
-                />
-                <img
-                  src="/fitin-wordmark.svg"
-                  alt="Fitin Connection"
-                  className="h-8 w-auto max-w-[150px] object-contain sm:hidden"
-                />
-              </span>
+              <img
+                src="/fitin-icon.svg"
+                alt="Fitin Connection"
+                className="h-12 w-auto object-contain sm:h-14"
+              />
             </button>
           </div>
 
@@ -124,6 +117,15 @@ export function Header({
           </nav>
 
           <div className="ml-auto hidden items-center gap-2 md:flex">
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noreferrer"
+              className={iconButtonClass}
+              aria-label="Open Fitin Connection Instagram"
+            >
+              <Instagram className="h-4 w-4" />
+            </a>
             <button
               type="button"
               onClick={() => setLanguage(language === 'ko' ? 'en' : 'ko')}
@@ -203,6 +205,15 @@ export function Header({
                 {t('common.login')}
               </button>
             )}
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noreferrer"
+              className={iconButtonClass}
+              aria-label="Open Fitin Connection Instagram"
+            >
+              <Instagram className="h-4 w-4" />
+            </a>
             <button
               type="button"
               onClick={() => setShowMobileMenu((prev) => !prev)}

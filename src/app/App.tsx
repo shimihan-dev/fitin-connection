@@ -24,6 +24,97 @@ const AdminDashboard  = lazy(() => import('./components/AdminDashboard').then(m 
 const TrainerDashboard = lazy(() => import('./components/TrainerDashboard'));
 
 type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board' | 'admin';
+type WorkoutTab = 'routine' | 'running' | 'diet';
+type RoutineSubTab = 'planner' | 'upper' | 'lower';
+
+interface AppLocationState {
+  currentPage: Page;
+  workoutTab: WorkoutTab;
+  routineSubTab: RoutineSubTab;
+  isSignupPage: boolean;
+}
+
+interface NavigationOptions {
+  workoutTab?: WorkoutTab;
+  routineSubTab?: RoutineSubTab;
+  replace?: boolean;
+}
+
+const appPages: Page[] = ['home', 'workout', 'routine', 'progress', 'diet', 'competition', 'board', 'admin'];
+const workoutTabs: WorkoutTab[] = ['routine', 'running', 'diet'];
+const routineSubTabs: RoutineSubTab[] = ['planner', 'upper', 'lower'];
+
+const isPage = (value: string | null): value is Page =>
+  Boolean(value && appPages.includes(value as Page));
+
+const isWorkoutTab = (value: string | null): value is WorkoutTab =>
+  Boolean(value && workoutTabs.includes(value as WorkoutTab));
+
+const isRoutineSubTab = (value: string | null): value is RoutineSubTab =>
+  Boolean(value && routineSubTabs.includes(value as RoutineSubTab));
+
+const readAppLocation = (): AppLocationState => {
+  if (typeof window === 'undefined') {
+    return {
+      currentPage: 'home',
+      workoutTab: 'routine',
+      routineSubTab: 'planner',
+      isSignupPage: false,
+    };
+  }
+
+  const params = new URLSearchParams(window.location.search);
+
+  return {
+    currentPage: isPage(params.get('appPage')) ? (params.get('appPage') as Page) : 'home',
+    workoutTab: isWorkoutTab(params.get('workoutTab'))
+      ? (params.get('workoutTab') as WorkoutTab)
+      : 'routine',
+    routineSubTab: isRoutineSubTab(params.get('routineTab'))
+      ? (params.get('routineTab') as RoutineSubTab)
+      : 'planner',
+    isSignupPage: params.get('page') === 'signup',
+  };
+};
+
+const writeAppLocation = (
+  currentPage: Page,
+  workoutTab: WorkoutTab,
+  routineSubTab: RoutineSubTab,
+  replace = false,
+) => {
+  if (typeof window === 'undefined') return;
+
+  const url = new URL(window.location.href);
+  url.searchParams.delete('page');
+
+  if (currentPage === 'home') {
+    url.searchParams.delete('appPage');
+  } else {
+    url.searchParams.set('appPage', currentPage);
+  }
+
+  if (currentPage === 'workout') {
+    url.searchParams.set('workoutTab', workoutTab);
+    if (workoutTab === 'routine') {
+      url.searchParams.set('routineTab', routineSubTab);
+    } else {
+      url.searchParams.delete('routineTab');
+    }
+  } else {
+    url.searchParams.delete('workoutTab');
+    url.searchParams.delete('routineTab');
+  }
+
+  const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+  const state = { currentPage, workoutTab, routineSubTab };
+
+  if (replace) {
+    window.history.replaceState(state, '', nextUrl);
+  } else {
+    window.history.pushState(state, '', nextUrl);
+  }
+};
 
 const PageSpinner = () => (
   <div className="flex justify-center items-center pt-20">
@@ -34,9 +125,12 @@ const PageSpinner = () => (
 export default function App() {
   const { t } = useLanguage();
   const { user, handleLogout, handleLoginSuccess, loading } = useAuth();
+  const initialLocation = readAppLocation();
 
-  const [currentPage, setCurrentPage]           = useState<Page>('home');
-  const [isSignupPage, setIsSignupPage]         = useState(false);
+  const [currentPage, setCurrentPage]           = useState<Page>(initialLocation.currentPage);
+  const [workoutTab, setWorkoutTab]             = useState<WorkoutTab>(initialLocation.workoutTab);
+  const [routineSubTab, setRoutineSubTab]       = useState<RoutineSubTab>(initialLocation.routineSubTab);
+  const [isSignupPage, setIsSignupPage]         = useState(initialLocation.isSignupPage);
   const [showMyPage, setShowMyPage]             = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showLoginDialog, setShowLoginDialog]   = useState(false);
@@ -44,9 +138,50 @@ export default function App() {
   const [showWelcomeSlides, setShowWelcomeSlides] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('page') === 'signup') setIsSignupPage(true);
+    const syncFromLocation = () => {
+      const nextLocation = readAppLocation();
+      setCurrentPage(nextLocation.currentPage);
+      setWorkoutTab(nextLocation.workoutTab);
+      setRoutineSubTab(nextLocation.routineSubTab);
+      setIsSignupPage(nextLocation.isSignupPage);
+      setShowMyPage(false);
+      setShowNotifications(false);
+    };
+
+    window.addEventListener('popstate', syncFromLocation);
+
+    return () => window.removeEventListener('popstate', syncFromLocation);
   }, []);
+
+  const navigateTo = (page: Page, options: NavigationOptions = {}) => {
+    const nextPage = page === 'admin' && !user ? 'home' : page;
+    const nextWorkoutTab =
+      options.workoutTab ?? (nextPage === 'workout' ? workoutTab : 'routine');
+    const nextRoutineSubTab =
+      options.routineSubTab ??
+      (nextPage === 'workout' && nextWorkoutTab === 'routine' ? routineSubTab : 'planner');
+
+    setCurrentPage(nextPage);
+    setWorkoutTab(nextWorkoutTab);
+    setRoutineSubTab(nextRoutineSubTab);
+    setShowMyPage(false);
+    setShowNotifications(false);
+    writeAppLocation(nextPage, nextWorkoutTab, nextRoutineSubTab, options.replace);
+  };
+
+  const handleWorkoutViewChange = (nextWorkoutTab: WorkoutTab, nextRoutineSubTab: RoutineSubTab) => {
+    setWorkoutTab(nextWorkoutTab);
+    setRoutineSubTab(nextRoutineSubTab);
+
+    if (currentPage === 'workout') {
+      writeAppLocation('workout', nextWorkoutTab, nextRoutineSubTab, true);
+    }
+  };
+
+  const closeSignupPage = () => {
+    setIsSignupPage(false);
+    writeAppLocation(currentPage, workoutTab, routineSubTab, true);
+  };
 
   const handleLoginSuccessWithSlides = (loggedInUser: any) => {
     handleLoginSuccess(loggedInUser);
@@ -59,20 +194,24 @@ export default function App() {
   const handleLogoutWithRedirect = () => {
     handleLogout();
     setShowMyPage(false);
+    setShowNotifications(false);
     setCurrentPage('home');
+    setWorkoutTab('routine');
+    setRoutineSubTab('planner');
+    writeAppLocation('home', 'routine', 'planner', true);
     alert(t('auth.logged_out'));
   };
 
-  const handleGuestNavigate = (page: Page) => {
-    setCurrentPage(page === 'admin' ? 'home' : page);
+  const handleGuestNavigate = (page: Page, options?: NavigationOptions) => {
+    navigateTo(page === 'admin' ? 'home' : page, options);
   };
 
   // ── 회원가입 페이지 ──────────────────────────────────────────
   if (isSignupPage) {
     return (
       <SignupPage
-        onClose={() => setIsSignupPage(false)}
-        onLoginClick={() => setIsSignupPage(false)}
+        onClose={closeSignupPage}
+        onLoginClick={closeSignupPage}
       />
     );
   }
@@ -90,7 +229,15 @@ export default function App() {
   const renderGuestPage = () => {
     switch (currentPage) {
       case 'home':        return <HomePage user={null} onNavigate={handleGuestNavigate} />;
-      case 'workout':     return <WorkoutGuide user={null} />;
+      case 'workout':
+        return (
+          <WorkoutGuide
+            user={null}
+            initialTab={workoutTab}
+            initialRoutineSubTab={routineSubTab}
+            onViewChange={handleWorkoutViewChange}
+          />
+        );
       case 'competition': return <CompetitionPage user={null} />;
       case 'routine':     return <RoutinePlanner user={null} />;
       case 'progress':    return <Progress user={null} onNavigate={handleGuestNavigate} />;
@@ -113,6 +260,8 @@ export default function App() {
           onSignupClick={() => setIsSignupPage(true)}
           onMyPageClick={() => setShowLoginDialog(true)}
           onNotificationsClick={() => setShowLoginDialog(true)}
+          showBackButton={currentPage !== 'home'}
+          onBack={() => navigateTo('home')}
         />
 
         <main className="flex-1 overflow-y-auto pt-18 scroll-smooth pb-24 md:pb-0">
@@ -149,15 +298,23 @@ export default function App() {
      }
 
     switch (currentPage) {
-      case 'home':        return <HomePage user={user} onNavigate={setCurrentPage} />;
-      case 'workout':     return <WorkoutGuide user={user} />;
+      case 'home':        return <HomePage user={user} onNavigate={navigateTo} />;
+      case 'workout':
+        return (
+          <WorkoutGuide
+            user={user}
+            initialTab={workoutTab}
+            initialRoutineSubTab={routineSubTab}
+            onViewChange={handleWorkoutViewChange}
+          />
+        );
       case 'competition': return <CompetitionPage user={user} />;
       case 'routine':     return <RoutinePlanner user={user} />;
-      case 'progress':    return <Progress user={user} onNavigate={setCurrentPage} />;
+      case 'progress':    return <Progress user={user} onNavigate={navigateTo} />;
       case 'diet':        return <Diet user={user} />;
       case 'board':       return <Board user={user} />;
-      case 'admin':       return <AdminDashboard onBack={() => setCurrentPage('home')} />;
-      default:            return <HomePage user={user} onNavigate={setCurrentPage} />;
+      case 'admin':       return <AdminDashboard onBack={() => navigateTo('home')} />;
+      default:            return <HomePage user={user} onNavigate={navigateTo} />;
     }
   };
 
@@ -172,17 +329,13 @@ export default function App() {
       <Header
         user={user}
         currentPage={currentPage}
-        onNavigate={(page) => {
-          setCurrentPage(page);
-          setShowMyPage(false);
-          setShowNotifications(false);
-        }}
+        onNavigate={navigateTo}
         onLogout={handleLogoutWithRedirect}
         onLoginSuccess={handleLoginSuccessWithSlides}
         onMyPageClick={() => setShowMyPage(true)}
         onNotificationsClick={() => { setShowNotifications(true); setShowMyPage(false); }}
-        showBackButton={showMyPage || showNotifications}
-        onBack={() => { setCurrentPage('home'); setShowMyPage(false); setShowNotifications(false); }}
+        showBackButton={showMyPage || showNotifications || currentPage !== 'home'}
+        onBack={() => navigateTo('home')}
       />
 
       <main className={`flex-1 overflow-y-auto pt-18 scroll-smooth ${showBottomNav ? 'pb-24 md:pb-0' : ''}`}>
@@ -191,7 +344,14 @@ export default function App() {
             {showNotifications ? (
               <NotificationsPage />
             ) : showMyPage ? (
-              <MyPage user={user} onBack={() => setShowMyPage(false)} onAdminClick={() => { setShowMyPage(false); setCurrentPage('admin'); }} />
+              <MyPage
+                user={user}
+                onBack={() => navigateTo('home')}
+                onAdminClick={() => {
+                  setShowMyPage(false);
+                  navigateTo('admin');
+                }}
+              />
             ) : (
               renderPage()
             )}
@@ -203,11 +363,7 @@ export default function App() {
         <div className="md:hidden">
           <Navigation
             currentPage={currentPage}
-            onNavigate={(page) => {
-              setCurrentPage(page);
-              setShowMyPage(false);
-              setShowNotifications(false);
-            }}
+            onNavigate={navigateTo}
           />
         </div>
       )}

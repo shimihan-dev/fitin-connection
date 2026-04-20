@@ -19,10 +19,17 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 
 type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board';
+type WorkoutTab = 'routine' | 'running' | 'diet';
+type RoutineSubTab = 'planner' | 'upper' | 'lower';
+
+interface NavigateOptions {
+  workoutTab?: WorkoutTab;
+  routineSubTab?: RoutineSubTab;
+}
 
 interface HomePageProps {
   user: { name: string; email: string; profile_picture?: string } | null;
-  onNavigate: (page: Page) => void;
+  onNavigate: (page: Page, options?: NavigateOptions) => void;
 }
 
 interface WorkoutLog {
@@ -462,6 +469,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
       body: copy.topCards.running.body,
       icon: Footprints,
       page: 'workout' as Page,
+      navigation: { workoutTab: 'running' as WorkoutTab },
       accentClass: 'from-[#0f172a] via-[#164fbb] to-[#56a6ff]',
       chipClass: 'bg-white/18 text-white',
       metrics: [
@@ -476,7 +484,8 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
       title: copy.topCards.gym.title,
       body: copy.topCards.gym.body,
       icon: Dumbbell,
-      page: 'routine' as Page,
+      page: 'workout' as Page,
+      navigation: { workoutTab: 'routine' as WorkoutTab, routineSubTab: 'planner' as RoutineSubTab },
       accentClass: 'from-[#30261d] via-[#6e4b22] to-[#d39746]',
       chipClass: 'bg-white/18 text-white',
       metrics: [
@@ -492,6 +501,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
       body: copy.topCards.sbd.body,
       icon: Trophy,
       page: 'competition' as Page,
+      navigation: undefined,
       accentClass: 'from-[#121418] via-[#1e2c44] to-[#394f7e]',
       chipClass: 'bg-white/18 text-white',
       metrics: [
@@ -541,21 +551,90 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-8"
           >
-            <header className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px] xl:items-stretch">
-              <div>
-                <p className="apple-kicker">{copy.heroKicker}</p>
-                <h1 className="mt-4 text-[clamp(2.25rem,4.8vw,4.5rem)] font-black leading-[0.94] tracking-[-0.08em] text-foreground">
-                  {greeting}
-                  <span className="text-primary">.</span>
-                </h1>
-                <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
-                  {dateLabel}. {copy.heroBody}
-                </p>
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-foreground/74 sm:text-base">
-                  {copy.heroLead}
-                </p>
+            <header className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px] xl:items-start">
+              <div className="space-y-6">
+                <div>
+                  <p className="apple-kicker">{copy.heroKicker}</p>
+                  <h1 className="mt-4 text-[clamp(2.25rem,4.8vw,4.5rem)] font-black leading-[0.94] tracking-[-0.08em] text-foreground">
+                    {greeting}
+                    <span className="text-primary">.</span>
+                  </h1>
+                  <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
+                    {dateLabel}. {copy.heroBody}
+                  </p>
+                  <p className="mt-4 max-w-2xl text-sm leading-6 text-foreground/74 sm:text-base">
+                    {copy.heroLead}
+                  </p>
+                </div>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between px-1">
+                    <div>
+                      <p className="apple-kicker">{copy.quickAccess}</p>
+                      <h2 className="mt-2 text-[1.95rem] font-black tracking-[-0.06em] text-foreground">
+                        Running, Gym, SBD
+                      </h2>
+                      <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy.quickAccessBody}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 lg:grid-cols-3">
+                    {topCards.map((card) => {
+                      const Icon = card.icon;
+
+                      return (
+                        <button
+                          key={card.title}
+                          type="button"
+                          onClick={() => onNavigate(card.page, card.navigation)}
+                          className={`group relative overflow-hidden rounded-[34px] bg-gradient-to-br ${card.accentClass} p-6 text-left text-white shadow-[0_24px_70px_rgba(15,23,42,0.16)] transition-transform hover:-translate-y-1 sm:p-7`}
+                        >
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.22),transparent_30%),radial-gradient(circle_at_84%_22%,rgba(255,255,255,0.14),transparent_24%)]" />
+                          <div className="relative flex h-full flex-col">
+                            <div className="flex items-start justify-between gap-4">
+                              <div>
+                                <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] ${card.chipClass}`}>
+                                  {copy.quickAccess}
+                                </span>
+                                <h3 className="mt-4 text-[2rem] font-black tracking-[-0.06em]">{card.title}</h3>
+                              </div>
+                              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/14">
+                                <Icon className="h-5 w-5" />
+                              </span>
+                            </div>
+
+                            <p className="mt-5 max-w-[30ch] text-sm leading-6 text-white/78">{card.body}</p>
+
+                            <div className="mt-6 grid gap-3">
+                              {card.metrics.map((metric) => (
+                                <div key={metric.label} className="rounded-[22px] border border-white/16 bg-white/10 px-4 py-4 backdrop-blur-md">
+                                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/64">{metric.label}</p>
+                                  <p className="mt-2 text-xl font-black tracking-[-0.04em]">{metric.value}</p>
+                                </div>
+                              ))}
+                            </div>
+
+                            {card.notice ? (
+                              <div className="mt-5 rounded-[22px] border border-white/14 bg-black/14 px-4 py-4 text-sm leading-6 text-white/78">
+                                {card.notice}
+                              </div>
+                            ) : null}
+
+                            <div className="mt-auto pt-6">
+                              <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                                {card.cta}
+                                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                              </div>
+                              <p className="mt-2 text-xs uppercase tracking-[0.16em] text-white/56">{card.footer}</p>
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-3">
                   <div className="apple-micro-card">
                     <p className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                       {copy.summaryStats[0]}
@@ -602,7 +681,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                 <div className="mt-6 flex flex-wrap gap-3">
                   <button
                     type="button"
-                    onClick={() => onNavigate('workout')}
+                    onClick={() => onNavigate('workout', { workoutTab: 'running' })}
                     className="apple-ghost-button gap-2 px-5"
                   >
                     <Footprints className="h-4 w-4 text-primary" />
@@ -619,73 +698,6 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                 </div>
               </div>
             </header>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between px-1">
-                <div>
-                  <p className="apple-kicker">{copy.quickAccess}</p>
-                  <h2 className="mt-2 text-[1.95rem] font-black tracking-[-0.06em] text-foreground">
-                    Running, Gym, IGC SBD
-                  </h2>
-                  <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy.quickAccessBody}</p>
-                </div>
-              </div>
-
-              <div className="grid gap-6 xl:grid-cols-3">
-                {topCards.map((card) => {
-                  const Icon = card.icon;
-
-                  return (
-                    <button
-                      key={card.title}
-                      type="button"
-                      onClick={() => onNavigate(card.page)}
-                      className={`group relative overflow-hidden rounded-[34px] bg-gradient-to-br ${card.accentClass} p-6 text-left text-white shadow-[0_24px_70px_rgba(15,23,42,0.16)] transition-transform hover:-translate-y-1 sm:p-7`}
-                    >
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.22),transparent_30%),radial-gradient(circle_at_84%_22%,rgba(255,255,255,0.14),transparent_24%)]" />
-                      <div className="relative flex h-full flex-col">
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] ${card.chipClass}`}>
-                              {copy.quickAccess}
-                            </span>
-                            <h3 className="mt-4 text-[2rem] font-black tracking-[-0.06em]">{card.title}</h3>
-                          </div>
-                          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/14">
-                            <Icon className="h-5 w-5" />
-                          </span>
-                        </div>
-
-                        <p className="mt-5 max-w-[30ch] text-sm leading-6 text-white/78">{card.body}</p>
-
-                        <div className="mt-6 grid gap-3">
-                          {card.metrics.map((metric) => (
-                            <div key={metric.label} className="rounded-[22px] border border-white/16 bg-white/10 px-4 py-4 backdrop-blur-md">
-                              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/64">{metric.label}</p>
-                              <p className="mt-2 text-xl font-black tracking-[-0.04em]">{metric.value}</p>
-                            </div>
-                          ))}
-                        </div>
-
-                        {card.notice ? (
-                          <div className="mt-5 rounded-[22px] border border-white/14 bg-black/14 px-4 py-4 text-sm leading-6 text-white/78">
-                            {card.notice}
-                          </div>
-                        ) : null}
-
-                        <div className="mt-auto pt-6">
-                          <div className="flex items-center gap-2 text-sm font-semibold text-white">
-                            {card.cta}
-                            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                          </div>
-                          <p className="mt-2 text-xs uppercase tracking-[0.16em] text-white/56">{card.footer}</p>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
           </motion.section>
 
           <motion.section

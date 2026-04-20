@@ -39,7 +39,13 @@ interface WorkoutLog {
 
 interface WorkoutGuideProps {
   user: { name: string; email: string } | null;
+  initialTab?: WorkoutTab;
+  initialRoutineSubTab?: RoutineSubTab;
+  onViewChange?: (selectedTab: WorkoutTab, routineSubTab: RoutineSubTab) => void;
 }
+
+type WorkoutTab = 'routine' | 'running' | 'diet';
+type RoutineSubTab = 'planner' | 'upper' | 'lower';
 
 // 근육 그룹 데이터
 const muscleGroups: Record<string, MuscleGroup[]> = {
@@ -170,9 +176,14 @@ const muscleGroups: Record<string, MuscleGroup[]> = {
   ],
 };
 
-export function WorkoutGuide({ user }: WorkoutGuideProps) {
-  const [selectedTab, setSelectedTab] = useState('routine');
-  const [routineSubTab, setRoutineSubTab] = useState('planner'); // 'planner', 'upper', 'lower'
+export function WorkoutGuide({
+  user,
+  initialTab = 'routine',
+  initialRoutineSubTab = 'planner',
+  onViewChange,
+}: WorkoutGuideProps) {
+  const [selectedTab, setSelectedTab] = useState<WorkoutTab>(initialTab);
+  const [routineSubTab, setRoutineSubTab] = useState<RoutineSubTab>(initialRoutineSubTab);
   const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
   const [showLogDialog, setShowLogDialog] = useState(false);
@@ -238,6 +249,18 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
   const [runningDistance, setRunningDistance] = useState('');
   const [runningDuration, setRunningDuration] = useState('');
   const [runningPace, setRunningPace] = useState('');
+
+  useEffect(() => {
+    setSelectedTab(initialTab);
+    if (initialTab === 'routine') {
+      setRoutineSubTab(initialRoutineSubTab);
+    }
+  }, [initialTab, initialRoutineSubTab]);
+
+  useEffect(() => {
+    if (!onViewChange) return;
+    onViewChange(selectedTab, routineSubTab);
+  }, [routineSubTab, selectedTab]);
 
   const saveRunningRecords = (records: RunningRecord[]) => {
     setRunningRecords(records);
@@ -573,7 +596,7 @@ export function WorkoutGuide({ user }: WorkoutGuideProps) {
         </div>
       </motion.div>
 
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
+      <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value as WorkoutTab)} className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="routine">루틴</TabsTrigger>
           <TabsTrigger value="running">러닝</TabsTrigger>
