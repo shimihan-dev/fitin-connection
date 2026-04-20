@@ -378,12 +378,6 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
     return `Your evening routine is ready, ${name}`;
   })();
 
-  const dateLabel = new Intl.DateTimeFormat(isKorean ? 'ko-KR' : 'en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  }).format(now);
-
   const weeklyWorkoutLogs = storedWorkouts.filter((workout) => new Date(workout.date) >= startOfWeek);
   const runningWorkoutLogs = weeklyWorkoutLogs.filter((workout) => runningPattern.test(workout.type));
   const gymWorkoutLogs = weeklyWorkoutLogs.filter((workout) => !runningPattern.test(workout.type));
@@ -555,16 +549,10 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
               <div className="space-y-6">
                 <div>
                   <p className="apple-kicker">{copy.heroKicker}</p>
-                  <h1 className="mt-4 text-[clamp(2.25rem,4.8vw,4.5rem)] font-black leading-[0.94] tracking-[-0.08em] text-foreground">
+                  <h1 className="mt-4 max-w-full whitespace-nowrap text-[1.15rem] font-black leading-[0.94] tracking-[-0.05em] text-foreground sm:text-[clamp(2.25rem,4.8vw,4.15rem)] sm:tracking-[-0.08em]">
                     {greeting}
                     <span className="text-primary">.</span>
                   </h1>
-                  <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
-                    {dateLabel}. {copy.heroBody}
-                  </p>
-                  <p className="mt-4 max-w-2xl text-sm leading-6 text-foreground/74 sm:text-base">
-                    {copy.heroLead}
-                  </p>
                 </div>
 
                 <div className="space-y-4">
@@ -574,7 +562,6 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                       <h2 className="mt-2 text-[1.95rem] font-black tracking-[-0.06em] text-foreground">
                         Running, Gym, SBD
                       </h2>
-                      <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy.quickAccessBody}</p>
                     </div>
                   </div>
 
@@ -664,27 +651,15 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                 </div>
               </div>
 
-              <div className="apple-panel flex flex-col justify-between p-6 sm:p-7">
+              <div className="apple-panel flex flex-col gap-6 p-6 sm:p-7">
                 <div>
                   <p className="apple-kicker">{copy.quickAccess}</p>
                   <h2 className="mt-3 text-[1.8rem] font-black tracking-[-0.06em] text-foreground">
                     Fitin Connection
                   </h2>
-                  <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy.quickAccessBody}</p>
                 </div>
 
-                <div className="mt-6 space-y-3">
-                  {copy.heroNotes.map((note) => (
-                    <div key={note.title} className="apple-soft-card px-4 py-4">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-                        {note.title}
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-foreground/76">{note.body}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-6 flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3">
                   <button
                     type="button"
                     onClick={() => onNavigate('workout', { workoutTab: 'running' })}
@@ -718,7 +693,6 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                   <h2 className="mt-3 text-[2rem] font-black tracking-[-0.06em] text-foreground">
                     {copy.weeklyReportTitle}
                   </h2>
-                  <p className="mt-3 text-base leading-7 text-muted-foreground">{copy.weeklyReportBody}</p>
                 </div>
 
                 <div className="space-y-3">
@@ -864,8 +838,6 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                 </span>
               </div>
 
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy.storiesBody}</p>
-
               <div className="mt-6 space-y-4">
                 {copy.reviews.map((review) => (
                   <div key={review.name} className="apple-soft-card p-5">
@@ -896,8 +868,6 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                   <ClipboardCheck className="h-5 w-5" />
                 </span>
               </div>
-
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy.mentoringBody}</p>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 {copy.mentoringSteps.map((step, index) => (
@@ -999,7 +969,6 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
                 <h2 className="mt-5 text-[1.95rem] font-black tracking-[-0.06em] text-white">
                   {copy.scheduleTitle}
                 </h2>
-                <p className="mt-2 text-sm leading-6 text-white/68">{copy.scheduleBody}</p>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
