@@ -5,6 +5,7 @@ import {
   BookOpen,
   ChevronRight,
   Globe,
+  Home,
   Instagram,
   LogOut,
   Menu,
@@ -37,6 +38,7 @@ const iconButtonClass =
   'flex h-10 w-10 items-center justify-center rounded-full bg-white/78 text-foreground shadow-[0_12px_24px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-white';
 const instagramUrl =
   'https://www.instagram.com/fitinconnection_official?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==';
+const homepageUrl = '#'; // 링크 추후 업데이트 예정
 
 const navItems: { id: Page; label: string; match: (page?: Page) => boolean }[] = [
   { id: 'home', label: 'Dashboard', match: (page) => page === 'home' },
@@ -117,6 +119,15 @@ export function Header({
           </nav>
 
           <div className="ml-auto hidden items-center gap-2 md:flex">
+            <a
+              href={homepageUrl}
+              target="_blank"
+              rel="noreferrer"
+              className={iconButtonClass}
+              aria-label="Open Homepage"
+            >
+              <Home className="h-4 w-4" />
+            </a>
             <a
               href={instagramUrl}
               target="_blank"
@@ -205,6 +216,15 @@ export function Header({
                 {t('common.login')}
               </button>
             )}
+            <a
+              href={homepageUrl}
+              target="_blank"
+              rel="noreferrer"
+              className={iconButtonClass}
+              aria-label="Open Homepage"
+            >
+              <Home className="h-4 w-4" />
+            </a>
             <a
               href={instagramUrl}
               target="_blank"
