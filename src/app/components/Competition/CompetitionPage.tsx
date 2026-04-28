@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Leaderboard } from './Leaderboard';
 import { RecordSubmission } from './RecordSubmission';
 import { SBDRecord } from '../../types/competition';
-import { supabase } from '../../../utils/supabase/client';
+import { supabase } from '../../../../utils/supabase/client';
 import { useAuth } from '../../contexts/AuthContext';
 
 export function CompetitionPage() {

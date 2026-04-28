@@ -123,9 +123,6 @@ export function Progress({ user, onNavigate }: ProgressProps) {
       return [];
     }
   });
-  const [showAddDialog, setShowAddDialog] = useState(false);
-  const [newWorkoutType, setNewWorkoutType] = useState('');
-  const [newWorkoutMinutes, setNewWorkoutMinutes] = useState(30);
 
   const [weeklyReport, setWeeklyReport] = useState<string | null>(null);
   const [reportLoading, setReportLoading] = useState(false);
