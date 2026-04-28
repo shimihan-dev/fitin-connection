@@ -1,27 +1,76 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Leaderboard } from './Leaderboard';
 import { RecordSubmission } from './RecordSubmission';
-import { SBDRecord, INITIAL_RECORDS } from '../../types/competition';
+import { SBDRecord } from '../../types/competition';
+import { supabase } from '../../../utils/supabase/client';
+import { useAuth } from '../../contexts/AuthContext';
 
-interface CompetitionPageProps {
-    user: { name: string; email: string } | null;
-}
+export function CompetitionPage() {
+    const { user } = useAuth();
+    const [records, setRecords] = useState<SBDRecord[]>([]);
 
-export function CompetitionPage({ user }: CompetitionPageProps) {
-    const [records, setRecords] = useState<SBDRecord[]>(INITIAL_RECORDS);
+    const fetchRecords = async () => {
+        const { data, error } = await supabase
+            .from('sbd_records')
+            .select(`
+                id,
+                squat,
+                bench,
+                deadlift,
+                total,
+                date,
+                user_id,
+                users (name, university, profile_picture)
+            `)
+            .order('total', { ascending: false });
 
-    const handleRecordSubmit = (newRecord: Omit<SBDRecord, 'id' | 'date'>) => {
-        const record: SBDRecord = {
-            ...newRecord,
-            id: Date.now().toString(),
-            date: new Date().toISOString().split('T')[0],
-        };
+        if (error) {
+            console.error('Error fetching SBD records:', error);
+            return;
+        }
 
-        // Update if user already has a record, otherwise add new
-        setRecords(prev => {
-            const existingFilter = prev.filter(r => r.userId !== newRecord.userId);
-            return [...existingFilter, record];
-        });
+        if (data) {
+            const mappedRecords: SBDRecord[] = data.map((d: any) => ({
+                id: d.id,
+                userId: d.user_id,
+                userName: d.users?.name || 'Unknown',
+                university: d.users?.university || '',
+                profilePicture: d.users?.profile_picture,
+                squat: d.squat,
+                bench: d.bench,
+                deadlift: d.deadlift,
+                total: d.total,
+                date: d.date
+            }));
+            setRecords(mappedRecords);
+        }
+    };
+
+    useEffect(() => {
+        fetchRecords();
+    }, []);
+
+    const handleRecordSubmit = async (newRecord: Omit<SBDRecord, 'id' | 'date'>) => {
+        if (!user) return;
+        
+        const { error } = await supabase
+            .from('sbd_records')
+            .insert({
+                user_id: user.id || newRecord.userId,
+                squat: newRecord.squat,
+                bench: newRecord.bench,
+                deadlift: newRecord.deadlift,
+                total: newRecord.total,
+                date: new Date().toISOString()
+            });
+
+        if (error) {
+            alert('기록 제출에 실패했습니다.');
+            console.error(error);
+        } else {
+            alert('기록이 성공적으로 제출되었습니다!');
+            fetchRecords();
+        }
     };
 
     return (
@@ -34,7 +83,6 @@ export function CompetitionPage({ user }: CompetitionPageProps) {
                     5개 대학 대표들의 뜨거운 경쟁! 당신의 한계를 도전하고 학교의 명예를 드높이세요.
                 </p>
             </div>
-
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
                     <Leaderboard records={records} />
@@ -52,7 +100,6 @@ export function CompetitionPage({ user }: CompetitionPageProps) {
                                 <p className="text-muted-foreground mb-4">기록을 제출하려면 로그인이 필요합니다.</p>
                             </div>
                         )}
-
                         <div className="mt-8 bg-gradient-to-br from-violet-600/20 to-purple-600/20 border border-violet-500/30 rounded-2xl p-6 shadow-xl">
                             <h3 className="font-bold text-lg mb-2 text-foreground">🔥 동기부여 명언</h3>
                             <p className="italic text-muted-foreground">"운동은 끝나고 나서야 비로소 시작된다. 그 전까진 그저 몸풀기일 뿐이다."</p>

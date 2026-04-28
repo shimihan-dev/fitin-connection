@@ -19,11 +19,12 @@ const MyPage          = lazy(() => import('./components/MyPage').then(m => ({ de
 const NotificationsPage = lazy(() => import('./components/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
 const CompetitionPage = lazy(() => import('./components/Competition/CompetitionPage').then(m => ({ default: m.CompetitionPage })));
 const AdminDashboard  = lazy(() => import('./components/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const CalendarPage    = lazy(() => import('./components/CalendarPage').then(m => ({ default: m.CalendarPage })));
+const LeaguePage      = lazy(() => import('./components/LeaguePage').then(m => ({ default: m.LeaguePage })));
 
-// PT 기능 (Phase 4 - 나중에 추가)
 const TrainerDashboard = lazy(() => import('./components/TrainerDashboard'));
 
-type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board' | 'admin';
+type Page = 'home' | 'workout' | 'routine' | 'progress' | 'diet' | 'competition' | 'board' | 'admin' | 'calendar' | 'league';
 type WorkoutTab = 'routine' | 'running' | 'diet';
 type RoutineSubTab = 'planner' | 'upper' | 'lower';
 
@@ -40,7 +41,7 @@ interface NavigationOptions {
   replace?: boolean;
 }
 
-const appPages: Page[] = ['home', 'workout', 'routine', 'progress', 'diet', 'competition', 'board', 'admin'];
+const appPages: Page[] = ['home', 'workout', 'routine', 'progress', 'diet', 'competition', 'board', 'admin', 'calendar', 'league'];
 const workoutTabs: WorkoutTab[] = ['routine', 'running', 'diet'];
 const routineSubTabs: RoutineSubTab[] = ['planner', 'upper', 'lower'];
 
@@ -238,11 +239,13 @@ export default function App() {
             onViewChange={handleWorkoutViewChange}
           />
         );
-      case 'competition': return <CompetitionPage user={null} />;
+      case 'competition': return <CompetitionPage />;
       case 'routine':     return <RoutinePlanner user={null} />;
       case 'progress':    return <Progress user={null} onNavigate={handleGuestNavigate} />;
       case 'diet':        return <Diet user={null} />;
       case 'board':       return <Board user={null} />;
+      case 'calendar':    return <CalendarPage />;
+      case 'league':      return <LeaguePage />;
       default:            return <HomePage user={null} onNavigate={handleGuestNavigate} />;
     }
   };
@@ -308,12 +311,14 @@ export default function App() {
             onViewChange={handleWorkoutViewChange}
           />
         );
-      case 'competition': return <CompetitionPage user={user} />;
+      case 'competition': return <CompetitionPage />;
       case 'routine':     return <RoutinePlanner user={user} />;
       case 'progress':    return <Progress user={user} onNavigate={navigateTo} />;
       case 'diet':        return <Diet user={user} />;
       case 'board':       return <Board user={user} />;
       case 'admin':       return <AdminDashboard onBack={() => navigateTo('home')} />;
+      case 'calendar':    return <CalendarPage />;
+      case 'league':      return <LeaguePage />;
       default:            return <HomePage user={user} onNavigate={navigateTo} />;
     }
   };

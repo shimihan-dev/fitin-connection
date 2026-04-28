@@ -110,6 +110,11 @@ export function Progress({ user, onNavigate }: ProgressProps) {
       };
 
   const [timeRange, setTimeRange] = useState<'week' | 'month'>('week');
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [newWorkoutType, setNewWorkoutType] = useState('');
+  const [newWorkoutMinutes, setNewWorkoutMinutes] = useState(30);
+
+  // 운동 로그 (로컬스토리지 기반)
   const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>(() => {
     try {
       const saved = localStorage.getItem(`workouts_${user?.email}`);
@@ -122,11 +127,51 @@ export function Progress({ user, onNavigate }: ProgressProps) {
   const [newWorkoutType, setNewWorkoutType] = useState('');
   const [newWorkoutMinutes, setNewWorkoutMinutes] = useState(30);
 
+  const [weeklyReport, setWeeklyReport] = useState<string | null>(null);
+  const [reportLoading, setReportLoading] = useState(false);
+
   useEffect(() => {
     if (user?.email) {
       localStorage.setItem(`workouts_${user.email}`, JSON.stringify(workoutLogs));
     }
   }, [workoutLogs, user?.email]);
+
+  // Task 4: AI 주간 리포트 API 페칭 및 캐싱 처리
+  useEffect(() => {
+    if (!user?.email) return;
+
+    const todayString = new Date().toISOString().split('T')[0];
+    const cacheKey = `weekly_report_text_${user.email}_${todayString}`;
+    const cachedReport = localStorage.getItem(cacheKey);
+
+    if (cachedReport) {
+      setWeeklyReport(cachedReport);
+      return;
+    }
+
+    setReportLoading(true);
+    fetch('/api/weekly-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.id || user.email })
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('API request failed');
+        return res.json();
+      })
+      .then((data) => {
+        const report = data.report || (isKorean ? '훌륭한 한 주였습니다! 계속 이 흐름을 유지하세요.' : 'Great week! Keep up the good work.');
+        setWeeklyReport(report);
+        localStorage.setItem(cacheKey, report);
+      })
+      .catch((err) => {
+        console.error('Failed to load weekly report', err);
+        setWeeklyReport(isKorean ? '주간 리포트를 불러오지 못했습니다.' : 'Could not fetch weekly report.');
+      })
+      .finally(() => {
+        setReportLoading(false);
+      });
+  }, [user]);
 
   const seed = getSeed(user?.email || user?.name || 'fitin');
   const sortedLogs = useMemo(
@@ -298,6 +343,27 @@ export function Progress({ user, onNavigate }: ProgressProps) {
             </header>
 
             <div className="grid gap-6 xl:grid-cols-12">
+              {/* === Task 4: AI 주간 리포트 렌더링 영역 === */}
+              <div className="apple-panel xl:col-span-12 p-6 sm:p-8 bg-blue-50/40 border border-blue-500/20">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="bg-blue-600 text-white p-1.5 rounded-lg">
+                    <span className="w-5 h-5 flex items-center justify-center font-bold">AI</span>
+                  </div>
+                  <h3 className="font-extrabold text-xl text-blue-900 tracking-tight">AI 주간 리포트</h3>
+                </div>
+                {reportLoading ? (
+                  <div className="space-y-3 animate-pulse mt-2">
+                    <div className="h-4 bg-blue-200/50 rounded w-full"></div>
+                    <div className="h-4 bg-blue-200/50 rounded w-11/12"></div>
+                    <div className="h-4 bg-blue-200/50 rounded w-4/5"></div>
+                  </div>
+                ) : (
+                  <p className="text-[15px] leading-relaxed text-blue-800/80 font-medium">
+                    {weeklyReport}
+                  </p>
+                )}
+              </div>
+
               <div className="apple-panel xl:col-span-8 p-6 sm:p-8">
                 <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-primary/6 blur-3xl" />
                 <div className="relative flex flex-col">
