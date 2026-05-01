@@ -2,18 +2,21 @@ import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import {
   ArrowUpRight,
-  Award,
-  ClipboardCheck,
   Dumbbell,
   Footprints,
-  Medal,
+  ClipboardCheck,
   Star,
   Trophy,
 } from 'lucide-react';
 import { getGlobalSetting } from '../../../utils/globalSettings';
+import {
+  getWeeklyTierMeta,
+  weeklyMemberProfiles,
+} from '../data/weeklyMemberProfiles';
 import { useLanguage } from '../contexts/LanguageContext';
 import { INITIAL_RECORDS, UNIVERSITIES } from '../types/competition';
 import { DashboardRail } from './DashboardRail';
+import { WeeklyLeaderboardPanel } from './WeeklyLeaderboardPanel';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
@@ -48,51 +51,12 @@ interface RunningRecord {
   pace: string;
 }
 
-interface WeeklyEntry {
-  name: string;
-  focus: string;
-  score: number;
-}
-
 const mondayBasedIndex = (date: Date) => (date.getDay() + 6) % 7;
 
 const getSeed = (value: string) =>
   value.split('').reduce((acc, char, index) => acc + char.charCodeAt(0) * (index + 1), 0);
 
 const runningPattern = /(run|running|러닝|조깅)/i;
-
-const tierThresholds = [
-  {
-    key: 'bronze',
-    min: 0,
-    label: 'Bronze',
-    rewardKo: '커뮤니티 배지 + 오픈짐 체크인 1회',
-    rewardEn: 'Community badge + 1 open gym check-in',
-    cardClass: 'border-[#d9b38c] bg-[#f6ebe0]',
-    chipClass: 'bg-[#8f5d34] text-white',
-    textClass: 'text-[#8f5d34]',
-  },
-  {
-    key: 'silver',
-    min: 260,
-    label: 'Silver',
-    rewardKo: '오픈짐 우선 예약 + 리뷰 배지',
-    rewardEn: 'Priority open gym booking + review badge',
-    cardClass: 'border-slate-300 bg-slate-100',
-    chipClass: 'bg-slate-600 text-white',
-    textClass: 'text-slate-600',
-  },
-  {
-    key: 'gold',
-    min: 420,
-    label: 'Gold',
-    rewardKo: 'PT 멘토링 우선 신청 + SBD 이벤트 초대',
-    rewardEn: 'Priority PT mentoring + SBD event invite',
-    cardClass: 'border-amber-300 bg-amber-50',
-    chipClass: 'bg-amber-500 text-slate-950',
-    textClass: 'text-amber-600',
-  },
-];
 
 function parseStoredArray<T>(key: string): T[] {
   if (typeof window === 'undefined') return [];
@@ -105,27 +69,6 @@ function parseStoredArray<T>(key: string): T[] {
   } catch {
     return [];
   }
-}
-
-function getTierMeta(score: number, isKorean: boolean) {
-  const tier =
-    [...tierThresholds].reverse().find((item) => score >= item.min) ?? tierThresholds[0];
-
-  return {
-    ...tier,
-    reward: isKorean ? tier.rewardKo : tier.rewardEn,
-  };
-}
-
-function getNextTier(score: number, isKorean: boolean) {
-  const nextTier = tierThresholds.find((item) => score < item.min);
-  if (!nextTier) return null;
-
-  return {
-    ...nextTier,
-    reward: isKorean ? nextTier.rewardKo : nextTier.rewardEn,
-    remaining: nextTier.min - score,
-  };
 }
 
 export function HomePage({ user, onNavigate }: HomePageProps) {
@@ -412,8 +355,7 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
     }
   }
 
-  const tierMeta = getTierMeta(weeklyScore, isKorean);
-  const nextTier = getNextTier(weeklyScore, isKorean);
+  const tierMeta = getWeeklyTierMeta(weeklyScore, isKorean);
 
   const topLifter = [...INITIAL_RECORDS].sort((a, b) => b.total - a.total)[0];
   const universityRankings = UNIVERSITIES.map((uni) => {
@@ -428,34 +370,6 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
   }).sort((a, b) => b.average - a.average);
   const topUniversity = universityRankings[0];
   const sbdNotice = sbdStatusText || copy.sbdNoticeFallback;
-
-  const weeklyEntries: WeeklyEntry[] = [
-    {
-      name: user?.name || (isKorean ? '내 기록' : 'My Record'),
-      focus: runningSessions >= gymSessions ? copy.topCards.running.title : copy.topCards.gym.title,
-      score: weeklyScore,
-    },
-    {
-      name: isKorean ? 'Marcus' : 'Marcus',
-      focus: copy.topCards.running.title,
-      score: weeklyScore + 72,
-    },
-    {
-      name: isKorean ? '소연' : 'Soyeon',
-      focus: copy.topCards.sbd.title,
-      score: Math.max(220, weeklyScore - 18),
-    },
-    {
-      name: isKorean ? 'Daniel' : 'Daniel',
-      focus: copy.topCards.gym.title,
-      score: Math.max(200, weeklyScore - 64),
-    },
-    {
-      name: isKorean ? '유진' : 'Eugene',
-      focus: copy.topCards.running.title,
-      score: Math.max(180, weeklyScore - 104),
-    },
-  ].sort((a, b) => b.score - a.score);
 
   const topCards = [
     {
@@ -686,138 +600,10 @@ export function HomePage({ user, onNavigate }: HomePageProps) {
             animate={{ opacity: 1, y: 0 }}
             className="apple-panel p-6 sm:p-8"
           >
-            <div className="grid gap-8 xl:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)]">
-              <div className="space-y-5">
-                <div>
-                  <p className="apple-kicker">{copy.weeklyReportTitle}</p>
-                  <h2 className="mt-3 text-[2rem] font-black tracking-[-0.06em] text-foreground">
-                    {copy.weeklyReportTitle}
-                  </h2>
-                </div>
-
-                <div className="space-y-3">
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    {copy.tierGuideTitle}
-                  </p>
-                  {tierThresholds.map((tier) => (
-                    <div key={tier.key} className={`rounded-[24px] border px-4 py-4 ${tier.cardClass}`}>
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] ${tier.chipClass}`}>
-                            {tier.label}
-                          </span>
-                          <span className="text-sm text-muted-foreground">
-                            {tier.key === 'bronze' ? '0+' : tier.key === 'silver' ? '260+' : '420+'} pt
-                          </span>
-                        </div>
-                        {tierMeta.key === tier.key ? (
-                          <span className="text-sm font-semibold text-foreground">{isKorean ? '현재 티어' : 'Current tier'}</span>
-                        ) : null}
-                      </div>
-                      <p className="mt-3 text-sm leading-6 text-foreground/82">
-                        {isKorean ? tier.rewardKo : tier.rewardEn}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="rounded-[26px] bg-[linear-gradient(135deg,#10131a,#1f3e75)] p-5 text-white shadow-[0_20px_50px_rgba(15,23,42,0.16)]">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/60">
-                        {isKorean ? '이번 주 보상' : 'Weekly reward'}
-                      </p>
-                      <p className="mt-2 text-2xl font-black tracking-[-0.05em]">{tierMeta.label}</p>
-                    </div>
-                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/12">
-                      <Award className="h-5 w-5" />
-                    </span>
-                  </div>
-                  <p className="mt-4 text-sm leading-6 text-white/76">{tierMeta.reward}</p>
-                  <div className="mt-5 rounded-[20px] border border-white/12 bg-white/10 px-4 py-4">
-                    {nextTier ? (
-                      <p className="text-sm leading-6 text-white/78">
-                        {isKorean
-                          ? `${nextTier.label}까지 ${nextTier.remaining}pt 남았어요.`
-                          : `${nextTier.remaining} points left to reach ${nextTier.label}.`}
-                      </p>
-                    ) : (
-                      <p className="text-sm leading-6 text-white/78">
-                        {isKorean ? '최상위 티어를 유지하고 있어요. 지금 흐름을 이어가세요.' : 'You are already in the top tier. Keep the momentum going.'}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="apple-kicker">{copy.weeklyReportTitle}</p>
-                    <h3 className="mt-2 text-[1.7rem] font-black tracking-[-0.05em] text-foreground">
-                      {isKorean ? '주간 순위표' : 'Weekly Leaderboard'}
-                    </h3>
-                  </div>
-                  <span className="apple-chip">
-                    <Medal className="h-3.5 w-3.5" />
-                    {weeklyEntries.length}
-                  </span>
-                </div>
-
-                <div className="overflow-x-auto rounded-[26px] border border-white/80 bg-white/72">
-                  <table className="min-w-full text-left">
-                    <thead className="bg-slate-50/90">
-                      <tr>
-                        {copy.leaderboardColumns.map((column) => (
-                          <th
-                            key={column}
-                            className="whitespace-nowrap px-4 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground"
-                          >
-                            {column}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {weeklyEntries.map((entry, index) => {
-                        const entryTier = getTierMeta(entry.score, isKorean);
-                        const isCurrentUser = entry.name === (user?.name || (isKorean ? '내 기록' : 'My Record'));
-
-                        return (
-                          <tr
-                            key={`${entry.name}_${entry.score}`}
-                            className={`${isCurrentUser ? 'bg-blue-50/70' : 'bg-white/75'} border-t border-slate-100`}
-                          >
-                            <td className="px-4 py-4 text-sm font-bold text-foreground">{index + 1}</td>
-                            <td className="px-4 py-4">
-                              <div className="flex items-center gap-3">
-                                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-foreground">
-                                  {entry.name.charAt(0)}
-                                </span>
-                                <div>
-                                  <p className="text-sm font-semibold text-foreground">{entry.name}</p>
-                                  {isCurrentUser ? (
-                                    <p className="text-xs text-primary">{isKorean ? '내 기록' : 'Your entry'}</p>
-                                  ) : null}
-                                </div>
-                              </div>
-                            </td>
-                            <td className="whitespace-nowrap px-4 py-4 text-sm text-muted-foreground">{entry.focus}</td>
-                            <td className="whitespace-nowrap px-4 py-4 text-sm font-semibold text-foreground">{entry.score} pt</td>
-                            <td className="px-4 py-4">
-                              <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] ${entryTier.chipClass}`}>
-                                {entryTier.label}
-                              </span>
-                            </td>
-                            <td className="min-w-[220px] px-4 py-4 text-sm text-muted-foreground">{entryTier.reward}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+            <WeeklyLeaderboardPanel
+              isKorean={isKorean}
+              profiles={weeklyMemberProfiles}
+            />
           </motion.section>
 
           <motion.section
